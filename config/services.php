@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+    ],
+
+    'ai' => [
+        'base_url' => env('AI_BASE_URL', 'https://models.github.ai/inference'),
+        'model' => env('AI_MODEL', 'openai/gpt-4.1-mini'),
+        'api_key' => env('AI_API_KEY'),
+        'timeout' => 20,
+    ],
+
 ];

@@ -3,11 +3,11 @@
 Single source of truth for "where are we". Read this first in every session. Git is the ground truth: if this file and `git log` disagree, believe git and fix this file.
 
 ## Current state
-- Last completed task: 3 (T003 — install Reverb, Echo, Vite; queue, cache and session drivers)
-- Next task: 4 (T004 Stripe and GitHub Models configuration (config/services.php) — 07.9)
+- Last completed task: 4 (T004 — Stripe and GitHub Models configuration)
+- Next task: 5 (T005 Base Blade layouts: public, customer, staff, admin — 08.7)
 - In progress: none
 - Branch: develop
-- Environment: Laravel 13.17 / PHP ^8.3, MySQL `coolaroo` database, `APP_TIMEZONE=Australia/Melbourne`, `APP_NAME="Coolaroo RMS"`. Auth guards (`customer`/`staff`) configured (T002). Reverb installed and wired: `BROADCAST_CONNECTION=reverb`, `REVERB_*`/`VITE_REVERB_*` set in `.env`/`.env.example`, `config/broadcasting.php` and `config/reverb.php` published, `resources/js/echo.js` created and imported from `resources/js/app.js`, `routes/channels.php` wired into `bootstrap/app.php`. `php artisan reverb:start`, `npm run build`, and `php artisan test` all confirmed working. Stripe/GitHub Models keys not set (T004). No project schema (role/staff/customer/etc.) or Blade views yet.
+- Environment: Laravel 13.17 / PHP ^8.3, MySQL `coolaroo` database, `APP_TIMEZONE=Australia/Melbourne`, `APP_NAME="Coolaroo RMS"`. Auth guards (`customer`/`staff`) configured (T002). Reverb installed and wired: `BROADCAST_CONNECTION=reverb`, `REVERB_*`/`VITE_REVERB_*` set in `.env`/`.env.example`, `config/broadcasting.php` and `config/reverb.php` published, `resources/js/echo.js` created and imported from `resources/js/app.js`, `routes/channels.php` wired into `bootstrap/app.php`. `php artisan reverb:start`, `npm run build`, and `php artisan test` all confirmed working. `config/services.php` has `stripe` and `ai` blocks (T004) — `AI_BASE_URL`/`AI_MODEL` set, but the three real credentials (`STRIPE_KEY`, `STRIPE_SECRET`, `AI_API_KEY`) are still blank in `.env` and must be filled in locally before T070 (Stripe) or T120 (AI) can run against the live APIs. No project schema (role/staff/customer/etc.) or Blade views yet.
 - Blocked: none
 
 ## Open deviations from the SDD
@@ -21,6 +21,12 @@ Single source of truth for "where are we". Read this first in every session. Git
 - Deviation: <FR/BR ID + what changed + why>  (or: none)
 - Follow-up: <what is deliberately left to a later task>
 -->
+
+### 2026-09-19 — Task 4 (T004) — done — Claude Code
+- Added / changed: `config/services.php`, `.env`, `.env.example`, `docs/PROGRESS.md`
+- Notes: Added `stripe` (`key`, `secret`) and `ai` (`base_url`, `model`, `api_key`, `timeout`) blocks per 07.9, with env var names taken from 10.3. `AI_BASE_URL=https://models.github.ai/inference` and `AI_MODEL=openai/gpt-4.1-mini` are set literally in both `.env` and `.env.example` — not secrets, and `config/services.php` carries the same values as fallback defaults. The 20-second GitHub Models timeout from 07.9 is hardcoded in the config rather than given an env var, since 10.3 names none. Deliberately did **not** install `stripe/stripe-php`: nothing calls it until T070, and installing early risks a repeat of T003's Guzzle resolution conflict. GitHub Models needs no package (OpenAI-compatible HTTP, called via Laravel's `Http` client in T120).
+- Deviation: none
+- Follow-up: `STRIPE_KEY`, `STRIPE_SECRET` and `AI_API_KEY` are intentionally blank — real credentials (Stripe **test mode** key pair, GitHub PAT with Models access) must be added to the local `.env` before T070/T120 can hit the live APIs. Never committed (AGENTS.md hard rule 9). `stripe/stripe-php` gets installed in T070.
 
 ### 2026-09-19 — Task 3 (T003) — done — Claude Code
 - Added / changed: `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, `.env`, `.env.example`, `bootstrap/app.php`, `resources/js/app.js`, `routes/channels.php` (new), `config/broadcasting.php` (new), `config/reverb.php` (new), `resources/js/echo.js` (new), `docs/PROGRESS.md`
