@@ -19,7 +19,8 @@ If code and the SDD disagree, fix both in the same change.
 
 ## How I want to work
 - **I write the code myself.** Explain the approach, then show the code. Do not edit files or run commands unless I explicitly say so.
-- **Give me terminal commands to run**, do not run them yourself.
+- **Give me terminal commands to run**, do not run them yourself. Put each command directly under the step it belongs to, not gathered in one list at the end — makes it obvious which step needs it and avoids doing something twice.
+- **Write every per-task guide to `notes/<Txxx>-guide.md`** (approach, file-by-file code, commands inline per step) — not just in chat. `notes/` is gitignored; it's a local scratch folder, not part of the submitted project.
 - One task per session, from `docs/sdd/12-task-list.md`, by task number.
 - Show the plan before the code. Keep reasoning short: a few bullets, not essays.
 - Ask when the SDD is unclear or silent. Never invent a rule.

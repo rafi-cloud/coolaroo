@@ -3,11 +3,11 @@
 Single source of truth for "where are we". Read this first in every session. Git is the ground truth: if this file and `git log` disagree, believe git and fix this file.
 
 ## Current state
-- Last completed task: 1 (T001 — Laravel project scaffold, environment config, .env.example)
-- Next task: 2 (T002 Customer and staff auth guards; remove default users migration — FR03, 06.1)
+- Last completed task: 2 (T002 — customer and staff auth guards; remove default users migration)
+- Next task: 3 (T003 Install Reverb, Echo, Vite; queue, cache and session drivers — 07.2, NFR09)
 - In progress: none
-- Branch: develop — created per docs/START-HERE.md Day 0 step 5.
-- Environment: Laravel 13.17 / PHP ^8.3. `.env` and `.env.example` both point at MySQL (`coolaroo` database, `127.0.0.1:3306`, `root`/no password, matching 07.2 local dev), `APP_NAME="Coolaroo RMS"`, `APP_TIMEZONE=Australia/Melbourne` set in both `.env` and `config/app.php` (NFR13). `php artisan migrate` confirmed working against the new `coolaroo` MySQL database (created via phpMyAdmin) — created the default `users`/`cache`/`jobs` tables, which T002 removes/replaces. Reverb broadcast driver still not installed (T003); Stripe/GitHub Models keys not set (T004).
+- Branch: develop
+- Environment: Laravel 13.17 / PHP ^8.3, MySQL `coolaroo` database (127.0.0.1:3306), `APP_TIMEZONE=Australia/Melbourne` and `APP_NAME="Coolaroo RMS"` set. `config/auth.php` now defines `customer` and `staff` guards (with `customers`/`staff` Eloquent providers and password-reset brokers), pointing at `App\Models\Customer`/`App\Models\Staff`, which don't exist yet (created in T014) — safe, since `::class` is a compile-time string. Default `users` migration removed; `password_reset_tokens`/`sessions` framework tables kept in a renamed migration. `php artisan migrate:fresh` and `php artisan test` confirmed passing against MySQL. Reverb broadcast driver still not installed (T003); Stripe/GitHub Models keys not set (T004). No project schema (role/staff/customer/etc.) or Blade views yet.
 - Blocked: none
 
 ## Open deviations from the SDD
@@ -21,6 +21,14 @@ Single source of truth for "where are we". Read this first in every session. Git
 - Deviation: <FR/BR ID + what changed + why>  (or: none)
 - Follow-up: <what is deliberately left to a later task>
 -->
+
+### 2026-09-19 — Task 2 (T002) — done — Claude Code
+- Added / changed: `config/auth.php`, `database/seeders/DatabaseSeeder.php`, `.obsidian/` untracked + gitignored, `.gitignore`, `AGENTS.md`
+- Removed: `app/Models/User.php`, `database/factories/UserFactory.php`, `database/migrations/0001_01_01_000000_create_users_table.php`
+- Added (new file): `database/migrations/0001_01_01_000000_create_password_reset_tokens_and_sessions_tables.php` — same file, renamed and trimmed to drop the `users` table while keeping `password_reset_tokens`/`sessions` (06.1: those are framework infra, not design entities, and stay)
+- Notes: Two guards (`customer`, `staff`) per 07.5, each with its own Eloquent provider and password-reset broker (FR05 applies to all users). Providers point at `App\Models\Customer`/`App\Models\Staff`, which don't exist until T014 — harmless, since `::class` never autoloads. `php artisan migrate:fresh` rebuilds `cache`/`cache_locks`/`jobs`/`job_batches`/`failed_jobs`/`password_reset_tokens`/`sessions`/`migrations` with no `users` table; `php artisan test` still green. Also untracked an accidentally-committed `.obsidian/` folder (unrelated editor config) and added it to `.gitignore`. `AGENTS.md` updated with two new standing rules: task guides go in `notes/<Txxx>-guide.md`, and terminal commands belong inline within each guide step rather than a separate list at the end.
+- Deviation: none
+- Follow-up: both new password-reset brokers (`customers`, `staff`) share the single `password_reset_tokens` table, keyed only by email with no guard/type column (06.1 treats it as shared framework infra) — a customer and staff member with the same email would share a reset-token row. Accepted as-is per the SDD; not revisited unless it becomes a real problem. T010 creates the actual `customer`/`staff` tables; T014 creates the models the guards already point to.
 
 ### 2026-09-18 — Task 1 (T001) — done — Claude Code
 - Added / changed: `.env`, `.env.example`, `config/app.php`, `package.json`, `package-lock.json`, `vite.config.js`, `resources/css/app.css`, `.gitignore`
