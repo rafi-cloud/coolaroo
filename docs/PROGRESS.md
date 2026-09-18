@@ -3,11 +3,11 @@
 Single source of truth for "where are we". Read this first in every session. Git is the ground truth: if this file and `git log` disagree, believe git and fix this file.
 
 ## Current state
-- Last completed task: 2 (T002 — customer and staff auth guards; remove default users migration)
-- Next task: 3 (T003 Install Reverb, Echo, Vite; queue, cache and session drivers — 07.2, NFR09)
+- Last completed task: 3 (T003 — install Reverb, Echo, Vite; queue, cache and session drivers)
+- Next task: 4 (T004 Stripe and GitHub Models configuration (config/services.php) — 07.9)
 - In progress: none
 - Branch: develop
-- Environment: Laravel 13.17 / PHP ^8.3, MySQL `coolaroo` database (127.0.0.1:3306), `APP_TIMEZONE=Australia/Melbourne` and `APP_NAME="Coolaroo RMS"` set. `config/auth.php` now defines `customer` and `staff` guards (with `customers`/`staff` Eloquent providers and password-reset brokers), pointing at `App\Models\Customer`/`App\Models\Staff`, which don't exist yet (created in T014) — safe, since `::class` is a compile-time string. Default `users` migration removed; `password_reset_tokens`/`sessions` framework tables kept in a renamed migration. `php artisan migrate:fresh` and `php artisan test` confirmed passing against MySQL. Reverb broadcast driver still not installed (T003); Stripe/GitHub Models keys not set (T004). No project schema (role/staff/customer/etc.) or Blade views yet.
+- Environment: Laravel 13.17 / PHP ^8.3, MySQL `coolaroo` database, `APP_TIMEZONE=Australia/Melbourne`, `APP_NAME="Coolaroo RMS"`. Auth guards (`customer`/`staff`) configured (T002). Reverb installed and wired: `BROADCAST_CONNECTION=reverb`, `REVERB_*`/`VITE_REVERB_*` set in `.env`/`.env.example`, `config/broadcasting.php` and `config/reverb.php` published, `resources/js/echo.js` created and imported from `resources/js/app.js`, `routes/channels.php` wired into `bootstrap/app.php`. `php artisan reverb:start`, `npm run build`, and `php artisan test` all confirmed working. Stripe/GitHub Models keys not set (T004). No project schema (role/staff/customer/etc.) or Blade views yet.
 - Blocked: none
 
 ## Open deviations from the SDD
@@ -21,6 +21,12 @@ Single source of truth for "where are we". Read this first in every session. Git
 - Deviation: <FR/BR ID + what changed + why>  (or: none)
 - Follow-up: <what is deliberately left to a later task>
 -->
+
+### 2026-09-19 — Task 3 (T003) — done — Claude Code
+- Added / changed: `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, `.env`, `.env.example`, `bootstrap/app.php`, `resources/js/app.js`, `routes/channels.php` (new), `config/broadcasting.php` (new), `config/reverb.php` (new), `resources/js/echo.js` (new), `docs/PROGRESS.md`
+- Notes: `composer require laravel/reverb -W` — needed `-W` because every Reverb release requires `guzzlehttp/psr7 ^2.6` while `laravel/framework` had resolved `guzzlehttp/guzzle` to its 8.x line (requiring `psr7 ^3.1`); Composer re-resolved the graph and downgraded guzzle to 7.15.5. `php artisan install:broadcasting` (chose Reverb) scaffolded `config/broadcasting.php`, `routes/channels.php`, the `channels:` wiring in `bootstrap/app.php`, `laravel-echo`/`pusher-js`, and `resources/js/echo.js`, but left `REVERB_*` env vars unset and `config/reverb.php` unpublished. `php artisan reverb:install` then crashed (`Pusher\Pusher::__construct(): $auth_key ... null given`) because `BROADCAST_CONNECTION=reverb` was already set with no key yet — fixed by adding the `REVERB_*`/`VITE_REVERB_*` block to `.env` by hand first (values read from the installer's own source so they'd match its real defaults). Re-running it hung at its last interactive confirm (Windows/PowerShell + Laravel Prompts rendering issue, harmless to Ctrl+C) and — separately — duplicated the `REVERB_*` block instead of skipping it, because its "already present" check looks for `\r\n` + the var name but `.env` uses plain `\n` line endings; removed the duplicate by hand. Also found and fixed the same duplicate-key pattern on `BROADCAST_CONNECTION` itself (`install:broadcasting` appended a second `BROADCAST_CONNECTION=reverb` line near the end instead of updating the original `=log` line in place) — consolidated to one line. Mirrored all new `.env` keys into `.env.example` with placeholder values. Replaced the installer's default `routes/channels.php` example (`App.Models.User.{id}`, referencing the model deleted in T002) with a placeholder comment — real channels land in T110. Queue/cache/session drivers needed no changes; already `database` since T001, matching 07.2's local row.
+- Deviation: none
+- Follow-up: none. `config/reverb.php` and `config/broadcasting.php` are framework defaults, untouched beyond what the installer generated.
 
 ### 2026-09-19 — Task 2 (T002) — done — Claude Code
 - Added / changed: `config/auth.php`, `database/seeders/DatabaseSeeder.php`, `.obsidian/` untracked + gitignored, `.gitignore`, `AGENTS.md`
