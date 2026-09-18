@@ -20,12 +20,14 @@ yarn-error.log
 /.vscode
 /.nova
 /.zed
+/.obsidian
 
 # Claude Code - local state
 .claude/
 CLAUDE.local.md
 .mcp.json
 /notes/
+/docs/MODEL-GUIDE.md
 
 # Antigravity / Gemini - local state
 .antigravity/
