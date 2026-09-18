@@ -14,7 +14,7 @@ Single source of truth for "where are we". Read this first in every session. Git
 - None
 
 ## Log
-<!-- Newest first. One entry per task.
+<!-- Newest first. One entry per task, one task at a time.
 ### YYYY-MM-DD — Task <n> (<Txxx>) — done — <tool>
 - Added / changed: <files>
 - Notes: <decisions, rule IDs applied>
