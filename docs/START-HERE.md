@@ -29,11 +29,11 @@ Rule: finish a task, commit, then switch tools. Never run both on the same uncom
 7. Add two lines to `docs/learning-log.md`: what you learned, what confused you.
 
 ## First three tasks
-| # | Task | Result |
-|---|---|---|
-| 1 | T001 scaffold and env config | `php artisan serve` shows the Laravel welcome page |
-| 2 | T002 customer and staff guards | Two auth guards configured, default `users` migration deleted |
-| 3 | T003 Reverb, Echo, Vite, drivers | `php artisan reverb:start` runs |
+| #   | Task                             | Result                                                        |
+| --- | -------------------------------- | ------------------------------------------------------------- |
+| 1   | T001 scaffold and env config     | `php artisan serve` shows the Laravel welcome page            |
+| 2   | T002 customer and staff guards   | Two auth guards configured, default `users` migration deleted |
+| 3   | T003 Reverb, Echo, Vite, drivers | `php artisan reverb:start` runs                               |
 
 Then tasks 4 to 13 are migrations, models, enums and seeders: after them `php artisan migrate:fresh --seed` must run clean. That is milestone M1.
 

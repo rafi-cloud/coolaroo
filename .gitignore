@@ -25,6 +25,7 @@ yarn-error.log
 .claude/
 CLAUDE.local.md
 .mcp.json
+/notes/
 
 # Antigravity / Gemini - local state
 .antigravity/
