@@ -18,6 +18,15 @@ class EnsureStaffSessionIsActive
             return $next($request);
         }
 
+        if (! $staff->is_active) {
+            Auth::guard('staff')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('staff.login')
+                ->with('status', 'Your account has been deactivated. Contact an administrator.');
+        }
+
         $timeoutMinutes = (int) (Setting::find('staff_session_timeout_minutes')?->setting_value ?? 30);
         $lastActivity = $request->session()->get('staff_last_activity');
 

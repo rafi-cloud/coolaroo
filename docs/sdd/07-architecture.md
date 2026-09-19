@@ -85,8 +85,9 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | AiMenuService | Build context, call GitHub Models, validate IDs, totals, busy handling | BR46–BR49 |
 | SpecialsService | Active sale detection, Specials list, homepage top Special | BR59 |
 | ReportService | Dashboard widgets and reports, exports | FR81–FR88 |
-| AuditLogger | audit_log writes, archive snapshots | NFR14, BR62 |
+| AuditLogger | audit_log writes, archive snapshots — `log()`/`snapshot()` built in T024 for BR62's staff-deactivation case, extend rather than rebuild | NFR14, BR62 |
 | SettingService | Cached settings, switches | FR91, BR58 |
+| StaffAccountService | Create, edit, deactivate/reactivate staff; self/last-admin guard | FR02, FR08, BR60 |
 
 ## 7.5 Authentication and access
 | Item | Design |
@@ -98,7 +99,7 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | Switches | `EnsureQrOrderingEnabled` on customer cart/checkout; reservation store checks `reservations_online_enabled` |
 | Throttling | Login 5/min; checkout 10/min per user; call waiter cooldown in cache; AI no app limit |
 | CSRF | All POST/PATCH/DELETE; no exemptions |
-| Staff deactivation | Delete rows in `sessions` for that staff id |
+| Staff deactivation | `EnsureStaffSessionIsActive` rechecks `staff.is_active` on every `auth:staff` request and logs out immediately if false (BR60) — not a `sessions` table delete; `sessions.user_id` only ever reflects the app's default guard (`customer`), confirmed by testing, so it can never hold a staff id |
 | Staff session timeout | `EnsureStaffSessionIsActive` checks `staff_session_timeout_minutes` (06.5, default 30) against `session('staff_last_activity')`; logs out and redirects to `staff.login` when stale (BR51) |
 
 ## 7.6 Routes

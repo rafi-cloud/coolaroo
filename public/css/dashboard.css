@@ -442,6 +442,10 @@ input{font:inherit}
 .b-served{background:#EFE7E0;color:var(--served)}
 .b-cancelled{background:#F0EAE5;color:var(--cancelled)}
 
+/* staff account status — not order status, uses different colours per the note above */
+.b-active{background:#FFE7DA;color:var(--orange-dark)}
+.b-inactive{background:#EFEAE5;color:#8A7B6C}
+
 .row-actions{display:flex;gap:.35rem;justify-content:flex-end}
 
 

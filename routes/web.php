@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationPromptController;
@@ -55,6 +56,16 @@ Route::middleware(['auth:staff', 'staff.session'])->group(function () {
 
     Route::get('/staff/profile', [StaffProfileController::class, 'edit'])->name('staff.profile.edit');
     Route::patch('/staff/profile', [StaffProfileController::class, 'update'])->name('staff.profile.update');
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {
+    Route::get('/staff', [StaffAccountController::class, 'index'])->name('staff.index');
+    Route::get('/staff/create', [StaffAccountController::class, 'create'])->name('staff.create');
+    Route::post('/staff', [StaffAccountController::class, 'store'])->name('staff.store');
+    Route::get('/staff/{staff}/edit', [StaffAccountController::class, 'edit'])->name('staff.edit');
+    Route::patch('/staff/{staff}', [StaffAccountController::class, 'update'])->name('staff.update');
+    Route::patch('/staff/{staff}/deactivate', [StaffAccountController::class, 'deactivate'])->name('staff.deactivate');
+    Route::patch('/staff/{staff}/reactivate', [StaffAccountController::class, 'reactivate'])->name('staff.reactivate');
 });
 
 //have to delete this block when the real pages done.
