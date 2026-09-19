@@ -113,7 +113,9 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | POST | /t/{table}/call-waiter | Public\WaiterCallController@store | FR40 |
 | GET | /reservations/availability | Public\AvailabilityController@index | FR61 |
 | GET/POST | /register, /login, /logout, /forgot-password, /reset-password/{token} | Customer\Auth\* | FR01, FR03, FR05 |
+| GET | /email/verify | Customer\Auth\EmailVerificationPromptController | FR06 |
 | GET | /email/verify/{id}/{hash} | Customer\Auth\VerifyEmailController | FR06 |
+| POST | /email/verification-notification | Customer\Auth\EmailVerificationNotificationController | FR06 |
 
 ### Customer (`auth:customer`)
 | Method | URI | Controller | FR |

@@ -584,3 +584,60 @@ svg{display:block}
   padding:.5rem 1rem;border-radius:100px;
 }
 .table-chip svg{width:16px;height:16px;color:var(--orange)}
+
+/* =====================================================================
+   T020: auth pages (S07 login / register / reset / verify)
+   — pulled from docs/design/colaroo html temp 2/customer-pages.css.
+   ===================================================================== */
+.auth{
+  min-height:calc(100vh - 74px);
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(2rem,6vw,4rem) var(--gutter);
+  background:var(--sand);
+}
+.auth-card{
+  width:100%;max-width:440px;
+  background:#fff;border-radius:12px;
+  box-shadow:var(--shadow);
+  padding:clamp(1.8rem,4vw,2.6rem);
+}
+.auth-head{text-align:center;margin-bottom:1.8rem}
+.auth-head img{width:44px;height:44px;margin:0 auto .9rem}
+.auth-head h1{font-size:1.5rem;margin-bottom:.35rem}
+.auth-head p{font-size:.92rem}
+.auth-field{margin-bottom:1.1rem}
+.auth-field label{
+  display:block;font-size:.85rem;font-weight:600;
+  color:var(--ink);margin-bottom:.4rem;
+}
+.auth-field input{
+  width:100%;padding:.85rem 1rem;
+  border:1.5px solid #EEE0D0;border-radius:8px;
+  font-family:var(--sans);font-size:.95rem;color:var(--ink);
+  background:var(--cream);
+}
+.auth-field input:focus{outline:none;border-color:var(--orange)}
+.auth-field input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.auth-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.4rem;font-size:.86rem;
+}
+.auth-row label{display:flex;align-items:center;gap:.5rem;cursor:pointer}
+.auth-row a{color:var(--orange-dark);font-weight:600}
+.auth-row a:hover{text-decoration:underline}
+.auth .btn{width:100%;text-align:center;padding:1em}
+.auth-foot{
+  text-align:center;margin-top:1.6rem;font-size:.9rem;
+  padding-top:1.4rem;border-top:1px solid #F0E6D8;
+}
+.auth-foot a{color:var(--orange-dark);font-weight:700}
+.auth-foot a:hover{text-decoration:underline}
+.auth-error{
+  display:flex;gap:.6rem;align-items:flex-start;
+  background:#FBEAE5;border:1px solid #F3CFC3;color:#9A2D14;
+  border-radius:8px;padding:.85rem 1rem;font-size:.86rem;
+  margin-bottom:1.3rem;
+}
+.auth-error svg{width:18px;height:18px;flex:none;margin-top:1px}
+.auth-error.auth-success{background:#DDF2E5;border-color:#BFE6CE;color:#1F7844}
+.field-error{color:#9A2D14;font-size:.82rem;margin-top:.4rem}
