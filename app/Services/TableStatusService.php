@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\OrderStatus;
 use App\Enums\TableStatus;
+use App\Events\TableStatusChanged;
 use App\Models\RestaurantTable;
 use App\Models\Staff;
 use App\Models\Visit;
@@ -39,6 +40,8 @@ class TableStatusService
         $table->forceFill(['status' => $to, 'status_changed_at' => now()])->save();
 
         $this->auditLogger->log($actor, 'table_status', $table);
+
+        event(new TableStatusChanged($table));
     }
 
     public function seatWalkIn(RestaurantTable $table, Staff $actor, ?int $guestCount = null): Visit

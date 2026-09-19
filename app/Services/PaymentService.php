@@ -1,0 +1,169 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\Destination;
+use App\Enums\OrderStatus;
+use App\Enums\PaymentAttemptStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use App\Enums\TableStatus;
+use App\Events\OrderPaid;
+use App\Events\OrderStatusChanged;
+use App\Events\StockConflictDetected;
+use App\Models\Customer;
+use App\Models\MenuItem;
+use App\Models\Order;
+use App\Models\OrderStatusHistory;
+use App\Models\Payment;
+use App\Models\RestaurantTable;
+use App\Models\Setting;
+use App\Models\Staff;
+use App\Models\Visit;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * FR55, 07.7, BR01, BR10, BR25, BR30, BR54. Shared by Stripe (T070) and cash
+ * (T072) once either exists — both will create a Payment row and hand it
+ * here; this task builds the transaction itself.
+ */
+class PaymentService
+{
+    public function __construct(
+        private StockService $stock,
+        private TableStatusService $tableStatus,
+        private AuditLogger $auditLogger,
+    ) {
+    }
+
+    public function markPaid(Payment $payment, Staff|Customer|null $actor = null): Order
+    {
+        return DB::transaction(function () use ($payment, $actor) {
+            $lockedPayment = Payment::whereKey($payment->payment_id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedPayment->status === PaymentAttemptStatus::Succeeded) {
+                return Order::findOrFail($lockedPayment->order_id);
+            }
+
+            $order = Order::whereKey($lockedPayment->order_id)->firstOrFail();
+            $items = $order->items()->with('menuItem')->get();
+
+            $this->deductStock($order, $items);
+
+            $lockedPayment->forceFill(['status' => PaymentAttemptStatus::Succeeded, 'paid_at' => now()])->save();
+
+            $order->forceFill([
+                'status' => OrderStatus::Paid,
+                'payment_status' => PaymentStatus::Paid,
+                'paid_at' => now(),
+                'kitchen_eta_at' => $this->estimateEta($order, $items, Destination::Kitchen),
+                'bar_eta_at' => $this->estimateEta($order, $items, Destination::Bar),
+            ])->save();
+
+            $table = $order->restaurantTable()->lockForUpdate()->first();
+            $visit = $this->openVisit($table);
+            $order->update(['visit_id' => $visit->visit_id]);
+
+            if ($table->status !== TableStatus::Occupied) {
+                $this->tableStatus->transition($table, TableStatus::Occupied);
+            }
+
+            OrderStatusHistory::create([
+                'order_id' => $order->order_id,
+                'status_seq' => $order->statusHistory()->max('status_seq') + 1,
+                'status' => 'paid',
+                'occurred_at' => now(),
+                'event_source' => $lockedPayment->method === PaymentMethod::Cash ? 'waitstaff' : 'stripe',
+            ]);
+
+            $this->auditLogger->log($actor, 'payment_succeeded', $order);
+
+            $order->refresh();
+
+            event(new OrderPaid($order));
+            event(new OrderStatusChanged($order));
+
+            if ($order->has_stock_conflict) {
+                foreach ($items->pluck('destination')->unique() as $destination) {
+                    event(new StockConflictDetected($order, $destination));
+                }
+            }
+
+            return $order;
+        });
+    }
+
+    /** BR09/BR10/BR54: exact deduction, flagged (never blocked) on conflict. */
+    private function deductStock(Order $order, Collection $items): void
+    {
+        $quantityByItem = [];
+
+        foreach ($items as $line) {
+            $quantityByItem[$line->item_id] = ($quantityByItem[$line->item_id] ?? 0) + $line->quantity;
+        }
+
+        if (empty($quantityByItem)) {
+            return;
+        }
+
+        $menuItems = MenuItem::whereIn('item_id', array_keys($quantityByItem))
+            ->orderBy('item_id')
+            ->lockForUpdate()
+            ->get()
+            ->keyBy('item_id');
+
+        $conflict = false;
+
+        foreach ($quantityByItem as $itemId => $quantity) {
+            if (! $this->stock->deduct($menuItems[$itemId], $quantity)) {
+                $conflict = true;
+            }
+        }
+
+        if ($conflict) {
+            $order->update(['has_stock_conflict' => true]);
+        }
+    }
+
+    /** BR01, 06.4.16: opened_by_staff_id stays NULL — no staff is present for a QR payment. */
+    private function openVisit(RestaurantTable $table): Visit
+    {
+        $visit = Visit::where('table_id', $table->table_id)->whereNull('closed_at')->first();
+
+        if ($visit === null) {
+            return Visit::create(['table_id' => $table->table_id, 'opened_at' => now()]);
+        }
+
+        if ($visit->opened_at === null) {
+            $visit->update(['opened_at' => now()]);
+        }
+
+        return $visit;
+    }
+
+    /** BR30. The formula only — EtaService's staff-adjustment half is T082. */
+    private function estimateEta(Order $order, Collection $items, Destination $destination): ?Carbon
+    {
+        $lines = $items->filter(fn ($line) => $line->destination === $destination);
+
+        if ($lines->isEmpty()) {
+            return null;
+        }
+
+        $longestPrep = $lines->max(fn ($line) => $line->menuItem->prep_minutes);
+
+        $settingKey = $destination === Destination::Kitchen ? 'avg_ticket_minutes_kitchen' : 'avg_ticket_minutes_bar';
+        $default = $destination === Destination::Kitchen ? 8 : 3;
+        $avgMinutes = (int) (Setting::find($settingKey)?->setting_value ?? $default);
+
+        $queueAhead = \App\Models\OrderItem::where('destination', $destination->value)
+            ->whereIn('status', ['pending', 'preparing'])
+            ->where('order_id', '!=', $order->order_id)
+            ->distinct('order_id')
+            ->count('order_id');
+
+        return now()->addMinutes($longestPrep + $queueAhead * $avgMinutes);
+    }
+}
