@@ -24,6 +24,8 @@ class MenuItemService
         $item->allergens()->sync($allergenIds);
         $item->dietaryTags()->sync($dietaryTagIds);
 
+        $this->auditLogger->log(null, 'menu_item_create', $item);
+
         return $item;
     }
 
@@ -32,6 +34,8 @@ class MenuItemService
         $item->update($data);
         $item->allergens()->sync($allergenIds);
         $item->dietaryTags()->sync($dietaryTagIds);
+
+        $this->auditLogger->log(null, 'menu_item_update', $item);
 
         return $item;
     }

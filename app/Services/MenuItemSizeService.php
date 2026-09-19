@@ -11,14 +11,24 @@ use Illuminate\Validation\ValidationException;
  */
 class MenuItemSizeService
 {
+    public function __construct(private AuditLogger $auditLogger)
+    {
+    }
+
     public function create(MenuItem $item, array $data): MenuItemSize
     {
-        return $item->sizes()->create($data);
+        $size = $item->sizes()->create($data);
+
+        $this->auditLogger->log(null, 'menu_item_size_create', $size);
+
+        return $size;
     }
 
     public function update(MenuItemSize $size, array $data): MenuItemSize
     {
         $size->update($data);
+
+        $this->auditLogger->log(null, 'menu_item_size_update', $size);
 
         return $size;
     }
@@ -30,6 +40,8 @@ class MenuItemSizeService
                 'size' => 'Cannot delete the only remaining size for this item.',
             ]);
         }
+
+        $this->auditLogger->log(null, 'menu_item_size_delete', $size);
 
         $size->delete();
     }

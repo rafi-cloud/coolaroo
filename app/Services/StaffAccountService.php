@@ -16,12 +16,18 @@ class StaffAccountService
 
     public function create(array $data): Staff
     {
-        return Staff::create($data);
+        $staff = Staff::create($data);
+
+        $this->auditLogger->log(null, 'staff_create', $staff);
+
+        return $staff;
     }
 
     public function update(Staff $staff, array $data): Staff
     {
         $staff->update($data);
+
+        $this->auditLogger->log(null, 'staff_update', $staff);
 
         return $staff;
     }

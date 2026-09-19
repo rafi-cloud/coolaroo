@@ -17,12 +17,18 @@ class CategoryService
 
     public function create(array $data): MenuCategory
     {
-        return MenuCategory::create($data);
+        $category = MenuCategory::create($data);
+
+        $this->auditLogger->log(null, 'category_create', $category);
+
+        return $category;
     }
 
     public function update(MenuCategory $category, array $data): MenuCategory
     {
         $category->update($data);
+
+        $this->auditLogger->log(null, 'category_update', $category);
 
         return $category;
     }

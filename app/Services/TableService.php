@@ -20,7 +20,11 @@ class TableService
 
     public function create(array $data): RestaurantTable
     {
-        return RestaurantTable::create($data + ['qr_token' => Str::random(64)]);
+        $table = RestaurantTable::create($data + ['qr_token' => Str::random(64)]);
+
+        $this->auditLogger->log(null, 'table_create', $table);
+
+        return $table;
     }
 
     public function update(RestaurantTable $table, array $data): ?string
@@ -28,6 +32,8 @@ class TableService
         $warning = $this->seatWarning($table, $data['seat_capacity']);
 
         $table->update($data);
+
+        $this->auditLogger->log(null, 'table_update', $table);
 
         return $warning;
     }

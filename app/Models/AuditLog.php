@@ -42,4 +42,18 @@ class AuditLog extends Model
     {
         return $this->hasOne(HistoricalDataManagement::class, 'log_id', 'log_id');
     }
+
+    public function save(array $options = [])
+    {
+        if ($this->exists) {
+            throw new \RuntimeException('audit_log is append-only — no updates.');
+        }
+
+        return parent::save($options);
+    }
+
+    public function delete()
+    {
+        throw new \RuntimeException('audit_log is append-only — no deletes.');
+    }
 }

@@ -3,20 +3,21 @@
 namespace App\Services;
 
 use App\Models\AuditLog;
+use App\Models\Customer;
 use App\Models\HistoricalDataManagement;
 use App\Models\Staff;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * NFR14, BR62. Minimal on purpose — see T024's guide for why this exists
- * ahead of T151, which owns extending it (more action types, ip_address, …).
+ * FR89, BR62, NFR14.
  */
 class AuditLogger
 {
-    public function log(?Staff $actor, string $actionType, Model $entity, ?string $reason = null): AuditLog
+    public function log(Staff|Customer|null $actor, string $actionType, Model $entity, ?string $reason = null): AuditLog
     {
         return AuditLog::create([
-            'staff_id' => $actor?->staff_id,
+            'staff_id' => $actor instanceof Staff ? $actor->staff_id : null,
+            'customer_id' => $actor instanceof Customer ? $actor->customer_id : null,
             'action_type' => $actionType,
             'entity_name' => $entity->getTable(),
             'entity_id' => $entity->getKey(),
@@ -24,7 +25,7 @@ class AuditLogger
         ]);
     }
 
-    public function snapshot(?Staff $actor, string $actionType, Model $entity, ?string $reason = null): AuditLog
+    public function snapshot(Staff|Customer|null $actor, string $actionType, Model $entity, ?string $reason = null): AuditLog
     {
         $log = $this->log($actor, $actionType, $entity, $reason);
 
