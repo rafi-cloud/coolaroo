@@ -17,6 +17,7 @@ class RestaurantTableFactory extends Factory
             'seat_capacity' => fake()->numberBetween(2, 8),
             'section' => 'Dining',
             'qr_token' => Str::random(64),
+            'is_active' => true,
         ];
     }
 }
