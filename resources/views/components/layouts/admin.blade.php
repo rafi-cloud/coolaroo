@@ -1,6 +1,9 @@
-@include('layouts.partials.head', ['css' => 'dashboard.css', 'suffix' => 'Coolaroo Admin', 'vite' => true])
-<body>
-
+@props([
+    'title' => null,
+    'pageTitle' => null,
+    'pageSub' => null,
+])
+<x-document css="dashboard.css" suffix="Coolaroo Admin" :vite="true" :title="$title">
 <input class="nav-state" type="checkbox" id="nav-open" data-testid="admin-nav-toggle">
 <label class="scrim" for="nav-open" aria-hidden="true"></label>
 
@@ -9,18 +12,15 @@
     <img src="{{ asset('images/logo.svg') }}" alt="">
     <span class="brand-text"><strong>COOLAROO</strong><span>ADMIN</span></span>
   </a>
-  @include('layouts.partials.nav-admin')
+  <x-dashboard.nav-admin />
 </aside>
 
 <div class="shell">
-  @include('layouts.partials.dashboard-topbar')
+  <x-dashboard.topbar :title="$pageTitle" :sub="$pageSub" />
 
   <main class="content">
-    @yield('content')
-    @include('layouts.partials.dashboard-footer')
+    {{ $slot }}
+    <x-dashboard.footer />
   </main>
 </div>
-
-@stack('scripts')
-</body>
-</html>
+</x-document>

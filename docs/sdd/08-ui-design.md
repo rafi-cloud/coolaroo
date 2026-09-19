@@ -1,11 +1,11 @@
 # 8. UI Design
 
 ## 8.1 Screen inventory
-| ID | Screen | Route | Blade view | Roles | UC |
+| ID | Screen | Route | Blade view / component | Roles | UC |
 |---|---|---|---|---|---|
 | S01 | Homepage | / | public/home | Visitor, Customer | UC01, UC03, UC13 |
 | S02 | Full menu | /menu | public/menu | Visitor, Customer | UC01 |
-| S03 | Item detail modal | modal | partials/item-modal | Visitor, Customer | UC01, UC08 |
+| S03 | Item detail modal | modal | `<x-menu.item-modal>` | Visitor, Customer | UC01, UC08 |
 | S04 | Table ordering menu (cart bar, Call waiter, homepage link) | /t/{table}/{token} | public/menu (ordering mode) | Customer | UC02, UC07, UC08 |
 | S05 | Reserved table notice | /t/… | public/table-reserved | Customer | UC07 |
 | S06 | Table unavailable | /t/… | public/table-unavailable | Any | UC07 |
@@ -17,23 +17,23 @@
 | S12 | Order status timeline (+ Check payment status) | /orders/{order} | customer/order | Customer | UC11, UC12 |
 | S13 | My orders | /orders | customer/orders | Customer | UC11 |
 | S14 | Receipt PDF | /orders/{order}/receipt | pdf/receipt | Customer | UC11 |
-| S15 | Feedback modal | modal on S12 | partials/feedback-modal | Customer | UC15 |
+| S15 | Feedback modal | modal on S12 | `<x-feedback-modal>` | Customer | UC15 |
 | S16 | Meal builder | /meal-builder | public/meal-builder | Visitor, Customer | UC09 |
-| S17 | Chat widget | S01, S02, S04, S16 | partials/chat | Visitor, Customer | UC09 |
-| S18 | Reservation wizard | /#reserve | partials/reserve | Visitor, Customer | UC13 |
+| S17 | Chat widget | S01, S02, S04, S16 | `<x-chat>` | Visitor, Customer | UC09 |
+| S18 | Reservation wizard | /#reserve | `<x-reserve>` | Visitor, Customer | UC13 |
 | S19 | My reservations | /my/reservations | customer/reservations | Customer | UC14 |
 | S20 | Profile | /profile | customer/profile | Customer | UC06 |
 | S21 | Staff login | /staff/login | staff/auth/login | Staff | UC05 |
 | S22 | Floor view (grid, alerts, ready to serve, cash waiting, paused banner) | /staff/floor | staff/floor/index | Waitstaff, Admin | UC16–UC18, UC21, UC40 |
-| S23 | Table drawer | panel | staff/floor/partials/table-drawer | Waitstaff | UC17–UC19 |
+| S23 | Table drawer | panel | `<x-floor.table-drawer>` | Waitstaff | UC17–UC19 |
 | S24 | Take order | /staff/tables/{table}/order | staff/floor/order | Waitstaff | UC19 |
-| S25 | Cash payment modal | modal | staff/floor/partials/cash-modal | Waitstaff | UC20 |
-| S26 | Stripe QR modal | modal | staff/floor/partials/stripe-qr | Waitstaff | UC19 |
+| S25 | Cash payment modal | modal | `<x-floor.cash-modal>` | Waitstaff | UC20 |
+| S26 | Stripe QR modal | modal | `<x-floor.stripe-qr>` | Waitstaff | UC19 |
 | S27 | Reservations board | /staff/reservations | staff/reservations/index | Waitstaff, Admin | UC22–UC25 |
-| S28 | Request review panel with trust profile | panel | staff/reservations/partials/review | Waitstaff, Admin | UC22 |
-| S29 | Refund request modal | modal | staff/partials/refund-request | Waitstaff, Kitchen, Bar | UC26 |
+| S28 | Request review panel with trust profile | panel | `<x-reservations.review>` | Waitstaff, Admin | UC22 |
+| S29 | Refund request modal | modal | `<x-staff.refund-request>` | Waitstaff, Kitchen, Bar | UC26 |
 | S30 | Station display (kitchen / bar) | /staff/kds/{destination} | staff/kds/index | Kitchen, Bar, Admin | UC28, UC41 |
-| S31 | Availability drawer | drawer on S30 | staff/kds/partials/availability | Kitchen, Bar | UC29 |
+| S31 | Availability drawer | drawer on S30 | `<x-kds.availability>` | Kitchen, Bar | UC29 |
 | S32 | Admin dashboard | /admin | admin/dashboard | Admin | UC35 |
 | S33 | Orders | /admin/orders | admin/orders/* | Admin | UC33, UC40, UC41 |
 | S34 | Refund queue | /admin/refunds | admin/refunds/index | Admin | UC33 |
@@ -129,3 +129,6 @@ Sidebar: Dashboard · Floor view · Orders · Refunds · Reservations · Menu it
 | Accessibility | Labels on inputs, alt text, visible focus, 44 px touch targets, reduced-motion support |
 | HTML | Valid HTML5 (no self-closing void tags, `lang` set, unique ids) |
 | Icons | Inline SVG, `aria-hidden` when decorative |
+| Layouts | Every page wraps its content in one layout component: `<x-layouts.public>`, `<x-layouts.customer>`, `<x-layouts.staff>` or `<x-layouts.admin>`. Page values are attributes: `title`, `description` (public, customer), `table-label` (customer, switches in the order bar), `page-title`, `page-sub` (staff, admin), `body-class` (staff). All four wrap `<x-document>`, which owns `<!DOCTYPE>`, `<head>` and `<body>` |
+| Components | Any markup used in more than one place, and every modal, drawer and panel in 8.1, is an anonymous Blade component in `resources/views/components/` with its inputs declared in `@props` (e.g. `<x-status-badge :status="$order->status" />`). No `@extends`, `@section`, `@yield` or `@include` |
+| Page scripts | `@push('scripts')` from a page or component; the layout prints the stack before `</body>`. Public pages can also `@push('widgets')` (e.g. the chat widget), printed after the footer |

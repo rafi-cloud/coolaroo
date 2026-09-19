@@ -1,10 +1,6 @@
-@extends('layouts.public')
-
-@section('title', 'Layout preview')
-
-@section('content')
+<x-layouts.public title="Layout preview">
   <section class="section wrap">
     <h1>Public layout</h1>
-    <p>Header, footer and back-to-top come from <code>layouts/public</code>.</p>
+    <p>Header, footer and back-to-top come from <code>&lt;x-layouts.public&gt;</code>.</p>
   </section>
-@endsection
+</x-layouts.public>

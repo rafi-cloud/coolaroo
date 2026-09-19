@@ -1,10 +1,5 @@
-@extends('layouts.staff')
-
-@section('title', 'Layout preview')
-@section('page_title', 'Staff layout')
-
-@section('content')
+<x-layouts.staff title="Layout preview" page-title="Staff layout">
   <section class="block">
     <p>Sidebar: Floor view, Reservations, Kitchen display, Bar display.</p>
   </section>
-@endsection
+</x-layouts.staff>

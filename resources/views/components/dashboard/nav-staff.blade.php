@@ -18,7 +18,7 @@
   @foreach ($groups as $label => $items)
     <p class="nav-label">{{ $label }}</p>
     @foreach ($items as $item)
-      @include('layouts.partials.nav-item', ['item' => $item])
+      <x-dashboard.nav-item :item="$item" />
     @endforeach
   @endforeach
 </nav>
