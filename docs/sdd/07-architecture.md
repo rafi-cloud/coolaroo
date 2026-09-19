@@ -223,6 +223,8 @@ Private channels authorised in `routes/channels.php`; `order.{id}` only for the 
 | Stripe (test mode) | Checkout Session with metadata order_id, payment_id; 30 min expiry; success URL includes `session_id`; verification by `sessions.retrieve`; refunds via `refunds.create` then retrieve; no webhook endpoint |
 | GitHub Models | OpenAI-compatible chat completions at `AI_BASE_URL=https://models.github.ai/inference`, model `AI_MODEL` (e.g. openai/gpt-4.1-mini), token `AI_API_KEY`; JSON output schema; compact menu JSON under 8K tokens; 20 s timeout; 429/5xx → busy message |
 | Email | Queued Mailables, 3 tries with backoff |
+| PDF (dompdf) | `barryvdh/laravel-dompdf` v3, default config (A4, `CPDF` backend — no GD needed for text/table layout PDFs); `storage/fonts/` for font cache |
+| QR codes | `endroid/qr-code` v6; `SvgWriter` works today (zero extension deps); `PngWriter` needs GD or Imagick, **neither enabled on this machine** — resolve before T051 ships a PNG download |
 
 Queues: `broadcasts`, `mail`, `default` → `queue:work --queue=broadcasts,mail,default`.
 
