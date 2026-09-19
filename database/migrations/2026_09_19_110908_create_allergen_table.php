@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('slot_capacity', function (Blueprint $table) {
-            $table->increments('slot_id');
-            $table->time('slot_time')->unique();
-            $table->unsignedSmallInteger('max_covers');
+        Schema::create('allergen', function (Blueprint $table) {
+            $table->smallIncrements('allergen_id');
+            $table->string('allergen_name', 50)->unique();
+            $table->string('description', 255)->nullable();
             $table->boolean('is_active')->default(true);
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('slot_capacity');
+        Schema::dropIfExists('allergen');
     }
 };

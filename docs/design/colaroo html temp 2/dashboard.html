@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — Coolaroo Admin</title>
+<meta name="description" content="Coolaroo restaurant management system. Takings, orders, menu editing, reservations, customers, staff and feedback.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<input class="nav-state" type="checkbox" id="nav-open">
+<label class="scrim" for="nav-open" aria-hidden="true"></label>
+
+<aside class="sidebar">
+  <a class="brand" href="#dashboard">
+    <img src="images/logo.svg" alt="">
+    <span class="brand-text"><strong>COOLAROO</strong><span>ADMIN</span></span>
+  </a>
+
+  <nav class="nav" aria-label="Main">
+    <p class="nav-label">Overview</p>
+    <a class="nav-item" href="#dashboard" data-nav="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      <span>Dashboard</span>
+    </a>
+
+    <p class="nav-label">Service</p>
+    <a class="nav-item" href="#orders" data-nav="orders">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12l1 16H5z"/><path d="M9 8h6"/><path d="M9 12h6"/></svg>
+      <span>Orders</span>
+      <span class="pill">6</span>
+    </a>
+    <a class="nav-item" href="#reservations" data-nav="reservations">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+      <span>Reservations</span>
+    </a>
+
+    <p class="nav-label">Catalogue</p>
+    <a class="nav-item" href="#menu" data-nav="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9M4 12h9M4 18h9"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      <span>Menu items</span>
+    </a>
+    <a class="nav-item" href="#categories" data-nav="categories">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l3-3h5l2 2h8v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <span>Categories</span>
+    </a>
+
+    <p class="nav-label">People</p>
+    <a class="nav-item" href="#customers" data-nav="customers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+      <span>Customers</span>
+    </a>
+    <a class="nav-item" href="#staff" data-nav="staff">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M2 20c0-3.7 3.1-6 7-6s7 2.3 7 6"/><path d="M17 8.5a3 3 0 0 0 0-1M18 14c2.4.6 4 2.4 4 5"/></svg>
+      <span>Staff</span>
+    </a>
+    <a class="nav-item" href="#feedback" data-nav="feedback">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+      <span>Feedback</span>
+      <span class="pill pill-quiet">4</span>
+    </a>
+
+    <p class="nav-label">Insight</p>
+    <a class="nav-item" href="#reports" data-nav="reports">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      <span>Reports</span>
+    </a>
+    <a class="nav-item" href="#settings" data-nav="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.4-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4a2 2 0 1 1 4 0a1.7 1.7 0 0 0 2.8 1.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4z"/></svg>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-foot">
+    <p class="shift">Dinner service</p>
+    <p class="shift-sub">Kitchen open until 11pm</p>
+  </div>
+</aside>
+
+<div class="shell">
+
+  <header class="topbar">
+    <label class="burger" for="nav-open">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span class="sr-only">Open navigation</span>
+    </label>
+
+    <div class="page-head">
+      <h1>Coolaroo Admin</h1>
+      <p>Tuesday, 1 September 2026</p>
+    </div>
+
+    <div class="topbar-tools">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <label class="sr-only" for="q">Search orders, customers or menu items</label>
+        <input id="q" type="search" placeholder="Search orders, customers, menu…">
+      </div>
+
+      <button class="icon-btn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span class="dot"></span>
+        <span class="sr-only">Notifications, 3 unread</span>
+      </button>
+
+      <button class="profile" type="button">
+        <span class="avatar">RS</span>
+        <span class="profile-text"><strong>Rafi S.</strong><span>Manager</span></span>
+        <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <section class="block" id="dashboard">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">Overview</p>
+          <h2>Dashboard</h2>
+        </div>
+      </header>
+
+      <div class="grid">
+        <article class="card tile">
+          <div class="tile-top">
+            <span class="tile-ico ico-orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12l1 16H5z"/><path d="M9 9h6"/></svg>
+            </span>
+            <img class="spark" src="images/spark-orders.png" alt="">
+          </div>
+          <p class="tile-value">126</p>
+          <p class="tile-name">Orders today</p>
+          <p class="tile-change up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+            12.4% <span>vs yesterday</span>
+          </p>
+        </article>
+
+        <article class="card tile">
+          <div class="tile-top">
+            <span class="tile-ico ico-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+            </span>
+            <img class="spark" src="images/spark-customers.png" alt="">
+          </div>
+          <p class="tile-value">1,842</p>
+          <p class="tile-name">Customers</p>
+          <p class="tile-change up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+            3.1% <span>vs last week</span>
+          </p>
+        </article>
+
+        <article class="card tile">
+          <div class="tile-top">
+            <span class="tile-ico ico-amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9M4 12h9M4 18h9"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+            </span>
+            <img class="spark" src="images/spark-menu.png" alt="">
+          </div>
+          <p class="tile-value">48</p>
+          <p class="tile-name">Menu items</p>
+          <p class="tile-change down">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            3 <span>off the menu tonight</span>
+          </p>
+        </article>
+
+        <article class="card takings">
+          <header class="card-head">
+            <div>
+              <h3>Today&rsquo;s takings</h3>
+              <p class="card-sub">Against a $4,200 daily target</p>
+            </div>
+          </header>
+
+          <div class="radial">
+            <img src="images/chart-target.png" alt="Radial progress showing 76 percent of the daily target reached">
+            <span class="radial-mid">
+              <strong>76%</strong>
+              <span>of target</span>
+            </span>
+          </div>
+
+          <p class="takings-amount">$3,180<span>.50</span></p>
+          <p class="takings-gap">$1,019.50 to go</p>
+          <a class="link-more" href="#reports">
+            View reports
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 6l6 6-6 6"/></svg>
+          </a>
+        </article>
+
+        <article class="card chart-card">
+          <header class="card-head">
+            <div>
+              <h3>Orders over time</h3>
+              <p class="card-sub">Mon 25 Aug &ndash; Sun 31 Aug</p>
+            </div>
+            <div class="tabs" role="group" aria-label="Range">
+              <button type="button">Today</button>
+              <button class="is-on" type="button" aria-pressed="true">Week</button>
+              <button type="button">Month</button>
+            </div>
+          </header>
+
+          <div class="chart">
+            <img src="images/chart-orders.png" alt="Line chart of orders per day, rising from 64 on Monday to a peak of 142 on Saturday">
+          </div>
+          <ul class="chart-axis">
+            <li>Mon</li><li>Tue</li><li>Wed</li><li>Thu</li><li>Fri</li><li>Sat</li><li>Sun</li>
+          </ul>
+          <dl class="chart-legend">
+            <div><dt>Busiest</dt><dd>Saturday &middot; 142</dd></div>
+            <div><dt>Average</dt><dd>99 a day</dd></div>
+            <div><dt>Total</dt><dd>695 orders</dd></div>
+          </dl>
+        </article>
+
+        <article class="card selling">
+          <header class="card-head">
+            <div>
+              <h3>Selling today</h3>
+              <p class="card-sub">Top five by order count</p>
+            </div>
+          </header>
+
+          <ol class="rank">
+            <li>
+              <span class="rank-no">1</span>
+              <img src="images/dish-burger.jpg" alt="">
+              <span class="rank-body"><strong>Coolaroo Burger</strong><span>$22.00</span></span>
+              <span class="rank-count">38</span>
+            </li>
+            <li>
+              <span class="rank-no">2</span>
+              <img src="images/dish-margherita.jpg" alt="">
+              <span class="rank-body"><strong>Margherita</strong><span>$19.00</span></span>
+              <span class="rank-count">31</span>
+            </li>
+            <li>
+              <span class="rank-no">3</span>
+              <img src="images/dish-rigatoni.jpg" alt="">
+              <span class="rank-body"><strong>Rigatoni Rag&ugrave;</strong><span>$25.00</span></span>
+              <span class="rank-count">24</span>
+            </li>
+            <li>
+              <span class="rank-no">4</span>
+              <img src="images/dish-tacos.jpg" alt="">
+              <span class="rank-body"><strong>Fish Tacos</strong><span>$18.00</span></span>
+              <span class="rank-count">19</span>
+            </li>
+            <li>
+              <span class="rank-no">5</span>
+              <img src="images/dish-porterhouse.jpg" alt="">
+              <span class="rank-body"><strong>Porterhouse</strong><span>$39.00</span></span>
+              <span class="rank-count">14</span>
+            </li>
+          </ol>
+
+          <a class="link-more" href="#reports">
+            Full menu report
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 6l6 6-6 6"/></svg>
+          </a>
+        </article>
+
+        <article class="card wide">
+          <header class="card-head">
+            <div>
+              <h3>Orders needing attention</h3>
+              <p class="card-sub">Anything not yet served or cancelled</p>
+            </div>
+            <a class="btn btn-ghost" href="#orders">All orders</a>
+          </header>
+
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Item</th>
+                  <th scope="col">Order</th>
+                  <th scope="col">Customer</th>
+                  <th scope="col" class="num">Qty</th>
+                  <th scope="col" class="num">Total</th>
+                  <th scope="col">Status</th>
+                  <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="cell-item">
+                      <img src="images/dish-burger.jpg" alt="">
+                      <span><strong>Coolaroo Burger</strong><span>Table 12</span></span>
+                    </span>
+                  </td>
+                  <td class="mono">#CLR-2418</td>
+                  <td>Dana Whitfield</td>
+                  <td class="num">3</td>
+                  <td class="num">$64.00</td>
+                  <td><span class="badge b-pending">Pending payment</span></td>
+                  <td class="row-actions">
+                    <button class="btn btn-solid" type="button">Take payment</button>
+                    <button class="btn btn-quiet" type="button">View</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="cell-item">
+                      <img src="images/dish-fish.jpg" alt="">
+                      <span><strong>Market Fish</strong><span>Table 4</span></span>
+                    </span>
+                  </td>
+                  <td class="mono">#CLR-2417</td>
+                  <td>Sam Okonkwo</td>
+                  <td class="num">1</td>
+                  <td class="num">$34.00</td>
+                  <td><span class="badge b-preparing">Preparing</span></td>
+                  <td class="row-actions">
+                    <button class="btn btn-solid" type="button">Mark ready</button>
+                    <button class="btn btn-quiet" type="button">View</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="cell-item">
+                      <img src="images/dish-tacos.jpg" alt="">
+                      <span><strong>Fish Tacos</strong><span>Takeaway counter</span></span>
+                    </span>
+                  </td>
+                  <td class="mono">#CLR-2412</td>
+                  <td>Liam Doyle</td>
+                  <td class="num">2</td>
+                  <td class="num">$36.00</td>
+                  <td><span class="badge b-ready">Ready</span></td>
+                  <td class="row-actions">
+                    <button class="btn btn-solid" type="button">Mark served</button>
+                    <button class="btn btn-quiet" type="button">View</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="orders">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">Service</p>
+          <h2>Orders</h2>
+          <p class="block-sub">Every order taken today, newest first.</p>
+        </div>
+        <button class="btn btn-solid btn-lg" type="button">New order</button>
+      </header>
+
+      <div class="card">
+        <div class="toolbar">
+          <div class="filters" role="group" aria-label="Filter by status">
+            <button class="chip is-on" type="button" aria-pressed="true">All <span>126</span></button>
+            <button class="chip" type="button">Pending payment <span>9</span></button>
+            <button class="chip" type="button">Preparing <span>31</span></button>
+            <button class="chip" type="button">Ready <span>24</span></button>
+            <button class="chip" type="button">Served <span>58</span></button>
+            <button class="chip" type="button">Cancelled <span>4</span></button>
+          </div>
+          <div class="toolbar-right">
+            <div class="field-inline">
+              <label class="sr-only" for="ord-date">Date</label>
+              <input id="ord-date" type="date" value="2026-09-01">
+            </div>
+            <div class="search search-sm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+              <label class="sr-only" for="ord-q">Search by order number or customer</label>
+              <input id="ord-q" type="search" placeholder="Order no. or customer">
+            </div>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Item</th>
+                <th scope="col">Order</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Placed</th>
+                <th scope="col" class="num">Qty</th>
+                <th scope="col" class="num">Total</th>
+                <th scope="col">Status</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span class="cell-item">
+                    <img src="images/dish-burger.jpg" alt="">
+                    <span><strong>Coolaroo Burger</strong><span>Table 12</span></span>
+                  </span>
+                </td>
+                <td class="mono">#CLR-2418</td>
+                <td>Dana Whitfield</td>
+                <td class="muted">7:42pm</td>
+                <td class="num">3</td>
+                <td class="num">$64.00</td>
+                <td><span class="badge b-pending">Pending payment</span></td>
+                <td class="row-actions">
+                  <button class="btn btn-solid" type="button">Take payment</button>
+                  <button class="btn btn-quiet" type="button">View</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="cell-item">
+                    <img src="images/dish-fish.jpg" alt="">
+                    <span><strong>Market Fish</strong><span>Table 4</span></span>
+                  </span>
+                </td>
+                <td class="mono">#CLR-2417</td>
+                <td>Sam Okonkwo</td>
+                <td class="muted">7:38pm</td>
+                <td class="num">1</td>
+                <td class="num">$34.00</td>
+                <td><span class="badge b-preparing">Preparing</span></td>
+                <td class="row-actions">
+                  <button class="btn btn-solid" type="button">Mark ready</button>
+                  <button class="btn btn-quiet" type="button">View</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="cell-item">
+                    <img src="images/dish-margherita.jpg" alt="">
+                    <span><strong>Margherita</strong><span>Table 9</span></span>
+                  </span>
+                </td>
+                <td class="mono">#CLR-2415</td>
+                <td>Priya Raman</td>
+                <td class="muted">7:21pm</td>
+                <td class="num">3</td>
+                <td class="num">$57.00</td>
+                <td><span class="badge b-preparing">Preparing</span></td>
+                <td class="row-actions">
+                  <button class="btn btn-solid" type="button">Mark ready</button>
+                  <button class="btn btn-quiet" type="button">View</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="cell-item">
+                    <img src="images/dish-tacos.jpg" alt="">
+                    <span><strong>Fish Tacos</strong><span>Takeaway counter</span></span>
+                  </span>
+                </td>
+                <td class="mono">#CLR-2412</td>
+                <td>Liam Doyle</td>
+                <td class="muted">7:06pm</td>
+                <td class="num">2</td>
+                <td class="num">$36.00</td>
+                <td><span class="badge b-ready">Ready</span></td>
+                <td class="row-actions">
+                  <button class="btn btn-solid" type="button">Mark served</button>
+                  <button class="btn btn-quiet" type="button">View</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="cell-item">
+                    <img src="images/dish-prawns.jpg" alt="">
+                    <span><strong>Garlic Prawns</strong><span>Table 2</span></span>
+                  </span>
+                </td>
+                <td class="mono">#CLR-2409</td>
+                <td>Aroha Kingi</td>
+                <td class="muted">6:54pm</td>
+                <td class="num">1</td>
+                <td class="num">$26.00</td>
+                <td><span class="badge b-served">Served</span></td>
+                <td class="row-actions">
+                  <button class="btn btn-quiet" type="button">View</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="cell-item">
+                    <img src="images/dish-porterhouse.jpg" alt="">
+                    <span><strong>Porterhouse</strong><span>Table 15</span></span>
+                  </span>
+                </td>
+                <td class="mono">#CLR-2407</td>
+                <td>Jess Tanner</td>
+                <td class="muted">6:47pm</td>
+                <td class="num">2</td>
+                <td class="num">$78.00</td>
+                <td><span class="badge b-served">Served</span></td>
+                <td class="row-actions">
+                  <button class="btn btn-quiet" type="button">View</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="cell-item">
+                    <img src="images/dish-gelato.jpg" alt="">
+                    <span><strong>Triple Gelato</strong><span>Table 7</span></span>
+                  </span>
+                </td>
+                <td class="mono">#CLR-2406</td>
+                <td>Marco Bianchi</td>
+                <td class="muted">6:40pm</td>
+                <td class="num">2</td>
+                <td class="num">$22.00</td>
+                <td><span class="badge b-cancelled">Cancelled</span></td>
+                <td class="row-actions">
+                  <button class="btn btn-quiet" type="button">View</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <p>Showing 7 of 126 orders</p>
+          <div class="pager-btns">
+            <button class="btn btn-quiet" type="button" disabled>Previous</button>
+            <button class="btn btn-quiet" type="button">Next</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="reservations">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">Service</p>
+          <h2>Reservations</h2>
+          <p class="block-sub">Bookings taken from the public site and over the phone.</p>
+        </div>
+        <button class="btn btn-solid btn-lg" type="button">Add booking</button>
+      </header>
+
+      <div class="grid">
+        <article class="card tile">
+          <p class="tile-value">18</p>
+          <p class="tile-name">Covers booked tonight</p>
+          <p class="tile-change up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+            6 <span>walk-ins expected</span>
+          </p>
+        </article>
+        <article class="card tile">
+          <p class="tile-value">7</p>
+          <p class="tile-name">Tables free after 8pm</p>
+          <p class="tile-change">of 22 tables</p>
+        </article>
+        <article class="card tile">
+          <p class="tile-value">2</p>
+          <p class="tile-name">Awaiting confirmation</p>
+          <p class="tile-change down">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            <span>ring the customer back</span>
+          </p>
+        </article>
+
+        <article class="card wide">
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Time</th>
+                  <th scope="col" class="num">Party</th>
+                  <th scope="col">Table</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Status</th>
+                  <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">DW</span> Dana Whitfield</span></td>
+                  <td>Tue 1 Sep</td>
+                  <td class="mono">7:30pm</td>
+                  <td class="num">4</td>
+                  <td>12</td>
+                  <td class="muted">0412 668 201</td>
+                  <td><span class="badge b-ready">Confirmed</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">HN</span> Hana Nguyen</span></td>
+                  <td>Tue 1 Sep</td>
+                  <td class="mono">8:00pm</td>
+                  <td class="num">2</td>
+                  <td>6</td>
+                  <td class="muted">0431 907 554</td>
+                  <td><span class="badge b-ready">Confirmed</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">TB</span> Tom Brennan</span></td>
+                  <td>Tue 1 Sep</td>
+                  <td class="mono">8:15pm</td>
+                  <td class="num">6</td>
+                  <td class="muted">unassigned</td>
+                  <td class="muted">0455 120 883</td>
+                  <td><span class="badge b-preparing">Awaiting confirmation</span></td>
+                  <td class="row-actions">
+                    <button class="btn btn-solid" type="button">Confirm</button>
+                    <button class="btn btn-quiet" type="button">View</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">SO</span> Sam Okonkwo</span></td>
+                  <td>Wed 2 Sep</td>
+                  <td class="mono">6:45pm</td>
+                  <td class="num">3</td>
+                  <td>4</td>
+                  <td class="muted">0400 731 649</td>
+                  <td><span class="badge b-ready">Confirmed</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">MB</span> Marco Bianchi</span></td>
+                  <td>Sat 5 Sep</td>
+                  <td class="mono">7:00pm</td>
+                  <td class="num">10</td>
+                  <td>long table</td>
+                  <td class="muted">0466 288 015</td>
+                  <td><span class="badge b-preparing">Awaiting confirmation</span></td>
+                  <td class="row-actions">
+                    <button class="btn btn-solid" type="button">Confirm</button>
+                    <button class="btn btn-quiet" type="button">View</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="menu">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">Catalogue</p>
+          <h2>Menu items</h2>
+          <p class="block-sub">Forty-eight dishes across six categories. Toggle a dish off and it disappears from the public menu straight away.</p>
+        </div>
+        <button class="btn btn-solid btn-lg" type="button">Add item</button>
+      </header>
+
+      <div class="editor">
+        <div class="editor-main">
+          <div class="card">
+            <div class="toolbar">
+              <div class="filters" role="group" aria-label="Filter by category">
+                <button class="chip is-on" type="button" aria-pressed="true">All <span>48</span></button>
+                <button class="chip" type="button">Pizza <span>9</span></button>
+                <button class="chip" type="button">Pasta <span>7</span></button>
+                <button class="chip" type="button">From the grill <span>8</span></button>
+                <button class="chip" type="button">Seafood <span>6</span></button>
+                <button class="chip" type="button">Dessert <span>11</span></button>
+                <button class="chip" type="button">Drinks <span>7</span></button>
+              </div>
+              <div class="search search-sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                <label class="sr-only" for="menu-q">Search menu items</label>
+                <input id="menu-q" type="search" placeholder="Search dishes">
+              </div>
+            </div>
+
+            <ul class="items">
+              <li class="item is-editing">
+                <img src="images/dish-margherita.jpg" alt="">
+                <span class="item-body">
+                  <strong>Margherita</strong>
+                  <span class="item-meta">Pizza &middot; San Marzano, fior di latte, basil</span>
+                </span>
+                <span class="item-price">$19.00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Margherita available</span>
+                </label>
+                <span class="item-actions">
+                  <button class="btn btn-quiet" type="button">Edit</button>
+                  <button class="icon-sm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                    <span class="sr-only">Delete Margherita</span>
+                  </button>
+                </span>
+              </li>
+
+              <li class="item">
+                <img src="images/dish-burger.jpg" alt="">
+                <span class="item-body">
+                  <strong>Coolaroo Burger</strong>
+                  <span class="item-meta">From the grill &middot; Double beef, cheddar, pickles</span>
+                </span>
+                <span class="item-price">$22.00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Coolaroo Burger available</span>
+                </label>
+                <span class="item-actions">
+                  <button class="btn btn-quiet" type="button">Edit</button>
+                  <button class="icon-sm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                    <span class="sr-only">Delete Coolaroo Burger</span>
+                  </button>
+                </span>
+              </li>
+
+              <li class="item">
+                <img src="images/dish-rigatoni.jpg" alt="">
+                <span class="item-body">
+                  <strong>Rigatoni Rag&ugrave;</strong>
+                  <span class="item-meta">Pasta &middot; Slow beef, tomato, pecorino</span>
+                </span>
+                <span class="item-price">$25.00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Rigatoni available</span>
+                </label>
+                <span class="item-actions">
+                  <button class="btn btn-quiet" type="button">Edit</button>
+                  <button class="icon-sm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                    <span class="sr-only">Delete Rigatoni</span>
+                  </button>
+                </span>
+              </li>
+
+              <li class="item is-off">
+                <img src="images/dish-fish.jpg" alt="">
+                <span class="item-body">
+                  <strong>Market Fish</strong>
+                  <span class="item-meta">Seafood &middot; Whole snapper, lemon, salsa verde</span>
+                </span>
+                <span class="item-price">$34.00</span>
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Market Fish available</span>
+                </label>
+                <span class="item-actions">
+                  <button class="btn btn-quiet" type="button">Edit</button>
+                  <button class="icon-sm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                    <span class="sr-only">Delete Market Fish</span>
+                  </button>
+                </span>
+              </li>
+
+              <li class="item">
+                <img src="images/dish-porterhouse.jpg" alt="">
+                <span class="item-body">
+                  <strong>Porterhouse</strong>
+                  <span class="item-meta">From the grill &middot; 300g grass-fed, duck-fat potatoes</span>
+                </span>
+                <span class="item-price">$39.00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Porterhouse available</span>
+                </label>
+                <span class="item-actions">
+                  <button class="btn btn-quiet" type="button">Edit</button>
+                  <button class="icon-sm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                    <span class="sr-only">Delete Porterhouse</span>
+                  </button>
+                </span>
+              </li>
+
+              <li class="item is-off">
+                <img src="images/dish-prawns.jpg" alt="">
+                <span class="item-body">
+                  <strong>Garlic Prawns</strong>
+                  <span class="item-meta">Seafood &middot; Chilli, parsley, grilled sourdough</span>
+                </span>
+                <span class="item-price">$26.00</span>
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Garlic Prawns available</span>
+                </label>
+                <span class="item-actions">
+                  <button class="btn btn-quiet" type="button">Edit</button>
+                  <button class="icon-sm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                    <span class="sr-only">Delete Garlic Prawns</span>
+                  </button>
+                </span>
+              </li>
+
+              <li class="item">
+                <img src="images/dish-gelato.jpg" alt="">
+                <span class="item-body">
+                  <strong>Triple Gelato</strong>
+                  <span class="item-meta">Dessert &middot; Pistachio, stracciatella, raspberry</span>
+                </span>
+                <span class="item-price">$11.00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Triple Gelato available</span>
+                </label>
+                <span class="item-actions">
+                  <button class="btn btn-quiet" type="button">Edit</button>
+                  <button class="icon-sm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                    <span class="sr-only">Delete Triple Gelato</span>
+                  </button>
+                </span>
+              </li>
+
+              <li class="item">
+                <img src="images/dish-espresso.jpg" alt="">
+                <span class="item-body">
+                  <strong>Espresso</strong>
+                  <span class="item-meta">Drinks &middot; Local roast, single origin</span>
+                </span>
+                <span class="item-price">$4.00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Espresso available</span>
+                </label>
+                <span class="item-actions">
+                  <button class="btn btn-quiet" type="button">Edit</button>
+                  <button class="icon-sm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+                    <span class="sr-only">Delete Espresso</span>
+                  </button>
+                </span>
+              </li>
+            </ul>
+
+            <div class="pager">
+              <p>Showing 8 of 48 items</p>
+              <div class="pager-btns">
+                <button class="btn btn-quiet" type="button" disabled>Previous</button>
+                <button class="btn btn-quiet" type="button">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="editor-side">
+          <div class="card form-card">
+            <header class="card-head">
+              <div>
+                <h3>Edit item</h3>
+                <p class="card-sub">Margherita</p>
+              </div>
+            </header>
+
+            <div class="upload">
+              <img src="images/dish-margherita.jpg" alt="Current photo for Margherita">
+              <div class="upload-copy">
+                <p><strong>dish-margherita.jpg</strong></p>
+                <p class="muted">Square, at least 600&times;600</p>
+                <button class="btn btn-quiet" type="button">Replace photo</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f-name">Item name</label>
+              <input id="f-name" type="text" value="Margherita">
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="f-cat">Category</label>
+                <select id="f-cat">
+                  <option selected>Pizza</option>
+                  <option>Pasta</option>
+                  <option>From the grill</option>
+                  <option>Seafood</option>
+                  <option>Dessert</option>
+                  <option>Drinks</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="f-price">Price (AUD)</label>
+                <input id="f-price" type="text" value="19.00" inputmode="decimal">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f-desc">Description</label>
+              <textarea id="f-desc" rows="3">San Marzano, fior di latte, basil</textarea>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Dietary</span>
+              <div class="checks">
+                <label><input type="checkbox" checked> Vegetarian</label>
+                <label><input type="checkbox"> Vegan option</label>
+                <label><input type="checkbox" checked> Gluten-free base</label>
+                <label><input type="checkbox"> Contains nuts</label>
+              </div>
+            </div>
+
+            <div class="field-switch">
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-track"><span class="switch-knob"></span></span>
+                <span class="sr-only">Available tonight</span>
+              </label>
+              <span>
+                <strong>Available tonight</strong>
+                <span class="muted">Shows on the public menu and the table QR code</span>
+              </span>
+            </div>
+
+            <div class="form-foot">
+              <button class="btn btn-solid btn-lg" type="button">Save changes</button>
+              <button class="btn btn-quiet btn-lg" type="button">Cancel</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="block" id="categories">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">Catalogue</p>
+          <h2>Categories</h2>
+          <p class="block-sub">The order here is the order they appear on the public menu.</p>
+        </div>
+        <button class="btn btn-solid btn-lg" type="button">Add category</button>
+      </header>
+
+      <div class="cat-grid">
+        <article class="card cat">
+          <span class="cat-order">1</span>
+          <img src="images/dish-margherita.jpg" alt="">
+          <div class="cat-body">
+            <strong>Pizza</strong>
+            <span class="muted">9 items &middot; 2 unavailable</span>
+          </div>
+          <button class="btn btn-quiet" type="button">Edit</button>
+        </article>
+        <article class="card cat">
+          <span class="cat-order">2</span>
+          <img src="images/dish-rigatoni.jpg" alt="">
+          <div class="cat-body">
+            <strong>Pasta</strong>
+            <span class="muted">7 items</span>
+          </div>
+          <button class="btn btn-quiet" type="button">Edit</button>
+        </article>
+        <article class="card cat">
+          <span class="cat-order">3</span>
+          <img src="images/dish-porterhouse.jpg" alt="">
+          <div class="cat-body">
+            <strong>From the grill</strong>
+            <span class="muted">8 items</span>
+          </div>
+          <button class="btn btn-quiet" type="button">Edit</button>
+        </article>
+        <article class="card cat">
+          <span class="cat-order">4</span>
+          <img src="images/dish-prawns.jpg" alt="">
+          <div class="cat-body">
+            <strong>Seafood</strong>
+            <span class="muted">6 items &middot; 1 unavailable</span>
+          </div>
+          <button class="btn btn-quiet" type="button">Edit</button>
+        </article>
+        <article class="card cat">
+          <span class="cat-order">5</span>
+          <img src="images/dish-cupcake.jpg" alt="">
+          <div class="cat-body">
+            <strong>Dessert</strong>
+            <span class="muted">11 items</span>
+          </div>
+          <button class="btn btn-quiet" type="button">Edit</button>
+        </article>
+        <article class="card cat">
+          <span class="cat-order">6</span>
+          <img src="images/dish-espresso.jpg" alt="">
+          <div class="cat-body">
+            <strong>Drinks</strong>
+            <span class="muted">7 items</span>
+          </div>
+          <button class="btn btn-quiet" type="button">Edit</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="customers">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">People</p>
+          <h2>Customers</h2>
+          <p class="block-sub">Anyone who has ordered or booked with us.</p>
+        </div>
+        <button class="btn btn-solid btn-lg" type="button">Export CSV</button>
+      </header>
+
+      <div class="grid">
+        <article class="card tile">
+          <p class="tile-value">1,842</p>
+          <p class="tile-name">Total customers</p>
+          <p class="tile-change up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+            57 <span>new this month</span>
+          </p>
+        </article>
+        <article class="card tile">
+          <p class="tile-value">$46.20</p>
+          <p class="tile-name">Average spend per visit</p>
+          <p class="tile-change up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+            2.8% <span>vs last month</span>
+          </p>
+        </article>
+        <article class="card tile">
+          <p class="tile-value">312</p>
+          <p class="tile-name">Regulars</p>
+          <p class="tile-change">five visits or more</p>
+        </article>
+
+        <article class="card wide">
+          <div class="toolbar">
+            <div class="filters" role="group" aria-label="Filter customers">
+              <button class="chip is-on" type="button" aria-pressed="true">All <span>1,842</span></button>
+              <button class="chip" type="button">Regulars <span>312</span></button>
+              <button class="chip" type="button">New this month <span>57</span></button>
+              <button class="chip" type="button">Lapsed <span>128</span></button>
+            </div>
+            <div class="search search-sm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+              <label class="sr-only" for="cust-q">Search customers</label>
+              <input id="cust-q" type="search" placeholder="Name, email or phone">
+            </div>
+          </div>
+
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Contact</th>
+                  <th scope="col" class="num">Orders</th>
+                  <th scope="col" class="num">Total spent</th>
+                  <th scope="col">Last order</th>
+                  <th scope="col">Tag</th>
+                  <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">DW</span> Dana Whitfield</span></td>
+                  <td class="muted">dana.w@example.com<br>0412 668 201</td>
+                  <td class="num">24</td>
+                  <td class="num">$1,184.50</td>
+                  <td class="muted">Tonight</td>
+                  <td><span class="tag tag-gold">Regular</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">SO</span> Sam Okonkwo</span></td>
+                  <td class="muted">s.okonkwo@example.com<br>0400 731 649</td>
+                  <td class="num">17</td>
+                  <td class="num">$806.00</td>
+                  <td class="muted">Tonight</td>
+                  <td><span class="tag tag-gold">Regular</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">PR</span> Priya Raman</span></td>
+                  <td class="muted">priya.r@example.com<br>0427 553 118</td>
+                  <td class="num">9</td>
+                  <td class="num">$413.00</td>
+                  <td class="muted">Tonight</td>
+                  <td><span class="tag tag-gold">Regular</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">LD</span> Liam Doyle</span></td>
+                  <td class="muted">liam.doyle@example.com<br>0490 224 776</td>
+                  <td class="num">3</td>
+                  <td class="num">$98.00</td>
+                  <td class="muted">Tonight</td>
+                  <td><span class="tag tag-new">New</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">AK</span> Aroha Kingi</span></td>
+                  <td class="muted">aroha.k@example.com<br>0466 019 342</td>
+                  <td class="num">31</td>
+                  <td class="num">$1,602.75</td>
+                  <td class="muted">Tonight</td>
+                  <td><span class="tag tag-gold">Regular</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-person"><span class="avatar avatar-sm">MB</span> Marco Bianchi</span></td>
+                  <td class="muted">m.bianchi@example.com<br>0466 288 015</td>
+                  <td class="num">6</td>
+                  <td class="num">$244.00</td>
+                  <td class="muted">14 Jun 2026</td>
+                  <td><span class="tag tag-quiet">Lapsed</span></td>
+                  <td class="row-actions"><button class="btn btn-quiet" type="button">View</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pager">
+            <p>Showing 6 of 1,842 customers</p>
+            <div class="pager-btns">
+              <button class="btn btn-quiet" type="button" disabled>Previous</button>
+              <button class="btn btn-quiet" type="button">Next</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="staff">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">People</p>
+          <h2>Staff</h2>
+          <p class="block-sub">Accounts are created here — there is no public sign-up.</p>
+        </div>
+        <button class="btn btn-solid btn-lg" type="button">Add staff member</button>
+      </header>
+
+      <div class="staff-grid">
+        <article class="card person">
+          <span class="avatar avatar-lg">RS</span>
+          <div class="person-body">
+            <strong>Rafi Sardar</strong>
+            <span class="muted">rafi@coolaroo.com.au</span>
+            <span class="role role-admin">Manager</span>
+          </div>
+          <dl class="person-meta">
+            <div><dt>Shift</dt><dd>Tue&ndash;Sat, evenings</dd></div>
+            <div><dt>Status</dt><dd><span class="badge b-ready">Active</span></dd></div>
+          </dl>
+          <div class="person-foot">
+            <button class="btn btn-quiet" type="button">Edit</button>
+            <button class="btn btn-quiet" type="button">Reset password</button>
+          </div>
+        </article>
+
+        <article class="card person">
+          <span class="avatar avatar-lg">JT</span>
+          <div class="person-body">
+            <strong>Jess Tanner</strong>
+            <span class="muted">jess@coolaroo.com.au</span>
+            <span class="role role-kitchen">Head chef</span>
+          </div>
+          <dl class="person-meta">
+            <div><dt>Shift</dt><dd>Tue&ndash;Sun, all day</dd></div>
+            <div><dt>Status</dt><dd><span class="badge b-ready">Active</span></dd></div>
+          </dl>
+          <div class="person-foot">
+            <button class="btn btn-quiet" type="button">Edit</button>
+            <button class="btn btn-quiet" type="button">Reset password</button>
+          </div>
+        </article>
+
+        <article class="card person">
+          <span class="avatar avatar-lg">HN</span>
+          <div class="person-body">
+            <strong>Hana Nguyen</strong>
+            <span class="muted">hana@coolaroo.com.au</span>
+            <span class="role role-floor">Front of house</span>
+          </div>
+          <dl class="person-meta">
+            <div><dt>Shift</dt><dd>Wed&ndash;Sun, evenings</dd></div>
+            <div><dt>Status</dt><dd><span class="badge b-ready">Active</span></dd></div>
+          </dl>
+          <div class="person-foot">
+            <button class="btn btn-quiet" type="button">Edit</button>
+            <button class="btn btn-quiet" type="button">Reset password</button>
+          </div>
+        </article>
+
+        <article class="card person">
+          <span class="avatar avatar-lg">TB</span>
+          <div class="person-body">
+            <strong>Tom Brennan</strong>
+            <span class="muted">tom@coolaroo.com.au</span>
+            <span class="role role-floor">Front of house</span>
+          </div>
+          <dl class="person-meta">
+            <div><dt>Shift</dt><dd>Fri&ndash;Sun, evenings</dd></div>
+            <div><dt>Status</dt><dd><span class="badge b-ready">Active</span></dd></div>
+          </dl>
+          <div class="person-foot">
+            <button class="btn btn-quiet" type="button">Edit</button>
+            <button class="btn btn-quiet" type="button">Reset password</button>
+          </div>
+        </article>
+
+        <article class="card person">
+          <span class="avatar avatar-lg">GC</span>
+          <div class="person-body">
+            <strong>Gio Castellan</strong>
+            <span class="muted">gio@coolaroo.com.au</span>
+            <span class="role role-kitchen">Kitchen hand</span>
+          </div>
+          <dl class="person-meta">
+            <div><dt>Shift</dt><dd>Thu&ndash;Sat, evenings</dd></div>
+            <div><dt>Status</dt><dd><span class="badge b-served">On leave</span></dd></div>
+          </dl>
+          <div class="person-foot">
+            <button class="btn btn-quiet" type="button">Edit</button>
+            <button class="btn btn-quiet" type="button">Reset password</button>
+          </div>
+        </article>
+
+        <article class="card person">
+          <span class="avatar avatar-lg">EM</span>
+          <div class="person-body">
+            <strong>Ellie Moss</strong>
+            <span class="muted">ellie@coolaroo.com.au</span>
+            <span class="role role-floor">Bar</span>
+          </div>
+          <dl class="person-meta">
+            <div><dt>Shift</dt><dd>Tue&ndash;Thu, evenings</dd></div>
+            <div><dt>Status</dt><dd><span class="badge b-cancelled">Suspended</span></dd></div>
+          </dl>
+          <div class="person-foot">
+            <button class="btn btn-quiet" type="button">Edit</button>
+            <button class="btn btn-quiet" type="button">Reset password</button>
+          </div>
+        </article>
+      </div>
+
+      <div class="card roles">
+        <header class="card-head">
+          <div>
+            <h3>Roles</h3>
+            <p class="card-sub">What each role can reach in the admin</p>
+          </div>
+        </header>
+        <div class="table-scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Role</th>
+                <th scope="col">Orders</th>
+                <th scope="col">Menu</th>
+                <th scope="col">Customers</th>
+                <th scope="col">Staff</th>
+                <th scope="col">Reports</th>
+                <th scope="col">Settings</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="role role-admin">Manager</span></td>
+                <td class="yes">Full</td><td class="yes">Full</td><td class="yes">Full</td>
+                <td class="yes">Full</td><td class="yes">Full</td><td class="yes">Full</td>
+              </tr>
+              <tr>
+                <td><span class="role role-kitchen">Kitchen</span></td>
+                <td class="yes">Status only</td><td class="yes">Availability</td><td class="no">&mdash;</td>
+                <td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td>
+              </tr>
+              <tr>
+                <td><span class="role role-floor">Front of house</span></td>
+                <td class="yes">Full</td><td class="yes">Read only</td><td class="yes">Read only</td>
+                <td class="no">&mdash;</td><td class="no">&mdash;</td><td class="no">&mdash;</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="feedback">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">People</p>
+          <h2>Feedback</h2>
+          <p class="block-sub">Reviews left on the public site. Nothing appears publicly until it is approved.</p>
+        </div>
+      </header>
+
+      <div class="grid">
+        <article class="card tile">
+          <p class="tile-value">4.6<span class="of">/5</span></p>
+          <p class="tile-name">Average rating</p>
+          <p class="tile-change up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+            0.2 <span>vs last month</span>
+          </p>
+        </article>
+        <article class="card tile">
+          <p class="tile-value">268</p>
+          <p class="tile-name">Reviews all up</p>
+          <p class="tile-change">since March 2025</p>
+        </article>
+        <article class="card tile">
+          <p class="tile-value">4</p>
+          <p class="tile-name">Waiting on approval</p>
+          <p class="tile-change down">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            <span>oldest is 2 days</span>
+          </p>
+        </article>
+
+        <article class="card wide">
+          <div class="toolbar">
+            <div class="filters" role="group" aria-label="Filter reviews">
+              <button class="chip is-on" type="button" aria-pressed="true">All <span>268</span></button>
+              <button class="chip" type="button">Pending <span>4</span></button>
+              <button class="chip" type="button">Approved <span>259</span></button>
+              <button class="chip" type="button">Hidden <span>5</span></button>
+            </div>
+          </div>
+
+          <ul class="reviews">
+            <li class="review is-pending">
+              <span class="avatar avatar-sm">PR</span>
+              <div class="review-body">
+                <div class="review-top">
+                  <strong>Priya Raman</strong>
+                  <span class="stars" role="img" aria-label="5 out of 5">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                  </span>
+                  <span class="badge b-preparing">Pending</span>
+                  <span class="review-date muted">30 Aug 2026</span>
+                </div>
+                <p class="review-dish muted">On <strong>Margherita</strong></p>
+                <p class="review-text">Best pizza I have had north of the city. The base actually tastes of something. Back next week.</p>
+                <div class="review-actions">
+                  <button class="btn btn-solid" type="button">Approve</button>
+                  <button class="btn btn-quiet" type="button">Hide</button>
+                  <button class="btn btn-quiet" type="button">Reply</button>
+                </div>
+              </div>
+            </li>
+
+            <li class="review is-pending">
+              <span class="avatar avatar-sm">TB</span>
+              <div class="review-body">
+                <div class="review-top">
+                  <strong>Tom Brennan</strong>
+                  <span class="stars" role="img" aria-label="2 out of 5">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg class="off" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg class="off" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg class="off" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                  </span>
+                  <span class="badge b-preparing">Pending</span>
+                  <span class="review-date muted">30 Aug 2026</span>
+                </div>
+                <p class="review-dish muted">On <strong>Market Fish</strong></p>
+                <p class="review-text">Waited fifty minutes on a Tuesday. Fish was good when it turned up but that is a long time with a hungry four-year-old.</p>
+                <div class="review-actions">
+                  <button class="btn btn-solid" type="button">Approve</button>
+                  <button class="btn btn-quiet" type="button">Hide</button>
+                  <button class="btn btn-quiet" type="button">Reply</button>
+                </div>
+              </div>
+            </li>
+
+            <li class="review">
+              <span class="avatar avatar-sm">AK</span>
+              <div class="review-body">
+                <div class="review-top">
+                  <strong>Aroha Kingi</strong>
+                  <span class="stars" role="img" aria-label="5 out of 5">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                  </span>
+                  <span class="badge b-ready">Approved</span>
+                  <span class="review-date muted">28 Aug 2026</span>
+                </div>
+                <p class="review-dish muted">On <strong>Garlic Prawns</strong></p>
+                <p class="review-text">Sat at the bar on my own and was looked after like a regular. The prawns are worth the drive.</p>
+                <div class="review-actions">
+                  <button class="btn btn-quiet" type="button">Hide</button>
+                  <button class="btn btn-quiet" type="button">Reply</button>
+                </div>
+              </div>
+            </li>
+
+            <li class="review is-hidden">
+              <span class="avatar avatar-sm">JD</span>
+              <div class="review-body">
+                <div class="review-top">
+                  <strong>J. Doe</strong>
+                  <span class="stars" role="img" aria-label="1 out of 5">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg class="off" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg class="off" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg class="off" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                    <svg class="off" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l2.3 4.9 5.2.7-3.8 3.7 1 5.3-4.7-2.6-4.7 2.6 1-5.3L4.5 9.6l5.2-.7z"/></svg>
+                  </span>
+                  <span class="badge b-cancelled">Hidden</span>
+                  <span class="review-date muted">21 Aug 2026</span>
+                </div>
+                <p class="review-dish muted">On <strong>Coolaroo Burger</strong></p>
+                <p class="review-text">Hidden by Rafi S. &mdash; abusive language, no order matches this account.</p>
+                <div class="review-actions">
+                  <button class="btn btn-quiet" type="button">Restore</button>
+                  <button class="btn btn-quiet" type="button">Delete</button>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="reports">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">Insight</p>
+          <h2>Reports</h2>
+          <p class="block-sub">Week to 31 August 2026.</p>
+        </div>
+        <button class="btn btn-solid btn-lg" type="button">Export PDF</button>
+      </header>
+
+      <div class="grid">
+        <article class="card chart-card">
+          <header class="card-head">
+            <div>
+              <h3>Revenue by day</h3>
+              <p class="card-sub">Saturday carried the week</p>
+            </div>
+            <div class="tabs" role="group" aria-label="Range">
+              <button class="is-on" type="button" aria-pressed="true">Week</button>
+              <button type="button">Month</button>
+              <button type="button">Year</button>
+            </div>
+          </header>
+          <div class="chart">
+            <img src="images/chart-revenue.png" alt="Bar chart of revenue per day, peaking on Saturday at $4,860">
+          </div>
+          <ul class="chart-axis">
+            <li>Mon</li><li>Tue</li><li>Wed</li><li>Thu</li><li>Fri</li><li>Sat</li><li>Sun</li>
+          </ul>
+          <dl class="chart-legend">
+            <div><dt>Week total</dt><dd>$24,650</dd></div>
+            <div><dt>Best day</dt><dd>Sat &middot; $4,860</dd></div>
+            <div><dt>Average</dt><dd>$3,521</dd></div>
+          </dl>
+        </article>
+
+        <article class="card takings">
+          <header class="card-head">
+            <div>
+              <h3>Orders by status</h3>
+              <p class="card-sub">126 orders today</p>
+            </div>
+          </header>
+          <div class="radial">
+            <img src="images/chart-status.png" alt="Donut chart splitting today's orders by status">
+            <span class="radial-mid">
+              <strong>126</strong>
+              <span>orders</span>
+            </span>
+          </div>
+          <ul class="key">
+            <li><span class="key-dot d-served"></span> Served <strong>58</strong></li>
+            <li><span class="key-dot d-preparing"></span> Preparing <strong>31</strong></li>
+            <li><span class="key-dot d-ready"></span> Ready <strong>24</strong></li>
+            <li><span class="key-dot d-pending"></span> Pending payment <strong>9</strong></li>
+            <li><span class="key-dot d-cancelled"></span> Cancelled <strong>4</strong></li>
+          </ul>
+        </article>
+
+        <article class="card wide">
+          <header class="card-head">
+            <div>
+              <h3>Top-selling items</h3>
+              <p class="card-sub">By revenue, week to 31 August</p>
+            </div>
+          </header>
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Item</th>
+                  <th scope="col">Category</th>
+                  <th scope="col" class="num">Sold</th>
+                  <th scope="col" class="num">Revenue</th>
+                  <th scope="col" class="num">Share</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-item"><img src="images/dish-burger.jpg" alt=""><span><strong>Coolaroo Burger</strong></span></span></td>
+                  <td class="muted">From the grill</td>
+                  <td class="num">214</td>
+                  <td class="num">$4,708</td>
+                  <td class="num"><span class="meter"><span style="width:19%"></span></span> 19%</td>
+                </tr>
+                <tr>
+                  <td><span class="cell-item"><img src="images/dish-porterhouse.jpg" alt=""><span><strong>Porterhouse</strong></span></span></td>
+                  <td class="muted">From the grill</td>
+                  <td class="num">96</td>
+                  <td class="num">$3,744</td>
+                  <td class="num"><span class="meter"><span style="width:15%"></span></span> 15%</td>
+                </tr>
+                <tr>
+                  <td><span class="cell-item"><img src="images/dish-margherita.jpg" alt=""><span><strong>Margherita</strong></span></span></td>
+                  <td class="muted">Pizza</td>
+                  <td class="num">178</td>
+                  <td class="num">$3,382</td>
+                  <td class="num"><span class="meter"><span style="width:14%"></span></span> 14%</td>
+                </tr>
+                <tr>
+                  <td><span class="cell-item"><img src="images/dish-rigatoni.jpg" alt=""><span><strong>Rigatoni Rag&ugrave;</strong></span></span></td>
+                  <td class="muted">Pasta</td>
+                  <td class="num">131</td>
+                  <td class="num">$3,275</td>
+                  <td class="num"><span class="meter"><span style="width:13%"></span></span> 13%</td>
+                </tr>
+                <tr>
+                  <td><span class="cell-item"><img src="images/dish-fish.jpg" alt=""><span><strong>Market Fish</strong></span></span></td>
+                  <td class="muted">Seafood</td>
+                  <td class="num">74</td>
+                  <td class="num">$2,516</td>
+                  <td class="num"><span class="meter"><span style="width:10%"></span></span> 10%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="settings">
+      <header class="block-head">
+        <div>
+          <p class="eyebrow">Insight</p>
+          <h2>Settings</h2>
+          <p class="block-sub">These feed the public site header, footer and booking form.</p>
+        </div>
+      </header>
+
+      <div class="editor">
+        <div class="editor-main">
+          <div class="card form-card">
+            <header class="card-head">
+              <div>
+                <h3>Restaurant details</h3>
+                <p class="card-sub">Shown across the public site</p>
+              </div>
+            </header>
+
+            <div class="field">
+              <label for="s-name">Restaurant name</label>
+              <input id="s-name" type="text" value="Coolaroo Restaurant &amp; Bistro">
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="s-phone">Phone</label>
+                <input id="s-phone" type="tel" value="(03) 9302 4453">
+              </div>
+              <div class="field">
+                <label for="s-email">Bookings email</label>
+                <input id="s-email" type="email" value="bookings@coolaroo.com.au">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="s-address">Address</label>
+              <input id="s-address" type="text" value="412 Sydney Road, Coolaroo VIC 3048">
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="s-charge">Service charge (%)</label>
+                <input id="s-charge" type="text" value="0" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="s-target">Daily takings target (AUD)</label>
+                <input id="s-target" type="text" value="4200" inputmode="numeric">
+              </div>
+            </div>
+
+            <div class="form-foot">
+              <button class="btn btn-solid btn-lg" type="button">Save settings</button>
+              <button class="btn btn-quiet btn-lg" type="button">Discard</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="editor-side">
+          <div class="card form-card">
+            <header class="card-head">
+              <div>
+                <h3>Opening hours</h3>
+                <p class="card-sub">Closed days hide the booking calendar</p>
+              </div>
+            </header>
+
+            <ul class="hours">
+              <li>
+                <span class="day">Monday</span>
+                <span class="muted">Closed</span>
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Open Monday</span>
+                </label>
+              </li>
+              <li>
+                <span class="day">Tuesday</span>
+                <span class="mono">11:00 &ndash; 23:00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Open Tuesday</span>
+                </label>
+              </li>
+              <li>
+                <span class="day">Wednesday</span>
+                <span class="mono">11:00 &ndash; 23:00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Open Wednesday</span>
+                </label>
+              </li>
+              <li>
+                <span class="day">Thursday</span>
+                <span class="mono">11:00 &ndash; 23:00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Open Thursday</span>
+                </label>
+              </li>
+              <li>
+                <span class="day">Friday</span>
+                <span class="mono">11:00 &ndash; 23:00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Open Friday</span>
+                </label>
+              </li>
+              <li>
+                <span class="day">Saturday</span>
+                <span class="mono">11:00 &ndash; 23:00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Open Saturday</span>
+                </label>
+              </li>
+              <li>
+                <span class="day">Sunday</span>
+                <span class="mono">11:00 &ndash; 23:00</span>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="sr-only">Open Sunday</span>
+                </label>
+              </li>
+            </ul>
+
+            <div class="qr-box">
+              <img src="images/qr-menu.svg" alt="QR code that opens the public menu">
+              <div>
+                <p><strong>Table menu code</strong></p>
+                <p class="muted">coolaroo.com.au/menu</p>
+                <button class="btn btn-quiet" type="button">Download for printing</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p>&copy; 2026 Coolaroo Restaurant &amp; Bistro &middot; Admin</p>
+      <p>412 Sydney Road, Coolaroo VIC 3048</p>
+    </footer>
+
+  </main>
+</div>
+
+</body>
+</html>

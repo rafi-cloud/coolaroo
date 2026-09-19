@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staff Interfaces — Coolaroo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dashboard.css">
+<style>
+body{min-height:100vh;display:grid;place-items:center;padding:1.5rem;background:radial-gradient(circle at top left,#FFE2D2 0,transparent 38%),var(--cream)}
+.launcher{width:min(920px,100%)}.launcher-head{text-align:center;margin-bottom:1.5rem}.launcher-head img{width:64px;margin:0 auto .9rem}.launcher-head h1{font-size:clamp(1.8rem,5vw,3rem)}.launcher-head p{margin:.4rem auto 0;max-width:58ch;font:italic 1rem/1.6 var(--serif)}
+.role-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.role-card{display:flex;flex-direction:column;gap:.9rem;min-height:270px;padding:1.5rem;transition:.18s ease}.role-card:hover{transform:translateY(-4px);box-shadow:0 18px 42px rgba(43,26,16,.13)}.role-icon{width:54px;height:54px;border-radius:13px;background:var(--sand);display:grid;place-items:center;color:var(--orange-dark)}.role-icon svg{width:27px;height:27px}.role-card h2{font-size:1.2rem}.role-card p{font-size:.83rem}.role-card ul{margin:0;padding-left:1.1rem;font-size:.76rem}.role-card .btn{align-self:flex-start;margin-top:auto;padding:.55rem 1rem}.admin-card{opacity:.82}.admin-card .role-icon{background:#ECE6E0;color:var(--ink)}.wait-card .role-icon{background:#E2F4EC;color:#146B50}
+.hint{text-align:center;margin-top:1rem;font-size:.74rem;color:var(--cancelled)}@media(max-width:760px){.role-cards{grid-template-columns:1fr}.role-card{min-height:auto}}
+</style>
+</head>
+<body>
+<main class="launcher"><header class="launcher-head"><img src="images/logo.svg" alt="Coolaroo"><p class="eyebrow">Restaurant management system</p><h1>Choose a staff workspace</h1><p>Each interface exposes the service tasks permitted for that role.</p></header><section class="role-cards" aria-label="Staff workspaces">
+  <article class="card role-card admin-card"><span class="role-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span><div><p class="eyebrow">Existing</p><h2>Admin</h2></div><p>Manage restaurant data, people, reports, menus and settings.</p><ul><li>Business dashboard</li><li>Staff and customer records</li><li>Reports and configuration</li></ul><a class="btn btn-quiet" href="dashboard.html">Open admin</a></article>
+  <article class="card role-card"><span class="role-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg></span><div><p class="eyebrow">New</p><h2>Kitchen</h2></div><p>Prepare incoming orders with item-level status and clear handoff at the pass.</p><ul><li>Live kitchen display</li><li>Preparation and ready states</li><li>Availability reporting</li></ul><a class="btn btn-solid" href="kitchen-interface.html">Open kitchen</a></article>
+  <article class="card role-card wait-card"><span class="role-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8"/><path d="M8 12h8M12 8v8"/></svg></span><div><p class="eyebrow" style="color:#146B50">New</p><h2>Waitstaff</h2></div><p>Run table service from seating and ordering through bills and payments.</p><ul><li>Tables, visits and reservations</li><li>Orders and kitchen handoff</li><li>Bills, payments and receipts</li></ul><a class="btn btn-solid" style="background:#18795A" href="waitstaff-interface.html">Open waitstaff</a></article>
+</section><p class="hint">Static interactive prototype · Demo data reflects the approved ERD structure</p></main>
+</body>
+</html>
+

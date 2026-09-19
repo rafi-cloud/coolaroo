@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kitchen Display — Coolaroo</title>
+<meta name="description" content="Coolaroo kitchen display for incoming orders, item preparation, ready orders and menu availability.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="role-dashboard.css">
+<script src="role-dashboard.js" defer></script>
+</head>
+<body class="role-kitchen">
+<input class="nav-state" type="checkbox" id="nav-open">
+<label class="scrim" for="nav-open" aria-hidden="true"></label>
+
+<aside class="sidebar">
+  <a class="brand" href="#kitchen-dashboard">
+    <img src="images/logo.svg" alt="">
+    <span class="brand-text"><strong>COOLAROO</strong><span>KITCHEN DISPLAY</span></span>
+  </a>
+  <nav class="nav" aria-label="Kitchen navigation">
+    <p class="nav-label">Live service</p>
+    <a class="nav-item" href="#kitchen-dashboard" data-nav="kitchen-dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Service overview</span></a>
+    <a class="nav-item" href="#kitchen-orders" data-nav="kitchen-orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Kitchen orders</span><span class="pill">8</span></a>
+    <a class="nav-item" href="#ready-queue" data-nav="ready-queue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 13l5 5L20 6"/></svg><span>Ready at pass</span><span class="pill pill-quiet">3</span></a>
+    <p class="nav-label">Operations</p>
+    <a class="nav-item" href="#availability" data-nav="availability"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="2"/></svg><span>Item availability</span></a>
+    <a class="nav-item" href="#kitchen-profile" data-nav="kitchen-profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>My profile</span></a>
+  </nav>
+  <div class="sidebar-foot">
+    <p class="shift">Dinner service · Live</p>
+    <p class="shift-sub">8 active orders across 4 stations</p>
+    <div class="role-switch"><a href="dashboard.html">Admin</a><span>·</span><a href="waitstaff-interface.html">Waitstaff</a></div>
+  </div>
+</aside>
+
+<div class="shell">
+  <header class="topbar">
+    <label class="burger" for="nav-open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="sr-only">Open navigation</span></label>
+    <div class="page-head"><h1>Kitchen display</h1><p>Tuesday, 8 September 2026 · <span data-live-clock></span></p></div>
+    <div class="topbar-tools">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><label class="sr-only" for="k-search">Search orders or dishes</label><input id="k-search" data-global-search type="search" placeholder="Order, table or dish…"></div>
+      <button class="icon-btn" type="button" data-demo-action="No new kitchen alerts."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot"></span><span class="sr-only">Kitchen notifications</span></button>
+      <a class="profile" href="#kitchen-profile"><span class="avatar">ML</span><span class="profile-text"><strong>Mia L.</strong><span>Kitchen</span></span></a>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="block" id="kitchen-dashboard">
+      <header class="block-head"><div><p class="eyebrow">Live service</p><h2>Kitchen overview</h2><p class="block-sub">Orders are prioritised by elapsed time and preparation status.</p></div><span class="live-indicator">Kitchen feed connected</span></header>
+      <div class="role-summary">
+        <article class="card metric"><p class="metric-kicker">New orders</p><p class="metric-value">3</p><p class="metric-note">Oldest waiting 04:18</p></article>
+        <article class="card metric"><p class="metric-kicker">Preparing</p><p class="metric-value">5</p><p class="metric-note">14 individual items</p></article>
+        <article class="card metric"><p class="metric-kicker">Ready at pass</p><p class="metric-value">3</p><p class="metric-note">Floor team notified</p></article>
+        <article class="card metric"><p class="metric-kicker">Average prep</p><p class="metric-value">12m</p><p class="metric-note">Target is under 15 minutes</p></article>
+      </div>
+
+      <div class="ops-layout">
+        <div class="ops-stack">
+          <article class="card">
+            <header class="card-head"><div><h3>Priority queue</h3><p class="card-sub">Next orders that need kitchen action</p></div><a class="btn btn-ghost" href="#kitchen-orders">Open full board</a></header>
+            <div class="ticket-grid">
+              <article class="card ticket" data-status="new" data-searchable>
+                <header class="ticket-head"><div class="ticket-order"><strong>#CLR-2424 · Table 6</strong><span>3 guests · Dine in</span></div><div class="elapsed is-late"><strong>04:18</strong><span>waiting</span></div></header>
+                <div class="ticket-meta"><span class="badge b-pending" data-status-badge>Received</span><span class="meta-pill station">Grill</span><span class="meta-pill">Taken by Priya</span></div>
+                <ul class="ticket-items"><li class="ticket-item"><span class="qty">2</span><span class="dish"><strong>Coolaroo Burger</strong><small>Medium · add bacon</small><small class="special">1 × no onion · sesame allergy</small></span><button class="item-check" data-item-check aria-label="Mark item prepared" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li><li class="ticket-item"><span class="qty">1</span><span class="dish"><strong>Garden Bowl</strong><small>Vegan dressing</small></span><button class="item-check" data-item-check aria-label="Mark item prepared" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li></ul>
+                <footer class="ticket-foot"><button class="btn btn-solid" data-next-status="preparing">Start preparation</button><span class="route-note">3 items</span></footer>
+              </article>
+              <article class="card ticket" data-status="preparing" data-searchable>
+                <header class="ticket-head"><div class="ticket-order"><strong>#CLR-2422 · Table 11</strong><span>2 guests · Dine in</span></div><div class="elapsed"><strong>11:42</strong><span>elapsed</span></div></header>
+                <div class="ticket-meta"><span class="badge b-preparing" data-status-badge>Preparing</span><span class="meta-pill station">Pizza</span><span class="meta-pill">Due 8:04pm</span></div>
+                <ul class="ticket-items"><li class="ticket-item"><span class="qty">1</span><span class="dish"><strong>Margherita</strong><small>Extra basil</small></span><button class="item-check is-done" data-item-check aria-label="Mark item not prepared" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li><li class="ticket-item"><span class="qty">1</span><span class="dish"><strong>Garlic Prawns</strong><small class="special">No chilli</small></span><button class="item-check" data-item-check aria-label="Mark item prepared" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li></ul>
+                <footer class="ticket-foot"><button class="btn btn-solid" data-next-status="ready">Mark order ready</button><span class="route-note">1 of 2 prepared</span></footer>
+              </article>
+            </div>
+          </article>
+        </div>
+        <aside class="ops-aside ops-stack">
+          <article class="card"><header class="card-head"><div><h3>Station load</h3><p class="card-sub">Active items by destination</p></div></header><ul class="station-load"><li><strong>Grill</strong><span class="load-bar"><span style="width:82%"></span></span><span>9</span></li><li><strong>Pizza</strong><span class="load-bar"><span style="width:58%"></span></span><span>5</span></li><li><strong>Cold</strong><span class="load-bar"><span style="width:34%"></span></span><span>3</span></li><li><strong>Dessert</strong><span class="load-bar"><span style="width:22%"></span></span><span>2</span></li></ul></article>
+          <article class="card"><header class="card-head"><div><h3>Kitchen notices</h3><p class="card-sub">Operational changes this shift</p></div></header><ul class="notice-list"><li class="notice"><span class="notice-icon">!</span><p><strong>Allergy protocol</strong><br>Table 6 has a sesame allergy. Use the red prep board.</p></li><li class="notice"><span class="notice-icon">i</span><p><strong>Low stock</strong><br>Only 4 Market Fish portions remain.</p></li></ul></article>
+        </aside>
+      </div>
+    </section>
+
+    <section class="block" id="kitchen-orders">
+      <header class="block-head"><div><p class="eyebrow">Order management</p><h2>Kitchen orders</h2><p class="block-sub">Track received, preparing and ready orders at item level.</p></div></header>
+      <div class="card">
+        <div class="toolbar"><div class="filters" data-filter-group data-filter-target="#kitchen-board" role="group" aria-label="Filter orders"><button class="chip is-on" data-filter="all" aria-pressed="true">All <span>8</span></button><button class="chip" data-filter="new" aria-pressed="false">Received <span>3</span></button><button class="chip" data-filter="preparing" aria-pressed="false">Preparing <span>5</span></button><button class="chip" data-filter="ready" aria-pressed="false">Ready <span>3</span></button></div><div class="status-line"><span class="section-caption">Sorted oldest first</span><span class="separator">·</span><span class="live-indicator">Auto refresh on</span></div></div>
+        <div class="ticket-grid" id="kitchen-board">
+          <article class="card ticket" data-status="new" data-searchable><header class="ticket-head"><div class="ticket-order"><strong>#CLR-2425 · Takeaway</strong><span>Online order · Pickup</span></div><div class="elapsed"><strong>02:06</strong><span>waiting</span></div></header><div class="ticket-meta"><span class="badge b-pending" data-status-badge>Received</span><span class="meta-pill station">Grill</span><span class="meta-pill">Paid</span></div><ul class="ticket-items"><li class="ticket-item"><span class="qty">1</span><span class="dish"><strong>Porterhouse</strong><small>Medium rare · chips</small></span><button class="item-check" data-item-check aria-label="Mark item prepared" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li></ul><footer class="ticket-foot"><button class="btn btn-solid" data-next-status="preparing">Start preparation</button><span class="route-note">1 item</span></footer></article>
+          <article class="card ticket" data-status="new" data-searchable><header class="ticket-head"><div class="ticket-order"><strong>#CLR-2424 · Table 6</strong><span>3 guests · Dine in</span></div><div class="elapsed is-late"><strong>04:18</strong><span>waiting</span></div></header><div class="ticket-meta"><span class="badge b-pending" data-status-badge>Received</span><span class="meta-pill station">Grill</span><span class="meta-pill">Allergy</span></div><ul class="ticket-items"><li class="ticket-item"><span class="qty">2</span><span class="dish"><strong>Coolaroo Burger</strong><small class="special">No onion · sesame allergy</small></span><button class="item-check" data-item-check aria-label="Mark item prepared" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li><li class="ticket-item"><span class="qty">1</span><span class="dish"><strong>Garden Bowl</strong><small>Vegan dressing</small></span><button class="item-check" data-item-check aria-label="Mark item prepared" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li></ul><footer class="ticket-foot"><button class="btn btn-solid" data-next-status="preparing">Start preparation</button><span class="route-note">3 items</span></footer></article>
+          <article class="card ticket" data-status="preparing" data-searchable><header class="ticket-head"><div class="ticket-order"><strong>#CLR-2422 · Table 11</strong><span>2 guests · Dine in</span></div><div class="elapsed"><strong>11:42</strong><span>elapsed</span></div></header><div class="ticket-meta"><span class="badge b-preparing" data-status-badge>Preparing</span><span class="meta-pill station">Pizza</span></div><ul class="ticket-items"><li class="ticket-item"><span class="qty">1</span><span class="dish"><strong>Margherita</strong><small>Extra basil</small></span><button class="item-check is-done" data-item-check aria-label="Mark item not prepared" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li><li class="ticket-item"><span class="qty">1</span><span class="dish"><strong>Garlic Prawns</strong><small class="special">No chilli</small></span><button class="item-check" data-item-check aria-label="Mark item prepared" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li></ul><footer class="ticket-foot"><button class="btn btn-solid" data-next-status="ready">Mark order ready</button><span class="route-note">1 of 2 prepared</span></footer></article>
+          <article class="card ticket" data-status="preparing" data-searchable><header class="ticket-head"><div class="ticket-order"><strong>#CLR-2419 · Table 3</strong><span>4 guests · Dine in</span></div><div class="elapsed is-late"><strong>18:09</strong><span>elapsed</span></div></header><div class="ticket-meta"><span class="badge b-preparing" data-status-badge>Preparing</span><span class="meta-pill station">Grill + Cold</span><span class="meta-pill">Priority</span></div><ul class="ticket-items"><li class="ticket-item"><span class="qty">2</span><span class="dish"><strong>Market Fish</strong><small>One gluten free</small></span><button class="item-check" data-item-check aria-label="Mark item prepared" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li><li class="ticket-item"><span class="qty">2</span><span class="dish"><strong>Garden Bowl</strong><small>No feta</small></span><button class="item-check is-done" data-item-check aria-label="Mark item not prepared" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li></ul><footer class="ticket-foot"><button class="btn btn-solid" data-next-status="ready">Mark order ready</button><span class="route-note">2 of 4 prepared</span></footer></article>
+          <article class="card ticket" data-status="ready" data-searchable><header class="ticket-head"><div class="ticket-order"><strong>#CLR-2418 · Table 12</strong><span>3 guests · Dine in</span></div><div class="elapsed"><strong>00:48</strong><span>at pass</span></div></header><div class="ticket-meta"><span class="badge b-ready" data-status-badge>Ready</span><span class="meta-pill station">Pass</span><span class="meta-pill">Floor notified</span></div><ul class="ticket-items"><li class="ticket-item"><span class="qty">3</span><span class="dish"><strong>Coolaroo Burger</strong><small>Order complete</small></span><button class="item-check is-done" aria-label="Prepared" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4L19 6"/></svg></button></li></ul><footer class="ticket-foot"><button class="btn btn-solid" disabled>Ready — notify floor</button><span class="route-note">Ready 8:01pm</span></footer></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="ready-queue">
+      <header class="block-head"><div><p class="eyebrow">Kitchen handoff</p><h2>Ready at pass</h2><p class="block-sub">Completed orders waiting for collection by waitstaff.</p></div></header>
+      <div class="ops-layout"><article class="card"><header class="card-head"><div><h3>Pickup queue</h3><p class="card-sub">Ready time is stored against each order</p></div><span class="live-indicator">3 waiting</span></header><div class="queue-list"><div class="queue-row" data-searchable><span class="queue-table">12</span><span class="queue-copy"><strong>#CLR-2418 · 3 × Coolaroo Burger</strong><span>Ready 8:01pm · Waitstaff: Priya</span></span><button class="btn btn-solid" data-clear-queue>Confirm pickup</button></div><div class="queue-row" data-searchable><span class="queue-table">4</span><span class="queue-copy"><strong>#CLR-2417 · Market Fish</strong><span>Ready 8:03pm · Waitstaff: Noah</span></span><button class="btn btn-solid" data-clear-queue>Confirm pickup</button></div><div class="queue-row" data-searchable><span class="queue-table">TO</span><span class="queue-copy"><strong>#CLR-2416 · 2 × Fish Tacos</strong><span>Ready 8:05pm · Takeaway counter</span></span><button class="btn btn-solid" data-clear-queue>Confirm pickup</button></div></div></article><aside class="ops-stack"><article class="card"><header class="card-head"><div><h3>Handoff standard</h3><p class="card-sub">Before an order leaves the pass</p></div></header><ul class="notice-list"><li class="notice"><span class="notice-icon">1</span><p>Match the order number and table.</p></li><li class="notice"><span class="notice-icon">2</span><p>Confirm allergy markers and special requests.</p></li><li class="notice"><span class="notice-icon">3</span><p>Waitstaff records the final served status.</p></li></ul></article></aside></div>
+    </section>
+
+    <section class="block" id="availability">
+      <header class="block-head"><div><p class="eyebrow">Menu data</p><h2>Item availability</h2><p class="block-sub">Kitchen can report stock issues; manager approval controls the published menu flag.</p></div><button class="btn btn-solid" data-demo-action="Availability report sent to the manager.">Send stock report</button></header>
+      <div class="card"><div class="toolbar"><div class="filters" role="group" aria-label="Filter menu station"><button class="chip is-on">All <span>8</span></button><button class="chip">Grill <span>3</span></button><button class="chip">Pizza <span>2</span></button><button class="chip">Cold <span>2</span></button><button class="chip">Dessert <span>1</span></button></div><span class="section-caption">Changes are logged against the signed-in staff member</span></div><div class="availability-list"><article class="card availability-item" data-searchable><img src="images/dish-burger.jpg" alt=""><span class="availability-copy"><strong>Coolaroo Burger</strong><span>Grill · 18 portions</span></span><label class="switch"><input type="checkbox" checked data-availability-toggle><span class="switch-track"><span class="switch-knob"></span></span><span class="sr-only">Coolaroo Burger available</span></label></article><article class="card availability-item" data-searchable><img src="images/dish-porterhouse.jpg" alt=""><span class="availability-copy"><strong>Porterhouse</strong><span>Grill · 7 portions</span></span><label class="switch"><input type="checkbox" checked data-availability-toggle><span class="switch-track"><span class="switch-knob"></span></span><span class="sr-only">Porterhouse available</span></label></article><article class="card availability-item" data-searchable><img src="images/dish-fish.jpg" alt=""><span class="availability-copy"><strong>Market Fish</strong><span>Grill · 4 portions · Low stock</span></span><label class="switch"><input type="checkbox" checked data-availability-toggle><span class="switch-track"><span class="switch-knob"></span></span><span class="sr-only">Market Fish available</span></label></article><article class="card availability-item is-off" data-searchable><img src="images/dish-gelato.jpg" alt=""><span class="availability-copy"><strong>Triple Gelato</strong><span>Dessert · Reported unavailable</span></span><label class="switch"><input type="checkbox" data-availability-toggle><span class="switch-track"><span class="switch-knob"></span></span><span class="sr-only">Triple Gelato unavailable</span></label></article></div></div>
+    </section>
+
+    <section class="block" id="kitchen-profile">
+      <header class="block-head"><div><p class="eyebrow">Account</p><h2>My profile</h2><p class="block-sub">Personal details and current kitchen assignment.</p></div></header>
+      <div class="profile-grid"><article class="card profile-hero"><span class="avatar">ML</span><h3>Mia Lawson</h3><p>Kitchen staff · Active</p><dl class="profile-details"><div><dt>Staff ID</dt><dd>STF-018</dd></div><div><dt>Last login</dt><dd>5:42pm</dd></div><div><dt>Shift</dt><dd>5pm–11pm</dd></div><div><dt>Station</dt><dd>Pass</dd></div></dl></article><article class="card form-card"><header class="card-head"><div><h3>Contact details</h3><p class="card-sub">Update your staff profile</p></div></header><form><div class="field-row"><div class="field"><label for="k-name">Full name</label><input id="k-name" value="Mia Lawson"></div><div class="field"><label for="k-phone">Phone</label><input id="k-phone" value="0402 555 014"></div></div><div class="field"><label for="k-email">Email</label><input id="k-email" type="email" value="mia.lawson@coolaroo.com.au"></div><div class="form-foot"><button class="btn btn-solid btn-lg" type="button" data-demo-action="Profile details saved.">Save profile</button><a class="btn btn-quiet btn-lg" href="account-reset.html">Change password</a></div></form></article></div>
+    </section>
+
+    <footer class="foot"><p>&copy; 2026 Coolaroo Restaurant &amp; Bistro · Kitchen</p><p>Role permissions: Kitchen</p></footer>
+  </main>
+</div>
+<div class="toast" data-toast role="status" aria-live="polite"></div>
+</body>
+</html>
+

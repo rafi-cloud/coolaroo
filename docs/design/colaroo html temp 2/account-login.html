@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in — Coolaroo Restaurant &amp; Bistro</title>
+<meta name="description" content="Log in to your Coolaroo account to view your bookings and order history.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="customer-pages.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="logo" href="index.html">
+      <img src="images/logo.svg" alt="Coolaroo Restaurant">
+      <span class="logo-text"><strong>COOLAROO</strong><span>RESTAURANT &amp; BISTRO</span></span>
+    </a>
+    <nav class="mainnav">
+      <a href="index.html">Home</a>
+      <a href="index.html#menu">Menu</a>
+      <a href="index.html#about">About</a>
+      <a class="btn btn-orange" href="index.html#reserve">Book a table</a>
+    </nav>
+  </div>
+</header>
+
+<main class="auth">
+  <div class="auth-card">
+    <div class="auth-head">
+      <img src="images/logo.svg" alt="">
+      <h1>Welcome back</h1>
+      <p>Log in to view your bookings and past orders</p>
+    </div>
+
+    <!-- Example validation state — remove this block when wiring up to the backend -->
+    <div class="auth-error" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>That email and password don't match. Try again, or reset your password below.</span>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="auth-field">
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      </div>
+
+      <div class="auth-field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </div>
+
+      <div class="auth-row">
+        <label><input type="checkbox" name="remember"> Remember me</label>
+        <a href="account-reset.html">Forgot password?</a>
+      </div>
+
+      <button class="btn btn-orange" type="submit">Log in</button>
+    </form>
+
+    <p class="auth-foot">New to Coolaroo? <a href="account-register.html">Create an account</a></p>
+  </div>
+</main>
+
+<script>
+  // Front-end only placeholder — real submission is handled once this is wired to the Laravel back end.
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    alert('This is a static template. Login will be connected once the Laravel back end is in place.');
+  });
+</script>
+
+</body>
+</html>
