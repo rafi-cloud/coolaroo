@@ -5,6 +5,17 @@
     'bodyClass' => null,
     'bare' => false,
 ])
+@php
+    $staffHome = '/staff/floor';
+
+    if (auth('staff')->check()) {
+        $landingScreen = auth('staff')->user()->role->landing_screen;
+
+        if (\Illuminate\Support\Facades\Route::has($landingScreen)) {
+            $staffHome = route($landingScreen);
+        }
+    }
+@endphp
 <x-document css="dashboard.css" suffix="Coolaroo Staff" :vite="true" :title="$title" :body-class="$bodyClass">
 @if ($bare)
 {{ $slot }}
@@ -13,7 +24,7 @@
 <label class="scrim" for="nav-open" aria-hidden="true"></label>
 
 <aside class="sidebar">
-  <a class="brand" href="{{ url('/staff/floor') }}" data-testid="staff-home">
+  <a class="brand" href="{{ $staffHome }}" data-testid="staff-home">
     <img src="{{ asset('images/logo.svg') }}" alt="">
     <span class="brand-text"><strong>COOLAROO</strong><span>STAFF</span></span>
   </a>

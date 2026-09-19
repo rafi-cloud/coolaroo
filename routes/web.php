@@ -7,7 +7,9 @@ use App\Http\Controllers\Customer\Auth\NewPasswordController;
 use App\Http\Controllers\Customer\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
+use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
+use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
 use Illuminate\Support\Facades\Route;
 
 // No '/' route yet — the real homepage lands in T030. Hitting '/' 404s until then.
@@ -38,6 +40,9 @@ Route::middleware('auth:customer')->group(function () {
     Route::post('/email/verification-notification', EmailVerificationNotificationController::class)
         ->middleware('throttle:6,1')
         ->name('verification.send');
+
+    Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
 });
 
 Route::middleware('guest:staff')->group(function () {
@@ -47,6 +52,9 @@ Route::middleware('guest:staff')->group(function () {
 
 Route::middleware(['auth:staff', 'staff.session'])->group(function () {
     Route::post('/staff/logout', [AuthenticatedStaffController::class, 'destroy'])->name('staff.logout');
+
+    Route::get('/staff/profile', [StaffProfileController::class, 'edit'])->name('staff.profile.edit');
+    Route::patch('/staff/profile', [StaffProfileController::class, 'update'])->name('staff.profile.update');
 });
 
 //have to delete this block when the real pages done.

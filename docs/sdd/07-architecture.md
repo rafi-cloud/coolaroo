@@ -139,6 +139,11 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | POST | /reservations/{reservation}/cancel | Customer\ReservationController@cancel | FR67 |
 | GET/PATCH | /profile | Customer\ProfileController | FR07 |
 
+### Staff (`auth:staff`)
+| Method | URI | Controller | FR |
+|---|---|---|---|
+| GET/PATCH | /staff/profile | Staff\ProfileController | FR07 |
+
 ### Staff floor (`auth:staff`, `role:waitstaff`)
 | Method | URI | Controller | FR |
 |---|---|---|---|

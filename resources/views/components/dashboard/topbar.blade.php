@@ -15,10 +15,10 @@
 
   <div class="topbar-tools">
     @auth('staff')
-      <span class="profile">
+      <a class="profile" href="{{ url('/staff/profile') }}" data-testid="staff-profile-link">
         <span class="avatar" aria-hidden="true">{{ mb_substr(auth('staff')->user()->full_name, 0, 1) }}</span>
         <span class="profile-text"><strong>{{ auth('staff')->user()->full_name }}</strong></span>
-      </span>
+      </a>
     @endauth
   </div>
 </header>

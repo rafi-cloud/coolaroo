@@ -867,3 +867,10 @@ input{font:inherit}
 }
 .auth-error svg{width:18px;height:18px;flex:none;margin-top:1px}
 .auth-error.auth-success{background:#DDF2E5;border-color:#BFE6CE;color:#1F7844}
+.panel{
+  max-width:520px;
+  background:#fff;border-radius:10px;
+  box-shadow:var(--shadow);
+  padding:clamp(1.5rem,4vw,2.2rem);
+  margin:1rem 0;
+}

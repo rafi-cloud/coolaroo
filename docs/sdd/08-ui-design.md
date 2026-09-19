@@ -46,6 +46,7 @@
 | S41 | Reports | /admin/reports/{type} | admin/reports/* | Admin | UC35 |
 | S42 | Audit log and archive | /admin/audit-log | admin/audit/* | Admin | UC36 |
 | S43 | Settings, slots, switches | /admin/settings | admin/settings/* | Admin | UC37 |
+| S44 | Staff profile | /staff/profile | staff/profile | Staff | UC06 |
 
 ## 8.2 QR scan flow
 ```mermaid
