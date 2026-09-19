@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MenuItemSizeController;
 use App\Http\Controllers\Admin\SlotCapacityController;
 use App\Http\Controllers\Admin\StaffAccountController;
+use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationPromptController;
@@ -104,6 +105,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::delete('menu-items/{menuItem}/groups/{group}/options/{option}', [AddOnOptionController::class, 'destroy'])->name('menu-items.groups.options.destroy');
 
     Route::resource('slots', SlotCapacityController::class)->except('show')->parameters(['slots' => 'slot']);
+
+    Route::resource('tables', TableController::class)->except(['show', 'destroy'])->parameters(['tables' => 'table']);
+    Route::patch('tables/{table}/deactivate', [TableController::class, 'deactivate'])->name('tables.deactivate');
+    Route::patch('tables/{table}/reactivate', [TableController::class, 'reactivate'])->name('tables.reactivate');
+    Route::patch('tables/{table}/status', [TableController::class, 'overrideStatus'])->name('tables.status');
 });
 
 //have to delete this block when the real pages done.
