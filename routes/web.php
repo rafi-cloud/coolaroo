@@ -7,6 +7,7 @@ use App\Http\Controllers\Customer\Auth\NewPasswordController;
 use App\Http\Controllers\Customer\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
+use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use Illuminate\Support\Facades\Route;
 
 // No '/' route yet — the real homepage lands in T030. Hitting '/' 404s until then.
@@ -37,6 +38,15 @@ Route::middleware('auth:customer')->group(function () {
     Route::post('/email/verification-notification', EmailVerificationNotificationController::class)
         ->middleware('throttle:6,1')
         ->name('verification.send');
+});
+
+Route::middleware('guest:staff')->group(function () {
+    Route::get('/staff/login', [AuthenticatedStaffController::class, 'create'])->name('staff.login');
+    Route::post('/staff/login', [AuthenticatedStaffController::class, 'store'])->middleware('throttle:login');
+});
+
+Route::middleware(['auth:staff', 'staff.session'])->group(function () {
+    Route::post('/staff/logout', [AuthenticatedStaffController::class, 'destroy'])->name('staff.logout');
 });
 
 //have to delete this block when the real pages done.

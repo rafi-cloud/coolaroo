@@ -3,8 +3,12 @@
     'pageTitle' => null,
     'pageSub' => null,
     'bodyClass' => null,
+    'bare' => false,
 ])
 <x-document css="dashboard.css" suffix="Coolaroo Staff" :vite="true" :title="$title" :body-class="$bodyClass">
+@if ($bare)
+{{ $slot }}
+@else
 <input class="nav-state" type="checkbox" id="nav-open" data-testid="staff-nav-toggle">
 <label class="scrim" for="nav-open" aria-hidden="true"></label>
 
@@ -24,4 +28,5 @@
     <x-dashboard.footer />
   </main>
 </div>
+@endif
 </x-document>

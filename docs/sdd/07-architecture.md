@@ -50,7 +50,7 @@ app/
   Models/         one per table (25)
   Http/
     Controllers/  Public/ Customer/ Staff/Floor/ Staff/Kds/ Staff/ Admin/
-    Middleware/   EnsureRole, EnsureTableContext, EnsureQrOrderingEnabled, EnsureEmailVerifiedForReservation
+    Middleware/   EnsureRole, EnsureTableContext, EnsureQrOrderingEnabled, EnsureEmailVerifiedForReservation, EnsureStaffSessionIsActive
     Requests/     one Form Request per write action
   Services/       see 7.4
   Policies/       OrderPolicy, ReservationPolicy, FeedbackPolicy, MenuItemPolicy
@@ -99,6 +99,7 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | Throttling | Login 5/min; checkout 10/min per user; call waiter cooldown in cache; AI no app limit |
 | CSRF | All POST/PATCH/DELETE; no exemptions |
 | Staff deactivation | Delete rows in `sessions` for that staff id |
+| Staff session timeout | `EnsureStaffSessionIsActive` checks `staff_session_timeout_minutes` (06.5, default 30) against `session('staff_last_activity')`; logs out and redirects to `staff.login` when stale (BR51) |
 
 ## 7.6 Routes
 ### Public
@@ -116,6 +117,8 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | GET | /email/verify | Customer\Auth\EmailVerificationPromptController | FR06 |
 | GET | /email/verify/{id}/{hash} | Customer\Auth\VerifyEmailController | FR06 |
 | POST | /email/verification-notification | Customer\Auth\EmailVerificationNotificationController | FR06 |
+| GET/POST | /staff/login | Staff\Auth\AuthenticatedStaffController | FR03 |
+| POST | /staff/logout | Staff\Auth\AuthenticatedStaffController@destroy | FR03 |
 
 ### Customer (`auth:customer`)
 | Method | URI | Controller | FR |
