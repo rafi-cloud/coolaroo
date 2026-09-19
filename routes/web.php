@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DietaryTagController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MenuItemSizeController;
+use App\Http\Controllers\Admin\SlotCapacityController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
@@ -101,6 +102,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::post('menu-items/{menuItem}/groups/{group}/options', [AddOnOptionController::class, 'store'])->name('menu-items.groups.options.store');
     Route::patch('menu-items/{menuItem}/groups/{group}/options/{option}', [AddOnOptionController::class, 'update'])->name('menu-items.groups.options.update');
     Route::delete('menu-items/{menuItem}/groups/{group}/options/{option}', [AddOnOptionController::class, 'destroy'])->name('menu-items.groups.options.destroy');
+
+    Route::resource('slots', SlotCapacityController::class)->except('show')->parameters(['slots' => 'slot']);
 });
 
 //have to delete this block when the real pages done.

@@ -30,4 +30,9 @@ class SlotCapacity extends Model
     {
         return $this->hasMany(Reservation::class, 'slot_id', 'slot_id');
     }
+
+    public function isInUse(): bool
+    {
+        return $this->reservations()->exists();
+    }
 }

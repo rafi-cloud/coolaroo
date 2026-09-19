@@ -35,7 +35,7 @@
              'icon' => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
             ['id' => 'admin-audit-log', 'label' => 'Audit log', 'url' => '/admin/audit-log', 'match' => ['admin/audit-log*'],
              'icon' => '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h7"/>'],
-            ['id' => 'admin-settings', 'label' => 'Settings', 'url' => '/admin/settings', 'match' => ['admin/settings*'],
+            ['id' => 'admin-settings', 'label' => 'Settings', 'url' => '/admin/settings', 'match' => ['admin/settings*', 'admin/slots*'],
              'icon' => '<circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.4-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4a2 2 0 1 1 4 0a1.7 1.7 0 0 0 2.8 1.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4z"/>'],
         ],
     ];
