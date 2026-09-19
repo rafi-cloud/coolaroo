@@ -43,6 +43,15 @@ class StockService
         return ($item->daily_limit - $item->sold_today) < $this->bufferMultiplier();
     }
 
+    public function maxOrderableQuantity(MenuItem $item): int
+    {
+        if ($item->daily_limit === null) {
+            return PHP_INT_MAX;
+        }
+
+        return max(0, intdiv($item->daily_limit - $item->sold_today, $this->bufferMultiplier()));
+    }
+
     /**
      * Atomically increments sold_today only if it stays within daily_limit.
      * Returns false (not an exception — BR54) if it would be exceeded.

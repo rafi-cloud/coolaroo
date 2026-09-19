@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\CartController;
+use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Customer\Auth\NewPasswordController;
@@ -67,6 +68,7 @@ Route::middleware('auth:customer')->group(function () {
         Route::patch('/cart/lines/{line}', [CartController::class, 'update'])->name('cart.lines.update');
         Route::delete('/cart/lines/{line}', [CartController::class, 'destroy'])->name('cart.lines.destroy');
         Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+        Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store')->middleware('throttle:checkout');
     });
 });
 

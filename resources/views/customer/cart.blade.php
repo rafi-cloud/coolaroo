@@ -1,6 +1,14 @@
 <x-layouts.customer title="Your cart">
 <div class="panel">
-  @if (session('status'))
+  @if (session('status') === 'order-placed')
+    <div class="auth-error auth-success" role="status" data-testid="cart-order-placed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>Order #{{ session('order_number') }} placed — payment step is coming soon.</span>
+    </div>
+    @if (! empty(session('removed_items')))
+      <p>Removed (no longer available): {{ implode(', ', session('removed_items')) }}</p>
+    @endif
+  @elseif (session('status'))
     <div class="auth-error auth-success" role="status">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
       <span>Saved.</span>
@@ -11,6 +19,13 @@
     <div class="auth-error" role="alert">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
       <span>{{ session('error') }}</span>
+    </div>
+  @endif
+
+  @if ($errors->has('cart'))
+    <div class="auth-error" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>{{ $errors->first('cart') }}</span>
     </div>
   @endif
 
@@ -48,6 +63,10 @@
       @csrf
       @method('DELETE')
       <button class="btn btn-outline" type="submit" data-testid="cart-clear">Clear cart</button>
+    </form>
+    <form method="POST" action="{{ route('checkout.store') }}">
+      @csrf
+      <button class="btn btn-orange" type="submit" data-testid="cart-checkout">Checkout</button>
     </form>
   @endif
 </div>

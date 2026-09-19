@@ -56,6 +56,12 @@ class CartService
         session()->forget('cart');
     }
 
+    /** @return array<int, array{item_id:int,size_id:int,quantity:int,special_request:?string,add_on_option_ids:int[]}> */
+    public function rawLines(): array
+    {
+        return array_values($this->rawCart()['lines'] ?? []);
+    }
+
     /**
      * @return array<int, array{line_id: string, item: MenuItem, size: MenuItemSize, options: \Illuminate\Support\Collection, quantity: int, special_request: ?string, unit_price: float, line_total: float}>
      */
