@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AllergenController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DietaryTagController;
+use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
@@ -76,6 +77,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
 
     Route::resource('allergens', AllergenController::class)->except('show');
     Route::resource('dietary-tags', DietaryTagController::class)->except('show');
+
+    Route::get('menu-items', [MenuItemController::class, 'index'])->name('menu-items.index');
+    Route::get('menu-items/create', [MenuItemController::class, 'create'])->name('menu-items.create');
+    Route::post('menu-items', [MenuItemController::class, 'store'])->name('menu-items.store');
+    Route::get('menu-items/{menuItem}/edit', [MenuItemController::class, 'edit'])->name('menu-items.edit');
+    Route::patch('menu-items/{menuItem}', [MenuItemController::class, 'update'])->name('menu-items.update');
+    Route::patch('menu-items/{menuItem}/archive', [MenuItemController::class, 'archive'])->name('menu-items.archive');
+    Route::patch('menu-items/{menuItem}/unarchive', [MenuItemController::class, 'unarchive'])->name('menu-items.unarchive');
+    Route::patch('menu-items/{menuItem}/toggle-featured', [MenuItemController::class, 'toggleFeatured'])->name('menu-items.toggle-featured');
 });
 
 //have to delete this block when the real pages done.
