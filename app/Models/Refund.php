@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\RefundMethod;
+use App\Enums\RefundStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +24,8 @@ class Refund extends Model
     protected function casts(): array
     {
         return [
+            'method' => RefundMethod::class,
+            'status' => RefundStatus::class,
             'amount' => 'decimal:2',
             'return_to_stock' => 'boolean',
             'requested_at' => 'datetime',

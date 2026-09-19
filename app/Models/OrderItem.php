@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Destination;
+use App\Enums\OrderItemStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +25,8 @@ class OrderItem extends Model
     protected function casts(): array
     {
         return [
+            'destination' => Destination::class,
+            'status' => OrderItemStatus::class,
             'original_unit_price' => 'decimal:2',
             'unit_price' => 'decimal:2',
             'selected_options' => 'array',

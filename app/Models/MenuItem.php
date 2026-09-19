@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Destination;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,7 @@ class MenuItem extends Model
     protected function casts(): array
     {
         return [
+            'destination' => Destination::class,
             'is_available' => 'boolean',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',

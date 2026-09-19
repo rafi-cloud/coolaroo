@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentAttemptStatus;
+use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +25,8 @@ class Payment extends Model
     protected function casts(): array
     {
         return [
+            'method' => PaymentMethod::class,
+            'status' => PaymentAttemptStatus::class,
             'amount' => 'decimal:2',
             'amount_received' => 'decimal:2',
             'change_given' => 'decimal:2',

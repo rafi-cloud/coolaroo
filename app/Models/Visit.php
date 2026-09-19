@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\VisitCloseReason;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +26,7 @@ class Visit extends Model
         return [
             'opened_at' => 'datetime',
             'closed_at' => 'datetime',
+            'close_reason' => VisitCloseReason::class,
         ];
     }
 
