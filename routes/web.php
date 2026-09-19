@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AllergenController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DietaryTagController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
@@ -66,6 +69,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::patch('/staff/{staff}', [StaffAccountController::class, 'update'])->name('staff.update');
     Route::patch('/staff/{staff}/deactivate', [StaffAccountController::class, 'deactivate'])->name('staff.deactivate');
     Route::patch('/staff/{staff}/reactivate', [StaffAccountController::class, 'reactivate'])->name('staff.reactivate');
+
+    Route::resource('categories', CategoryController::class)->except('show');
+    Route::patch('categories/{category}/deactivate', [CategoryController::class, 'deactivate'])->name('categories.deactivate');
+    Route::patch('categories/{category}/reactivate', [CategoryController::class, 'reactivate'])->name('categories.reactivate');
+
+    Route::resource('allergens', AllergenController::class)->except('show');
+    Route::resource('dietary-tags', DietaryTagController::class)->except('show');
 });
 
 //have to delete this block when the real pages done.

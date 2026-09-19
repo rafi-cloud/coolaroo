@@ -31,4 +31,9 @@ class Allergen extends Model
         return $this->belongsToMany(MenuItem::class, 'menu_item_allergen', 'allergen_id', 'item_id', 'allergen_id', 'item_id')
             ->using(MenuItemAllergen::class);
     }
+
+    public function isInUse(): bool
+    {
+        return $this->menuItems()->exists();
+    }
 }

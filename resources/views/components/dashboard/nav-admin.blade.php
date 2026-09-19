@@ -17,7 +17,7 @@
         'Catalogue' => [
             ['id' => 'admin-menu-items', 'label' => 'Menu items', 'url' => '/admin/menu-items', 'match' => ['admin/menu-items*'],
              'icon' => '<path d="M4 6h9M4 12h9M4 18h9"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/>'],
-            ['id' => 'admin-categories', 'label' => 'Categories & tags', 'url' => '/admin/categories', 'match' => ['admin/categories*'],
+            ['id' => 'admin-categories', 'label' => 'Categories & tags', 'url' => '/admin/categories', 'match' => ['admin/categories*', 'admin/allergens*', 'admin/dietary-tags*'],
              'icon' => '<path d="M3 7l3-3h5l2 2h8v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],
             ['id' => 'admin-tables', 'label' => 'Tables & QR', 'url' => '/admin/tables', 'match' => ['admin/tables*'],
              'icon' => '<rect x="3" y="3" width="7" height="7" rx="1.3"/><rect x="14" y="3" width="7" height="7" rx="1.3"/><rect x="3" y="14" width="7" height="7" rx="1.3"/><rect x="14" y="14" width="7" height="7" rx="1.3"/>'],

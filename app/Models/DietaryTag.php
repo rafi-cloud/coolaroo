@@ -31,4 +31,9 @@ class DietaryTag extends Model
         return $this->belongsToMany(MenuItem::class, 'menu_item_dietary_tag', 'dietary_tag_id', 'item_id', 'dietary_tag_id', 'item_id')
             ->using(MenuItemDietaryTag::class);
     }
+
+    public function isInUse(): bool
+    {
+        return $this->menuItems()->exists();
+    }
 }
