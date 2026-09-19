@@ -11,7 +11,7 @@ Laravel 11+ / PHP 8.5 / MySQL 8 QR ordering, kitchen display and reservation sys
 |---|---|
 | Design, rules, schema | `docs/sdd/` (12 files + README) |
 | Build tasks in execution order | `docs/sdd/12-task-list.md` |
-| Current state and history | `docs/PROGRESS.md` |
+| Current state and history | `docs/PROGRESS.md` (gitignored — local only, like `notes/`; not part of the submitted repo) |
 | Approved ERD | `docs/erd/Coolaroo_RMS_ERD_v2.drawio` |
 | Homepage and admin prototypes | `docs/design/` |
 
