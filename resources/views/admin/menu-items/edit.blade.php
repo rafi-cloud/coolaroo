@@ -149,4 +149,71 @@
     <button class="btn btn-solid" type="submit" data-testid="admin-size-create-submit">Add size</button>
   </form>
 </div>
+
+<div class="panel">
+  <h2>Add-on groups</h2>
+
+  @foreach ($groups as $group)
+    <div style="margin-bottom:1.5rem">
+      <form method="POST" action="{{ route('admin.menu-items.groups.update', [$item, $group]) }}">
+        @csrf
+        @method('PATCH')
+        <div class="auth-field">
+          <label for="group_name_{{ $group->group_id }}">Group name</label>
+          <input id="group_name_{{ $group->group_id }}" name="group_name" value="{{ $group->group_name }}" required data-testid="admin-group-name-{{ $group->group_id }}">
+        </div>
+        <div class="auth-field">
+          <label><input type="checkbox" name="is_required" value="1" @checked($group->is_required)> Required</label>
+        </div>
+        <div class="auth-field">
+          <label for="min_select_{{ $group->group_id }}">Min select</label>
+          <input id="min_select_{{ $group->group_id }}" name="min_select" type="number" min="0" value="{{ $group->min_select }}" data-testid="admin-group-min-{{ $group->group_id }}">
+        </div>
+        <div class="auth-field">
+          <label for="max_select_{{ $group->group_id }}">Max select</label>
+          <input id="max_select_{{ $group->group_id }}" name="max_select" type="number" min="0" value="{{ $group->max_select }}" data-testid="admin-group-max-{{ $group->group_id }}">
+        </div>
+        <button class="btn btn-solid" type="submit" data-testid="admin-group-save-{{ $group->group_id }}">Save group</button>
+      </form>
+      <form method="POST" action="{{ route('admin.menu-items.groups.destroy', [$item, $group]) }}" style="display:inline">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-ghost" data-testid="admin-group-delete-{{ $group->group_id }}">Delete group</button>
+      </form>
+
+      <h4>Options</h4>
+      @foreach ($group->options as $option)
+        <form method="POST" action="{{ route('admin.menu-items.groups.options.update', [$item, $group, $option]) }}" style="margin-bottom:.6rem">
+          @csrf
+          @method('PATCH')
+          <input name="option_name" value="{{ $option->option_name }}" required data-testid="admin-option-name-{{ $option->option_id }}">
+          <input name="price_delta" type="number" step="0.01" min="0" value="{{ $option->price_delta }}" data-testid="admin-option-price-{{ $option->option_id }}">
+          <label><input type="checkbox" name="is_available" value="1" @checked($option->is_available)> Available</label>
+          <button class="btn btn-solid" type="submit" data-testid="admin-option-save-{{ $option->option_id }}">Save</button>
+        </form>
+        <form method="POST" action="{{ route('admin.menu-items.groups.options.destroy', [$item, $group, $option]) }}" style="display:inline">
+          @csrf
+          @method('DELETE')
+          <button type="submit" class="btn btn-ghost" data-testid="admin-option-delete-{{ $option->option_id }}">Delete</button>
+        </form>
+      @endforeach
+
+      <form method="POST" action="{{ route('admin.menu-items.groups.options.store', [$item, $group]) }}">
+        @csrf
+        <input name="option_name" placeholder="Option name" required data-testid="admin-option-create-name-{{ $group->group_id }}">
+        <input name="price_delta" type="number" step="0.01" min="0" value="0" data-testid="admin-option-create-price-{{ $group->group_id }}">
+        <button class="btn btn-solid" type="submit" data-testid="admin-option-create-submit-{{ $group->group_id }}">Add option</button>
+      </form>
+    </div>
+  @endforeach
+
+  <h3>Add a group</h3>
+  <form method="POST" action="{{ route('admin.menu-items.groups.store', $item) }}">
+    @csrf
+    <input name="group_name" placeholder="e.g. Sauce" required data-testid="admin-group-create-name">
+    <input name="min_select" type="number" min="0" value="0" data-testid="admin-group-create-min">
+    <input name="max_select" type="number" min="0" value="1" data-testid="admin-group-create-max">
+    <button class="btn btn-solid" type="submit" data-testid="admin-group-create-submit">Add group</button>
+  </form>
+</div>
 </x-layouts.admin>

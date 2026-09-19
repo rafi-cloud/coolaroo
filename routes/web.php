@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AddOnGroupController;
+use App\Http\Controllers\Admin\AddOnOptionController;
 use App\Http\Controllers\Admin\AllergenController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DietaryTagController;
@@ -91,6 +93,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::post('menu-items/{menuItem}/sizes', [MenuItemSizeController::class, 'store'])->name('menu-items.sizes.store');
     Route::patch('menu-items/{menuItem}/sizes/{size}', [MenuItemSizeController::class, 'update'])->name('menu-items.sizes.update');
     Route::delete('menu-items/{menuItem}/sizes/{size}', [MenuItemSizeController::class, 'destroy'])->name('menu-items.sizes.destroy');
+
+    Route::post('menu-items/{menuItem}/groups', [AddOnGroupController::class, 'store'])->name('menu-items.groups.store');
+    Route::patch('menu-items/{menuItem}/groups/{group}', [AddOnGroupController::class, 'update'])->name('menu-items.groups.update');
+    Route::delete('menu-items/{menuItem}/groups/{group}', [AddOnGroupController::class, 'destroy'])->name('menu-items.groups.destroy');
+
+    Route::post('menu-items/{menuItem}/groups/{group}/options', [AddOnOptionController::class, 'store'])->name('menu-items.groups.options.store');
+    Route::patch('menu-items/{menuItem}/groups/{group}/options/{option}', [AddOnOptionController::class, 'update'])->name('menu-items.groups.options.update');
+    Route::delete('menu-items/{menuItem}/groups/{group}/options/{option}', [AddOnOptionController::class, 'destroy'])->name('menu-items.groups.options.destroy');
 });
 
 //have to delete this block when the real pages done.
