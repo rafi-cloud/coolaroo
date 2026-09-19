@@ -36,6 +36,7 @@ If code and the SDD disagree, fix both in the same change.
 7. **IDs are stable:** FR, BR, NFR, UC, S and TC numbers are never renumbered.
 8. **Money** is `decimal(8,2)`, AUD, GST-inclusive; GST = total / 11. Timezone Australia/Melbourne.
 9. **Never commit secrets.** Keys live in `.env`.
+10. **No `Co-Authored-By` or other AI attribution trailer in any commit message, ever** — including any default your harness adds automatically. This is a solo assessment submitted as group work; an AI co-author line undermines that framing.
 
 ## Session protocol
 **Start**
