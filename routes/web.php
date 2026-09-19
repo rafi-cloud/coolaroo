@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AllergenController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DietaryTagController;
 use App\Http\Controllers\Admin\MenuItemController;
+use App\Http\Controllers\Admin\MenuItemSizeController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
@@ -86,6 +87,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::patch('menu-items/{menuItem}/archive', [MenuItemController::class, 'archive'])->name('menu-items.archive');
     Route::patch('menu-items/{menuItem}/unarchive', [MenuItemController::class, 'unarchive'])->name('menu-items.unarchive');
     Route::patch('menu-items/{menuItem}/toggle-featured', [MenuItemController::class, 'toggleFeatured'])->name('menu-items.toggle-featured');
+
+    Route::post('menu-items/{menuItem}/sizes', [MenuItemSizeController::class, 'store'])->name('menu-items.sizes.store');
+    Route::patch('menu-items/{menuItem}/sizes/{size}', [MenuItemSizeController::class, 'update'])->name('menu-items.sizes.update');
+    Route::delete('menu-items/{menuItem}/sizes/{size}', [MenuItemSizeController::class, 'destroy'])->name('menu-items.sizes.destroy');
 });
 
 //have to delete this block when the real pages done.

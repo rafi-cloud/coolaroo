@@ -53,6 +53,7 @@ class MenuItemController extends Controller
     {
         return view('admin.menu-items.edit', $this->formOptions() + [
             'item' => $menuItem,
+            'sizes' => $menuItem->sizes()->orderBy('display_order')->get(),
             'selectedAllergens' => $menuItem->allergens()->pluck('allergen_id')->all(),
             'selectedDietaryTags' => $menuItem->dietaryTags()->pluck('dietary_tag_id')->all(),
         ]);

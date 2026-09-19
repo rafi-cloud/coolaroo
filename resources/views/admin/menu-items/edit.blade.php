@@ -90,7 +90,63 @@
 
     <button class="btn btn-solid" type="submit" data-testid="admin-menu-item-edit-submit">Save changes</button>
   </form>
+</div>
 
-  <p class="field-error" style="color:var(--body)">Sizes and prices are managed separately (T042).</p>
+<div class="panel">
+  <h2>Sizes</h2>
+
+  @error('size')
+    <div class="auth-error" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>{{ $message }}</span>
+    </div>
+  @enderror
+
+  @foreach ($sizes as $size)
+    <form method="POST" action="{{ route('admin.menu-items.sizes.update', [$item, $size]) }}" style="margin-bottom:1rem">
+      @csrf
+      @method('PATCH')
+      <div class="auth-field">
+        <label for="size_name_{{ $size->size_id }}">Name</label>
+        <input id="size_name_{{ $size->size_id }}" name="size_name" value="{{ $size->size_name }}" required data-testid="admin-size-name-{{ $size->size_id }}">
+      </div>
+      <div class="auth-field">
+        <label for="price_{{ $size->size_id }}">Price (AUD, GST-inclusive)</label>
+        <input id="price_{{ $size->size_id }}" name="price" type="number" step="0.01" min="0.01" value="{{ $size->price }}" required data-testid="admin-size-price-{{ $size->size_id }}">
+      </div>
+      <div class="auth-field">
+        <label for="sale_price_{{ $size->size_id }}">Sale price (optional)</label>
+        <input id="sale_price_{{ $size->size_id }}" name="sale_price" type="number" step="0.01" min="0.01" value="{{ $size->sale_price }}" data-testid="admin-size-sale-price-{{ $size->size_id }}">
+      </div>
+      <div class="auth-field">
+        <label for="sale_starts_at_{{ $size->size_id }}">Sale starts</label>
+        <input id="sale_starts_at_{{ $size->size_id }}" name="sale_starts_at" type="datetime-local" value="{{ optional($size->sale_starts_at)->format('Y-m-d\TH:i') }}">
+      </div>
+      <div class="auth-field">
+        <label for="sale_ends_at_{{ $size->size_id }}">Sale ends</label>
+        <input id="sale_ends_at_{{ $size->size_id }}" name="sale_ends_at" type="datetime-local" value="{{ optional($size->sale_ends_at)->format('Y-m-d\TH:i') }}">
+      </div>
+      <button class="btn btn-solid" type="submit" data-testid="admin-size-save-{{ $size->size_id }}">Save size</button>
+    </form>
+    <form method="POST" action="{{ route('admin.menu-items.sizes.destroy', [$item, $size]) }}" style="display:inline">
+      @csrf
+      @method('DELETE')
+      <button type="submit" class="btn btn-ghost" data-testid="admin-size-delete-{{ $size->size_id }}">Delete size</button>
+    </form>
+  @endforeach
+
+  <h3>Add a size</h3>
+  <form method="POST" action="{{ route('admin.menu-items.sizes.store', $item) }}">
+    @csrf
+    <div class="auth-field">
+      <label for="new_size_name">Name</label>
+      <input id="new_size_name" name="size_name" value="Regular" required data-testid="admin-size-create-name">
+    </div>
+    <div class="auth-field">
+      <label for="new_price">Price (AUD, GST-inclusive)</label>
+      <input id="new_price" name="price" type="number" step="0.01" min="0.01" required data-testid="admin-size-create-price">
+    </div>
+    <button class="btn btn-solid" type="submit" data-testid="admin-size-create-submit">Add size</button>
+  </form>
 </div>
 </x-layouts.admin>

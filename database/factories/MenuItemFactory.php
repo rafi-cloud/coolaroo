@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\Destination;
+use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,5 +19,12 @@ class MenuItemFactory extends Factory
             'destination' => Destination::Kitchen,
             'is_active' => true,
         ];
+    }
+
+    public function withSize(): static
+    {
+        return $this->afterCreating(function (MenuItem $item) {
+            $item->sizes()->create(['size_name' => 'Regular', 'price' => 12.50]);
+        });
     }
 }
