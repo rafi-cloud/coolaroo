@@ -2,9 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// No '/' route yet — the real homepage lands in T030. Hitting '/' 404s until then.
 
 //have to delete this block when the real pages done.
 if (app()->isLocal()) {
