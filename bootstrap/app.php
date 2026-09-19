@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
             'staff.session' => \App\Http\Middleware\EnsureStaffSessionIsActive::class,
+            'table.context' => \App\Http\Middleware\EnsureTableContext::class,
+            'qr.ordering.enabled' => \App\Http\Middleware\EnsureQrOrderingEnabled::class,
         ]);
 
         $middleware->redirectGuestsTo(fn (Request $request) => $request->is('staff/*', 'admin/*')

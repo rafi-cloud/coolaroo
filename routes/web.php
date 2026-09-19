@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\SlotCapacityController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
+use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Customer\Auth\NewPasswordController;
@@ -59,6 +60,14 @@ Route::middleware('auth:customer')->group(function () {
 
     Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+
+    Route::middleware(['table.context', 'qr.ordering.enabled'])->group(function () {
+        Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+        Route::post('/cart/lines', [CartController::class, 'store'])->name('cart.lines.store');
+        Route::patch('/cart/lines/{line}', [CartController::class, 'update'])->name('cart.lines.update');
+        Route::delete('/cart/lines/{line}', [CartController::class, 'destroy'])->name('cart.lines.destroy');
+        Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+    });
 });
 
 Route::middleware('guest:staff')->group(function () {
