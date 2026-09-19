@@ -3,8 +3,11 @@
 namespace App\Providers;
 
 use App\Models\Staff;
+use App\Support\AustralianDate;
+use App\Support\Money;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +34,18 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('checkout', function (Request $request) {
             return Limit::perMinute(10)->by($request->user()?->getAuthIdentifier() ?: $request->ip());
+        });
+
+        Blade::directive('money', function ($expression) {
+            return "<?php echo \App\Support\Money::format({$expression}); ?>";
+        });
+
+        Blade::directive('auDate', function ($expression) {
+            return "<?php echo \App\Support\AustralianDate::date({$expression}); ?>";
+        });
+
+        Blade::directive('auDateTime', function ($expression) {
+            return "<?php echo \App\Support\AustralianDate::dateTime({$expression}); ?>";
         });
     }
 }
