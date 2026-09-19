@@ -56,6 +56,13 @@
             </td>
             <td>
               <a href="{{ route('admin.tables.edit', $table) }}" data-testid="admin-table-edit-{{ $table->table_id }}">Edit</a>
+              <a href="{{ route('admin.tables.qr', $table) }}" data-testid="admin-table-qr-png-{{ $table->table_id }}">Download PNG</a>
+              <a href="{{ route('admin.tables.qr.pdf', $table) }}" data-testid="admin-table-qr-pdf-{{ $table->table_id }}">Download PDF</a>
+              <form method="POST" action="{{ route('admin.tables.qr.regenerate', $table) }}" style="display:inline">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn btn-ghost" data-testid="admin-table-qr-regenerate-{{ $table->table_id }}">Regenerate QR</button>
+              </form>
 
               @if ($table->is_active)
                 <form method="POST" action="{{ route('admin.tables.deactivate', $table) }}" style="display:inline">

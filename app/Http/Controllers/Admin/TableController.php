@@ -8,15 +8,19 @@ use App\Http\Requests\Admin\OverrideTableStatusRequest;
 use App\Http\Requests\Admin\StoreTableRequest;
 use App\Http\Requests\Admin\UpdateTableRequest;
 use App\Models\RestaurantTable;
+use App\Services\TableQrService;
 use App\Services\TableService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class TableController extends Controller
 {
-    public function __construct(private TableService $tables)
-    {
+    public function __construct(
+        private TableService $tables,
+        private TableQrService $tableQr,
+    ) {
     }
 
     public function index(): View
@@ -74,5 +78,28 @@ class TableController extends Controller
         );
 
         return redirect()->route('admin.tables.index')->with('status', 'table-status-overridden');
+    }
+
+    public function regenerateQr(Request $request, RestaurantTable $table): RedirectResponse
+    {
+        $this->tableQr->regenerate($table, $request->user('staff'));
+
+        return redirect()->route('admin.tables.index')->with('status', 'table-qr-regenerated');
+    }
+
+    public function qr(RestaurantTable $table): Response
+    {
+        return response($this->tableQr->png($table), 200, [
+            'Content-Type' => 'image/png',
+            'Content-Disposition' => 'attachment; filename="table-'.$table->table_number.'-qr.png"',
+        ]);
+    }
+
+    public function qrPdf(RestaurantTable $table): Response
+    {
+        return response($this->tableQr->pdf($table), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="table-'.$table->table_number.'-qr.pdf"',
+        ]);
     }
 }

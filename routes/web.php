@@ -24,6 +24,12 @@ use Illuminate\Support\Facades\Route;
 
 // No '/' route yet — the real homepage lands in T030. Hitting '/' 404s until then.
 
+// Stub for T052's real Public\TableScanController — exists now only so
+// URL::signedRoute('table.scan', ...) (07.5) has a real route to sign against.
+Route::get('/t/{table}/{token}', function () {
+    abort(501, "Table ordering isn't built yet — see T052.");
+})->middleware('signed')->name('table.scan');
+
 Route::middleware('guest:customer')->group(function () {
     Route::get('/register', [RegisteredCustomerController::class, 'create'])->name('register');
     Route::post('/register', [RegisteredCustomerController::class, 'store']);
@@ -110,6 +116,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::patch('tables/{table}/deactivate', [TableController::class, 'deactivate'])->name('tables.deactivate');
     Route::patch('tables/{table}/reactivate', [TableController::class, 'reactivate'])->name('tables.reactivate');
     Route::patch('tables/{table}/status', [TableController::class, 'overrideStatus'])->name('tables.status');
+    Route::patch('tables/{table}/qr/regenerate', [TableController::class, 'regenerateQr'])->name('tables.qr.regenerate');
+    Route::get('tables/{table}/qr.png', [TableController::class, 'qr'])->name('tables.qr');
+    Route::get('tables/{table}/qr.pdf', [TableController::class, 'qrPdf'])->name('tables.qr.pdf');
 });
 
 //have to delete this block when the real pages done.
