@@ -34,6 +34,7 @@ class MenuController extends Controller
             ->with([
                 'category',
                 'sizes' => fn ($q) => $q->where('is_active', true)->orderBy('price'),
+                'addOnGroups.options' => fn ($q) => $q->where('is_active', true)->orderBy('price_delta'),
                 'dietaryTags' => fn ($q) => $q->where('is_active', true),
                 'allergens' => fn ($q) => $q->where('is_active', true),
             ]);
@@ -100,6 +101,7 @@ class MenuController extends Controller
             'search' => $search,
             'table' => $table,
             'tableLabel' => $tableLabel,
+            'qrOrderingEnabled' => $this->settingService->getBool('qr_ordering_enabled', true),
         ]);
     }
 }

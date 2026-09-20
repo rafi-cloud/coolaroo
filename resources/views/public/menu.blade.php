@@ -122,15 +122,137 @@
             @endif
 
             <div class="order-card-foot">
-              <button type="button" class="btn btn-ghost btn-sm" data-testid="menu-item-{{ $item->item_id }}" data-item-id="{{ $item->item_id }}">
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                data-open-modal="item-modal-{{ $item->item_id }}"
+                data-testid="menu-item-{{ $item->item_id }}"
+                data-item-id="{{ $item->item_id }}"
+              >
                 View details
               </button>
             </div>
           </div>
+
+          {{-- S03: Item detail modal --}}
+          <x-menu.item-modal
+            :item="$item"
+            :has-table-context="(bool) $table"
+            :qr-ordering-enabled="$qrOrderingEnabled"
+          />
         </article>
       @empty
         <p class="menu-empty" data-testid="menu-empty">No dishes found matching your selected filters.</p>
       @endforelse
     </div>
   </div>
+
+  @push('scripts')
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function calcTotal(modal) {
+        if (!modal) return;
+        var sizeInput = modal.querySelector('input[name="size_id"]:checked') || modal.querySelector('input[name="size_id"][type="hidden"]');
+        var sizePrice = sizeInput ? parseFloat(sizeInput.getAttribute('data-price') || 0) : 0;
+
+        var addonTotal = 0;
+        modal.querySelectorAll('input[name="add_on_option_ids[]"]:checked').forEach(function (opt) {
+          addonTotal += parseFloat(opt.getAttribute('data-price') || 0);
+        });
+
+        var qtyInput = modal.querySelector('input[name="quantity"]');
+        var qty = qtyInput ? Math.max(1, parseInt(qtyInput.value, 10) || 1) : 1;
+        var total = (sizePrice + addonTotal) * qty;
+
+        var totalDisplay = modal.querySelector('.btn-price-calc');
+        if (totalDisplay) {
+          totalDisplay.textContent = '$' + total.toFixed(2);
+        }
+      }
+
+      // Open modal
+      document.addEventListener('click', function (e) {
+        var openBtn = e.target.closest('[data-open-modal]');
+        if (openBtn) {
+          e.preventDefault();
+          var targetId = openBtn.getAttribute('data-open-modal');
+          var modal = document.getElementById(targetId);
+          if (modal) {
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            calcTotal(modal);
+          }
+        }
+      });
+
+      // Close modal
+      document.addEventListener('click', function (e) {
+        var closeBtn = e.target.closest('[data-close-modal]');
+        if (closeBtn) {
+          e.preventDefault();
+          var targetId = closeBtn.getAttribute('data-close-modal');
+          var modal = document.getElementById(targetId);
+          if (modal) {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        } else if (e.target.classList.contains('modal-scrim')) {
+          e.target.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+      });
+
+      // Escape key closes modals
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.modal-scrim.open').forEach(function (m) {
+            m.classList.remove('open');
+          });
+          document.body.style.overflow = '';
+        }
+      });
+
+      // Quantity buttons
+      document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-qty-action]');
+        if (!btn) return;
+        var modal = btn.closest('.modal-scrim');
+        var input = modal ? modal.querySelector('input[name="quantity"]') : null;
+        if (!input) return;
+
+        var current = parseInt(input.value, 10) || 1;
+        if (btn.getAttribute('data-qty-action') === 'plus') {
+          input.value = Math.min(99, current + 1);
+        } else if (btn.getAttribute('data-qty-action') === 'minus') {
+          input.value = Math.max(1, current - 1);
+        }
+        calcTotal(modal);
+      });
+
+      // Inputs change (size, addons, quantity)
+      document.addEventListener('change', function (e) {
+        var modal = e.target.closest('.modal-scrim');
+        if (!modal) return;
+
+        // Enforce max-select on addon groups (BR16)
+        if (e.target.name === 'add_on_option_ids[]') {
+          var group = e.target.closest('.addon-group');
+          if (group) {
+            var maxSelect = parseInt(group.getAttribute('data-max'), 10) || 1;
+            var checked = group.querySelectorAll('input[name="add_on_option_ids[]"]:checked');
+            if (maxSelect === 1 && e.target.checked) {
+              checked.forEach(function (chk) {
+                if (chk !== e.target) chk.checked = false;
+              });
+            } else if (checked.length > maxSelect) {
+              e.target.checked = false;
+            }
+          }
+        }
+
+        calcTotal(modal);
+      });
+    });
+  </script>
+  @endpush
 </x-dynamic-component>
