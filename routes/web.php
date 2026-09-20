@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
+use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Customer\OrderController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\Customer\ReceiptController;
@@ -109,6 +110,7 @@ Route::middleware('auth:customer')->group(function () {
     Route::post('/orders/{order}/pay/stripe', [PaymentController::class, 'stripe'])->name('orders.pay.stripe');
     Route::post('/orders/{order}/pay/cash', [PaymentController::class, 'cash'])->name('orders.pay.cash');
     Route::post('/orders/{order}/payment-check', [PaymentController::class, 'check'])->name('orders.pay.check');
+    Route::post('/orders/{order}/feedback', [FeedbackController::class, 'store'])->name('orders.feedback.store');
     Route::get('/payment/success', [PaymentController::class, 'return'])->name('payment.success');
     Route::get('/payment/cancelled', [PaymentController::class, 'return'])->name('payment.cancelled');
 

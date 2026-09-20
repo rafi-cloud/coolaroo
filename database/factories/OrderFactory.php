@@ -37,4 +37,14 @@ class OrderFactory extends Factory
             'paid_at' => now(),
         ])->save());
     }
+
+    public function served(): static
+    {
+        return $this->afterCreating(fn ($order) => $order->forceFill([
+            'status' => OrderStatus::Served,
+            'payment_status' => PaymentStatus::Paid,
+            'paid_at' => now(),
+            'served_at' => now(),
+        ])->save());
+    }
 }

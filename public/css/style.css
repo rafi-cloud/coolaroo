@@ -648,6 +648,11 @@ svg{display:block}
 .auth-error svg{width:18px;height:18px;flex:none;margin-top:1px}
 .auth-error.auth-success{background:#DDF2E5;border-color:#BFE6CE;color:#1F7844}
 .field-error{color:#9A2D14;font-size:.82rem;margin-top:.4rem}
+.rating-field{border:none;padding:0;margin:0 0 1.1rem}
+.rating-field legend{font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:.4rem;padding:0}
+.rating-options{display:flex;gap:1rem}
+.rating-options label{display:flex;align-items:center;gap:.35rem;font-weight:600;color:var(--ink);cursor:pointer}
+.rating-options input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 .panel{
   max-width:520px;
   background:#fff;border-radius:10px;

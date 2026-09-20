@@ -15,6 +15,11 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
       <span>A staff member will come to collect payment.</span>
     </div>
+  @elseif (session('status') === 'feedback-submitted')
+    <div class="auth-error auth-success" role="status" data-testid="feedback-submitted-notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>Thanks for your feedback.</span>
+    </div>
   @endif
 
   @if (session('error'))
@@ -82,5 +87,13 @@
   <p><strong>Total: @money($order->total_amount)</strong></p>
 
   <p><a href="{{ route('orders.receipt', $order) }}" target="_blank" data-testid="order-receipt-link">Download receipt (PDF)</a></p>
+
+  @if ($order->status->value === 'served')
+    @if ($order->feedback)
+      <p data-testid="feedback-thanks">You've already rated this order — thanks!</p>
+    @elseif ($order->taken_by_staff_id === null)
+      <x-feedback-modal :order="$order" />
+    @endif
+  @endif
 </div>
 </x-layouts.customer>
