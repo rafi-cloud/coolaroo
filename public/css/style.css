@@ -1116,3 +1116,38 @@ svg{display:block}
 
 
 
+
+/* Meal builder (S16) */
+.mb-form{margin-top:2rem;max-width:760px}
+.mb-grid{display:grid;gap:1.2rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.mb-field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.2rem}
+.mb-field label{font-weight:600;color:var(--ink)}
+.mb-field input,.mb-field select,.mb-field textarea{
+  font:inherit;color:var(--body);background:#fff;
+  border:1.5px solid #EAE0D4;border-radius:10px;padding:.7rem .9rem;
+}
+.mb-fieldset{border:0;padding:0;margin:0 0 1.2rem}
+.mb-fieldset legend{font-weight:600;color:var(--ink);padding:0;margin-bottom:.5rem}
+.mb-tags{display:flex;flex-wrap:wrap;gap:.6rem}
+.mb-tag{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:#fff;border:1.5px solid #EAE0D4;border-radius:999px;
+  padding:.45rem .9rem;cursor:pointer;
+}
+.mb-status{margin-top:1.4rem;font-family:var(--serif);font-style:italic}
+.mb-results{display:grid;gap:1.4rem;margin-top:1.6rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.mb-card{background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:1.4rem}
+.mb-card-title{font-size:1.15rem;margin-bottom:.4rem}
+.mb-why{font-family:var(--serif);font-style:italic;margin-bottom:1rem}
+.mb-lines li{
+  display:flex;justify-content:space-between;gap:1rem;
+  padding:.5rem 0;border-bottom:1px solid #F3EAE0;font-size:.92rem;
+}
+.mb-lines li:last-child{border-bottom:none}
+.mb-line-total{white-space:nowrap;font-weight:600;color:var(--ink)}
+.mb-total{
+  display:flex;justify-content:space-between;gap:1rem;
+  margin:.9rem 0 1.1rem;font-size:1.05rem;color:var(--ink);
+}
+.mb-scan{font-size:.9rem;color:var(--body)}
+.mb-note{margin-top:2rem;font-size:.85rem;color:var(--body);max-width:760px}
