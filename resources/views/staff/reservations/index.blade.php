@@ -146,10 +146,16 @@
           };
         @endphp
 
-        <div class="reservation-card {{ $r->is_unassigned_inside_t30 ? 'card-unassigned-t30' : '' }}" data-testid="reservations-card-{{ $r->reservation_id }}">
+        <div class="reservation-card {{ $r->is_unassigned_inside_t30 ? 'card-unassigned-t30' : '' }} {{ $r->is_grace_elapsed ? 'card-grace-elapsed' : '' }}" data-testid="reservations-card-{{ $r->reservation_id }}">
           @if ($r->is_unassigned_inside_t30)
             <div class="unassigned-t30-banner" data-testid="reservations-unassigned-t30-alert-{{ $r->reservation_id }}">
               ⚠️ Unassigned Booking (T–30 min)
+            </div>
+          @endif
+
+          @if ($r->is_grace_elapsed)
+            <div class="no-show-alert-banner" data-testid="reservations-no-show-suggest-{{ $r->reservation_id }}">
+              ⚠️ Grace period elapsed (suggest no-show)
             </div>
           @endif
 
@@ -239,6 +245,27 @@
           @if ($r->special_requests)
             <div class="card-requests" data-testid="reservations-requests-{{ $r->reservation_id }}">
               <span class="requests-label">Note:</span> &ldquo;{{ $r->special_requests }}&rdquo;
+            </div>
+          @endif
+
+          <!-- Confirmed actions: Seat & Mark No-show (FR69, FR70, BR39) -->
+          @if ($r->status === \App\Enums\ReservationStatus::Confirmed)
+            <div class="card-confirmed-actions" data-testid="reservations-confirmed-actions-{{ $r->reservation_id }}" style="margin-top:auto; padding-top:0.5rem; border-top:1px solid var(--line); display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+              @if ($r->can_seat)
+                <form method="POST" action="{{ route('staff.reservations.seat', $r) }}" style="display:inline;">
+                  @csrf
+                  <button type="submit" class="btn btn-xs btn-primary" data-testid="reservations-seat-btn-{{ $r->reservation_id }}">
+                    Seat guests
+                  </button>
+                </form>
+              @endif
+
+              <form method="POST" action="{{ route('staff.reservations.no-show', $r) }}" style="display:inline;" onsubmit="return confirm('Confirm mark {{ $r->reference_code }} as no-show? Any assigned tables will be released.');">
+                @csrf
+                <button type="submit" class="btn btn-xs btn-outline-danger" data-testid="reservations-no-show-btn-{{ $r->reservation_id }}">
+                  Mark no-show
+                </button>
+              </form>
             </div>
           @endif
 

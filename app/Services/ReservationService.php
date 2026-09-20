@@ -795,36 +795,138 @@ class ReservationService
         );
     }
 
-    /** BR04: reuse the assigned-but-unopened visit; open it and occupy the table. */
+    /**
+     * FR69, BR03, BR04: Staff seats a reservation.
+     * Opens all assigned visit rows and transitions linked tables to Occupied.
+     */
+    public function seatReservation(Reservation $reservation, ?Staff $staff = null): Reservation
+    {
+        return DB::transaction(function () use ($reservation, $staff) {
+            $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
+
+            $locked->status->ensureCanTransitionTo(ReservationStatus::Seated);
+
+            $visits = $locked->visits()
+                ->whereNull('closed_at')
+                ->with('restaurantTable')
+                ->lockForUpdate()
+                ->get();
+
+            if ($visits->isEmpty()) {
+                throw ValidationException::withMessages([
+                    'table' => 'Reservation must have tables assigned before seating.',
+                ]);
+            }
+
+            foreach ($visits as $visit) {
+                if ($visit->opened_at === null) {
+                    $visit->update([
+                        'opened_at' => now(),
+                        'opened_by_staff_id' => $staff?->staff_id ?? $visit->opened_by_staff_id,
+                    ]);
+                }
+
+                $table = $visit->restaurantTable;
+                if ($table && $table->status !== TableStatus::Occupied) {
+                    $this->tableStatus->transition($table, TableStatus::Occupied, $staff);
+                }
+            }
+
+            $locked->forceFill([
+                'status' => ReservationStatus::Seated,
+                'seated_at' => now(),
+            ])->save();
+
+            $this->auditLogger->log($staff, 'reservation_seated', $locked);
+
+            return $locked;
+        });
+    }
+
+    /**
+     * FR70, BR39: Staff marks a reservation as no-show after grace period expires.
+     * Transitions reservation to NoShow, records staff and timestamp, closes visits with reason no_show,
+     * and returns Reserved tables to Available.
+     */
+    public function markNoShow(Reservation $reservation, ?Staff $staff = null): Reservation
+    {
+        return DB::transaction(function () use ($reservation, $staff) {
+            $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
+
+            $locked->status->ensureCanTransitionTo(ReservationStatus::NoShow);
+
+            $graceMinutes = (int) (Setting::find('reservation_grace_minutes')?->setting_value ?? 15);
+            $graceCutoff = $this->bookedAt($locked)->addMinutes($graceMinutes);
+
+            if (now()->lt($graceCutoff)) {
+                throw ValidationException::withMessages([
+                    'status' => "Cannot mark as no-show until the grace period has expired ({$graceMinutes} minutes after booking time).",
+                ]);
+            }
+
+            $locked->forceFill([
+                'status' => ReservationStatus::NoShow,
+                'no_show_at' => now(),
+                'no_show_by_staff_id' => $staff?->staff_id,
+            ])->save();
+
+            $this->unlinkTables($locked, VisitCloseReason::NoShow);
+
+            $this->auditLogger->log($staff, 'reservation_no_show', $locked);
+
+            return $locked;
+        });
+    }
+
+    /** BR04, FR69: reuse the assigned-but-unopened visits; open them and occupy all linked tables. */
     public function seatOnHolderScan(RestaurantTable $table, Reservation $reservation): Visit
     {
-        $visit = $table->visits()
-            ->whereNull('closed_at')
-            ->where('reservation_id', $reservation->reservation_id)
-            ->latest('visit_id')
-            ->first();
+        return DB::transaction(function () use ($table, $reservation) {
+            $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
 
-        if ($visit === null) {
-            $visit = $table->visits()->create([
-                'reservation_id' => $reservation->reservation_id,
-                'guest_count' => $reservation->party_size,
-                'opened_at' => now(),
-            ]);
-        } elseif ($visit->opened_at === null) {
-            $visit->update(['opened_at' => now()]);
-        }
+            $locked->status->ensureCanTransitionTo(ReservationStatus::Seated);
 
-        $reservation->status->ensureCanTransitionTo(ReservationStatus::Seated);
-        $reservation->forceFill([
-            'status' => ReservationStatus::Seated,
-            'seated_at' => now(),
-        ])->save();
+            $visits = $locked->visits()
+                ->whereNull('closed_at')
+                ->with('restaurantTable')
+                ->lockForUpdate()
+                ->get();
 
-        if ($table->status !== TableStatus::Occupied) {
-            $this->tableStatus->transition($table, TableStatus::Occupied);
-        }
+            $primaryVisit = null;
 
-        return $visit;
+            if ($visits->isEmpty()) {
+                $primaryVisit = $table->visits()->create([
+                    'reservation_id' => $locked->reservation_id,
+                    'guest_count' => $locked->party_size,
+                    'opened_at' => now(),
+                ]);
+                $visits = collect([$primaryVisit]);
+            }
+
+            foreach ($visits as $visit) {
+                if ($visit->opened_at === null) {
+                    $visit->update(['opened_at' => now()]);
+                }
+
+                if ($visit->table_id === $table->table_id) {
+                    $primaryVisit = $visit;
+                }
+
+                $t = $visit->restaurantTable ?? $table;
+                if ($t && $t->status !== TableStatus::Occupied) {
+                    $this->tableStatus->transition($t, TableStatus::Occupied);
+                }
+            }
+
+            $locked->forceFill([
+                'status' => ReservationStatus::Seated,
+                'seated_at' => now(),
+            ])->save();
+
+            $this->auditLogger->log(null, 'reservation_seated_holder_scan', $locked);
+
+            return $primaryVisit ?? $visits->first();
+        });
     }
 
     /** BR41: 'Jane D' — never the full surname. */

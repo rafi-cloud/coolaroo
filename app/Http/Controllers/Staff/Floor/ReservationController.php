@@ -85,6 +85,12 @@ class ReservationController extends Controller
                 && $reservation->is_unassigned
                 && $insideT30
                 && in_array($reservation->status, [ReservationStatus::Confirmed, ReservationStatus::Requested], true);
+
+            // BR39: grace elapsed check
+            $graceMinutes = (int) (\App\Models\Setting::find('reservation_grace_minutes')?->setting_value ?? 15);
+            $graceCutoff = $bookedAt->copy()->addMinutes($graceMinutes);
+            $reservation->is_grace_elapsed = $reservation->status === ReservationStatus::Confirmed && now()->gte($graceCutoff);
+            $reservation->can_seat = $reservation->status === ReservationStatus::Confirmed && $reservation->assigned_tables->isNotEmpty();
         });
 
         $activeSlots = \App\Models\SlotCapacity::where('is_active', true)->orderBy('slot_time')->get();
@@ -172,5 +178,25 @@ class ReservationController extends Controller
 
         return back()->with('status', 'tables-unassigned')
             ->with('message', "Tables unassigned from reservation {$reservation->reference_code}.");
+    }
+
+    public function seat(Request $request, Reservation $reservation): RedirectResponse
+    {
+        $staff = $request->user('staff');
+
+        $this->reservationService->seatReservation($reservation, $staff);
+
+        return back()->with('status', 'reservation-seated')
+            ->with('message', "Reservation {$reservation->reference_code} seated successfully.");
+    }
+
+    public function noShow(Request $request, Reservation $reservation): RedirectResponse
+    {
+        $staff = $request->user('staff');
+
+        $this->reservationService->markNoShow($reservation, $staff);
+
+        return back()->with('status', 'reservation-no-show')
+            ->with('message', "Reservation {$reservation->reference_code} marked as no-show.");
     }
 }
