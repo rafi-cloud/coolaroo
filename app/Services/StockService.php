@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
  */
 class StockService
 {
-    private function bufferMultiplier(): int
+    /** BR09's buffer. Public since T140: the dashboard's low-stock widget measures against it (08.5). */
+    public function bufferMultiplier(): int
     {
         return (int) (Setting::find('qr_stock_buffer_multiplier')?->setting_value ?? 5);
     }
