@@ -6,6 +6,7 @@ use App\Models\Staff;
 use App\Support\AustralianDate;
 use App\Support\Money;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -28,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.force_https')) {
             URL::forceScheme('https');
         }
+
+        Model::preventLazyLoading(! $this->app->isProduction());
 
         Gate::before(function ($user, string $ability) {
             return $user instanceof Staff && $user->role->role_name === 'admin' ? true : null;
