@@ -1,0 +1,136 @@
+<x-dynamic-component
+    :component="$table ? 'layouts.customer' : 'layouts.public'"
+    :table-label="$tableLabel"
+    title="Menu — Coolaroo Restaurant & Bistro"
+    description="Browse our wood-fired pizzas, burgers, fresh seafood, and bistro favourites."
+>
+  <div class="wrap menu-head">
+    <h1>Our Menu</h1>
+    <p class="sub">Hand-made dishes, wood-fired mains and fresh local ingredients.</p>
+
+    {{-- Category tabs --}}
+    <nav class="cat-tabs" aria-label="Menu categories" data-testid="menu-cat-tabs">
+      <a class="cat-tab @if($selectedCategory === 'all') active @endif" href="{{ route('menu.index', array_merge(request()->except(['category', 'page']), ['category' => 'all'])) }}" data-testid="menu-tab-all">All</a>
+      @if($hasSpecials)
+        <a class="cat-tab @if($selectedCategory === 'specials') active @endif" href="{{ route('menu.index', array_merge(request()->except(['category', 'page']), ['category' => 'specials'])) }}" data-testid="menu-tab-specials">Specials</a>
+      @endif
+      @foreach($categories as $cat)
+        <a class="cat-tab @if($selectedCategory == $cat->category_id) active @endif" href="{{ route('menu.index', array_merge(request()->except(['category', 'page']), ['category' => $cat->category_id])) }}" data-testid="menu-tab-{{ $cat->category_id }}">{{ $cat->category_name }}</a>
+      @endforeach
+    </nav>
+  </div>
+
+  {{-- Filter drawer for Dietary & Allergens (FR33) --}}
+  <div class="wrap">
+    <details class="menu-filter-drawer" @if(!empty($selectedDietary) || !empty($selectedAllergens) || $search) open @endif data-testid="menu-filters">
+      <summary data-testid="menu-filters-toggle">Filter by Dietary &amp; Allergens</summary>
+      <form method="get" action="{{ route('menu.index') }}" data-testid="menu-filter-form">
+        @if($selectedCategory !== 'all')
+          <input type="hidden" name="category" value="{{ $selectedCategory }}">
+        @endif
+        <div class="filter-grid">
+          <div class="filter-col">
+            <h4>Search</h4>
+            <input type="text" name="q" value="{{ $search }}" placeholder="Search dishes..." data-testid="menu-search-input">
+          </div>
+          <div class="filter-col">
+            <h4>Dietary Requirements</h4>
+            <div class="filter-tags">
+              @foreach($dietaryTags as $tag)
+                <label class="filter-checkbox" data-testid="menu-dietary-label-{{ $tag->dietary_tag_id }}">
+                  <input type="checkbox" name="dietary[]" value="{{ $tag->dietary_tag_id }}" @checked(in_array($tag->dietary_tag_id, $selectedDietary)) data-testid="menu-dietary-{{ $tag->dietary_tag_id }}">
+                  {{ $tag->tag_name }}
+                </label>
+              @endforeach
+            </div>
+          </div>
+          <div class="filter-col">
+            <h4>Exclude Allergens (BR61)</h4>
+            <div class="filter-tags">
+              @foreach($allergens as $allergen)
+                <label class="filter-checkbox" data-testid="menu-allergen-label-{{ $allergen->allergen_id }}">
+                  <input type="checkbox" name="exclude_allergen[]" value="{{ $allergen->allergen_id }}" @checked(in_array($allergen->allergen_id, $selectedAllergens)) data-testid="menu-allergen-{{ $allergen->allergen_id }}">
+                  {{ $allergen->allergen_name }}
+                </label>
+              @endforeach
+            </div>
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-orange" data-testid="menu-filter-apply">Apply filters</button>
+          <a href="{{ route('menu.index') }}" class="btn btn-ghost" data-testid="menu-filter-clear">Clear all</a>
+        </div>
+      </form>
+    </details>
+
+    {{-- Allergen disclaimer (FR33) --}}
+    <aside class="allergen-disclaimer" role="note" data-testid="menu-allergen-disclaimer">
+      <strong>Allergy Notice:</strong> Please inform our staff of any serious allergies before ordering. Allergen labels reflect ingredients in each dish and its add-on options (BR61); however, our kitchen handles nuts, seafood, gluten and dairy, and cross-contact may occur.
+    </aside>
+  </div>
+
+  {{-- Menu items grid --}}
+  <div class="wrap">
+    <div class="order-grid" data-testid="menu-grid">
+      @forelse($items as $item)
+        @php
+          $activeSizes = $item->sizes;
+          $lowestSize = $activeSizes->first();
+          $hasMultipleSizes = $activeSizes->count() > 1;
+          $isOnSale = $lowestSize && app(\App\Services\SpecialsService::class)->isSaleActive($lowestSize);
+          $hasNutrition = $item->calories_kcal || $item->protein_g || $item->carbohydrates_g || $item->fat_g;
+        @endphp
+        <article class="order-card @if(! $item->is_available) is-soldout @endif" data-testid="menu-card-{{ $item->item_id }}">
+          <img src="{{ $item->image_url ? asset($item->image_url) : asset('images/dish-burger.jpg') }}" alt="{{ $item->item_name }}">
+          <div class="order-card-body">
+            <div class="order-card-head">
+              <h4>{{ $item->item_name }}</h4>
+              <span class="price">
+                @if(! $item->is_available && $lowestSize)
+                  @money($lowestSize->price)
+                @elseif($isOnSale)
+                  <s>@money($lowestSize->price)</s> @money($lowestSize->sale_price)
+                @elseif($hasMultipleSizes)
+                  <small>from</small> @money($lowestSize->price)
+                @elseif($lowestSize)
+                  @money($lowestSize->price)
+                @endif
+              </span>
+            </div>
+            <p class="desc">{{ $item->description }}</p>
+
+            @if($item->dietaryTags->isNotEmpty())
+              <p class="tags">
+                @foreach($item->dietaryTags as $tag)
+                  <span class="tag" title="{{ $tag->tag_name }}">{{ strtoupper(str_starts_with(strtoupper($tag->tag_name), 'GF') ? 'GF' : substr($tag->tag_name, 0, 1)) }}</span>
+                @endforeach
+              </p>
+            @endif
+
+            {{-- FR34: Nutrition Information --}}
+            @if($hasNutrition)
+              <div class="nutrition-pill" data-testid="menu-nutrition-{{ $item->item_id }}">
+                @if($item->calories_kcal) {{ (int) $item->calories_kcal }} kcal @endif
+                @if($item->protein_g) &middot; P: {{ (int) $item->protein_g }}g @endif
+                @if($item->carbohydrates_g) &middot; C: {{ (int) $item->carbohydrates_g }}g @endif
+                @if($item->fat_g) &middot; F: {{ (int) $item->fat_g }}g @endif
+              </div>
+            @endif
+
+            @if(! $item->is_available)
+              <span class="unavailable-tag" data-testid="menu-soldout-{{ $item->item_id }}">Sold out</span>
+            @endif
+
+            <div class="order-card-foot">
+              <button type="button" class="btn btn-ghost btn-sm" data-testid="menu-item-{{ $item->item_id }}" data-item-id="{{ $item->item_id }}">
+                View details
+              </button>
+            </div>
+          </div>
+        </article>
+      @empty
+        <p class="menu-empty" data-testid="menu-empty">No dishes found matching your selected filters.</p>
+      @endforelse
+    </div>
+  </div>
+</x-dynamic-component>

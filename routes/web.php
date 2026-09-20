@@ -26,6 +26,7 @@ use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\MenuController;
 use App\Http\Controllers\Public\TableScanController;
 use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
@@ -42,6 +43,7 @@ use App\Http\Controllers\Staff\RefundRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
 
 Route::get('/t/{table}/{token}', [TableScanController::class, 'show'])
     ->middleware('signed')

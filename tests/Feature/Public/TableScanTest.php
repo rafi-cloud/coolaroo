@@ -84,7 +84,7 @@ class TableScanTest extends TestCase
 
         $this->actingAs(Customer::factory()->create(), 'customer')
             ->get($this->scanUrl($table))
-            ->assertRedirect(route('cart.index'));
+            ->assertRedirect(route('menu.index'));
 
         $this->assertSame($table->table_id, session('table_id'));
     }
@@ -110,7 +110,7 @@ class TableScanTest extends TestCase
 
         $this->actingAs($holder, 'customer')
             ->get($this->scanUrl($table))
-            ->assertRedirect(route('cart.index'));
+            ->assertRedirect(route('menu.index'));
 
         $this->assertSame(ReservationStatus::Seated, $reservation->fresh()->status);
         $this->assertSame(TableStatus::Occupied, $table->fresh()->status);
@@ -137,7 +137,7 @@ class TableScanTest extends TestCase
 
         $this->actingAs($customer, 'customer')
             ->post(route('table.scan.switch', $second))
-            ->assertRedirect(route('cart.index'));
+            ->assertRedirect(route('menu.index'));
 
         $this->assertSame($second->table_id, session('table_id'));
         $this->assertSame(0, app(CartService::class)->count());
