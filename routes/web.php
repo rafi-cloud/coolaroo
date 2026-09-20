@@ -144,6 +144,8 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
     Route::post('/reservations', [StaffReservationController::class, 'store'])->name('staff.reservations.store');
     Route::post('/reservations/{reservation}/approve', [StaffReservationController::class, 'approve'])->name('staff.reservations.approve');
     Route::post('/reservations/{reservation}/decline', [StaffReservationController::class, 'decline'])->name('staff.reservations.decline');
+    Route::post('/reservations/{reservation}/tables', [StaffReservationController::class, 'assign'])->name('staff.reservations.tables.assign');
+    Route::delete('/reservations/{reservation}/tables', [StaffReservationController::class, 'unassign'])->name('staff.reservations.tables.unassign');
     Route::get('/customers/{customer}/trust', [TrustController::class, 'show'])->name('staff.customers.trust');
 });
 

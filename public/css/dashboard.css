@@ -1080,4 +1080,13 @@ input{font:inherit}
 }
 .phone-form-actions{display:flex;justify-content:flex-end}
 
+/* table assignment drawer (FR65, FR95) */
+.card-table-section{display:flex;flex-direction:column;gap:.35rem}
+.table-assign-drawer{margin-top:.3rem}
+.table-assign-drawer summary{cursor:pointer;font-size:.78rem;padding:.2rem .5rem}
+.table-assign-form{margin-top:.4rem;padding:.6rem;background:var(--cream);border:1px solid var(--line);border-radius:6px}
+.table-checkboxes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:.35rem;max-height:130px;overflow-y:auto;margin:.4rem 0}
+.table-chk-label{display:flex;align-items:center;gap:.3rem;font-size:.8rem;color:var(--ink);cursor:pointer}
+
+
 

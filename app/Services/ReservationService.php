@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ReservationStatus;
 use App\Enums\TableStatus;
 use App\Enums\VisitCloseReason;
+use App\Events\ReservationAlert;
 use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\RestaurantTable;
@@ -13,6 +14,7 @@ use App\Models\SlotCapacity;
 use App\Models\Staff;
 use App\Models\Visit;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -567,6 +569,134 @@ class ReservationService
             $this->auditLogger->log(null, 'reservation_expired', $locked);
 
             return $locked;
+        });
+    }
+
+    /**
+     * FR65, FR95, BR04, BR07, BR33, BR64: Assign or reassign tables to a reservation.
+     * Checks active tables, total seats >= party_size, no overlapping reservation windows.
+     * If assigned inside T-30, transitions Available tables to Reserved with place-sign alert.
+     *
+     * @param array<int> $tableIds
+     * @return Collection<int, Visit>
+     */
+    public function assignTables(Reservation $reservation, array $tableIds, ?Staff $staff = null): Collection
+    {
+        if (empty($tableIds)) {
+            throw ValidationException::withMessages([
+                'table_ids' => 'At least one table must be selected for assignment.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($reservation, $tableIds, $staff) {
+            $lockedRes = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
+
+            $tables = RestaurantTable::whereIn('table_id', $tableIds)->lockForUpdate()->get();
+
+            if ($tables->count() !== count(array_unique($tableIds))) {
+                throw ValidationException::withMessages([
+                    'table_ids' => 'One or more selected tables could not be found.',
+                ]);
+            }
+
+            // BR07: Inactive tables cannot be assigned
+            foreach ($tables as $table) {
+                if (! $table->is_active) {
+                    throw ValidationException::withMessages([
+                        'table_ids' => "Table {$table->table_number} is inactive and cannot be assigned.",
+                    ]);
+                }
+            }
+
+            // BR33: Seats >= party size
+            $totalSeats = $tables->sum('seat_capacity');
+            if ($totalSeats < $lockedRes->party_size) {
+                throw ValidationException::withMessages([
+                    'table_ids' => "Selected tables seat {$totalSeats} guests, but the party size is {$lockedRes->party_size}.",
+                ]);
+            }
+
+            // BR33: Overlap check per table
+            $start1 = $this->bookedAt($lockedRes);
+            $duration1 = $this->availability->getDurationMinutes($lockedRes->party_size);
+            $end1 = $start1->copy()->addMinutes($duration1);
+
+            foreach ($tables as $table) {
+                $otherVisits = $table->visits()
+                    ->whereNull('closed_at')
+                    ->where('reservation_id', '!=', $lockedRes->reservation_id)
+                    ->whereNotNull('reservation_id')
+                    ->with('reservation')
+                    ->get();
+
+                foreach ($otherVisits as $otherVisit) {
+                    $otherRes = $otherVisit->reservation;
+                    if (! $otherRes || in_array($otherRes->status, [ReservationStatus::Cancelled, ReservationStatus::Declined, ReservationStatus::Completed, ReservationStatus::NoShow], true)) {
+                        continue;
+                    }
+
+                    if ($otherRes->booking_date->toDateString() === $lockedRes->booking_date->toDateString()) {
+                        $start2 = $this->bookedAt($otherRes);
+                        $duration2 = $this->availability->getDurationMinutes($otherRes->party_size);
+                        $end2 = $start2->copy()->addMinutes($duration2);
+
+                        if ($start1->isBefore($end2) && $start2->isBefore($end1)) {
+                            throw ValidationException::withMessages([
+                                'table_ids' => "Table {$table->table_number} is already assigned to reservation {$otherRes->reference_code} at ".substr($otherRes->booking_time, 0, 5).".",
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // Unassign any previously assigned tables first (reassignment per FR95, BR64)
+            $this->unlinkTables($lockedRes, VisitCloseReason::Unassigned);
+
+            // Check if inside T-30 window (BR04)
+            $isToday = $lockedRes->booking_date->isToday();
+            $insideT30 = $isToday && now()->betweenIncluded(
+                $start1->copy()->subMinutes(30),
+                $start1->copy()->addMinutes(15)
+            );
+
+            $visits = collect();
+
+            foreach ($tables as $table) {
+                $visit = $table->visits()->create([
+                    'reservation_id' => $lockedRes->reservation_id,
+                    'guest_count' => $lockedRes->party_size,
+                    'opened_at' => null, // BR04: opened_at NULL until occupied
+                ]);
+                $visits->push($visit);
+
+                if ($insideT30) {
+                    if ($table->status === TableStatus::Available) {
+                        $this->tableStatus->transition($table, TableStatus::Reserved, $staff);
+                        event(new ReservationAlert($lockedRes, ReservationAlert::PLACE_SIGN));
+                    } elseif ($table->status === TableStatus::Occupied) {
+                        event(new ReservationAlert($lockedRes, ReservationAlert::STILL_OCCUPIED));
+                    }
+                }
+            }
+
+            $this->auditLogger->log($staff, 'reservation_tables_assigned', $lockedRes);
+
+            return $visits;
+        });
+    }
+
+    /**
+     * FR95, BR64: Unassign all tables linked to a reservation.
+     * Closes visit rows with close_reason = unassigned; returns Reserved tables to Available.
+     */
+    public function unassignTables(Reservation $reservation, ?Staff $staff = null): void
+    {
+        DB::transaction(function () use ($reservation, $staff) {
+            $lockedRes = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
+
+            $this->unlinkTables($lockedRes, VisitCloseReason::Unassigned);
+
+            $this->auditLogger->log($staff, 'reservation_tables_unassigned', $lockedRes);
         });
     }
 
