@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AddOnGroupController;
 use App\Http\Controllers\Admin\AddOnOptionController;
 use App\Http\Controllers\Admin\AllergenController;
+use App\Http\Controllers\Admin\ArchiveController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -261,6 +263,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::patch('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::patch('/settings/toggle/{key}', [SettingController::class, 'toggle'])->name('settings.toggle');
+
+    Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+    Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
 });
 
 //have to delete this block when the real pages done.
