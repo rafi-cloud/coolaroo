@@ -116,6 +116,107 @@ class AiMenuService
         ];
     }
 
+    /** Turns of history sent back to the provider — a token guard, not a rule. */
+    private const HISTORY_TURNS = 6;
+
+    /**
+     * FR43: one question, one answer. The ids the model names are resolved
+     * against the same context it was given, so an invented id simply
+     * disappears (BR47).
+     *
+     * @param array<int, array{role:string, content:string}> $history
+     * @return array{answer:string, items:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}}
+     */
+    public function answerQuestion(string $message, array $history = []): array
+    {
+        $context = $this->buildContext();
+
+        $response = $this->chat(
+            array_merge(
+                [['role' => 'system', 'content' => $this->chatSystemPrompt($context)]],
+                array_slice($history, -self::HISTORY_TURNS),
+                [['role' => 'user', 'content' => $message]],
+            ),
+            $this->chatResponseFormat(),
+        );
+
+        $payload = $this->applyOffTopicGuard($this->decodeStructured($response));
+
+        return [
+            'answer' => (string) ($payload['answer'] ?? ''),
+            'items' => $this->resolveItems($payload['item_ids'] ?? [], $context),
+            'usage' => $this->usage($response),
+        ];
+    }
+
+    /**
+     * The provider returns the structured output as a JSON string inside
+     * the message content. Anything that is not decodable JSON is a failed
+     * request like any other (BR49) — same log channel, same exception.
+     *
+     * @param array<string, mixed> $response
+     * @return array<string, mixed>
+     */
+    private function decodeStructured(array $response): array
+    {
+        $content = $response['choices'][0]['message']['content'] ?? null;
+        $decoded = is_string($content) ? json_decode($content, true) : null;
+
+        if (! is_array($decoded)) {
+            Log::channel('integrations')->error('AI response was not valid JSON', ['content' => $content]);
+
+            throw new AiUnavailableException();
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * 06.4.24's `tokens_in`/`tokens_out` — the provider's own measured
+     * counts, not an estimate.
+     *
+     * @param array<string, mixed> $response
+     * @return array{tokens_in:int, tokens_out:int}
+     */
+    private function usage(array $response): array
+    {
+        return [
+            'tokens_in' => (int) ($response['usage']['prompt_tokens'] ?? 0),
+            'tokens_out' => (int) ($response['usage']['completion_tokens'] ?? 0),
+        ];
+    }
+
+    /**
+     * BR47: drop any id that is not in the live context.
+     *
+     * @param array<int, mixed> $itemIds
+     * @param array<string, mixed> $context
+     * @return array<int, array<string, mixed>>
+     */
+    private function resolveItems(array $itemIds, array $context): array
+    {
+        $byId = collect($context['items'])->keyBy('id');
+
+        return collect($itemIds)
+            ->filter(fn ($id) => is_int($id) && $byId->has($id))
+            ->unique()
+            ->map(fn ($id) => [
+                'item_id' => $byId[$id]['id'],
+                'name' => $byId[$id]['name'],
+                'price' => $this->lowestPrice($byId[$id]),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /** @param array<string, mixed> $item */
+    private function lowestPrice(array $item): float
+    {
+        return isset($item['price'])
+            ? (float) $item['price']
+            : (float) min(array_column($item['sizes'], 'price'));
+    }
+
     /**
      * BR48: the fixed allergy disclaimer. The app owns this wording (it
      * matches the menu page's, FR33) and the model is told not to write its

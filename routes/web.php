@@ -29,6 +29,7 @@ use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Customer\ReservationController as CustomerReservationController;
+use App\Http\Controllers\Public\AiController;
 use App\Http\Controllers\Public\AvailabilityController as PublicAvailabilityController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\MenuController;
@@ -52,6 +53,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
 Route::get('/reservations/availability', [PublicAvailabilityController::class, 'index'])->name('reservations.availability');
+
+Route::post('/ai/chat', [AiController::class, 'chat'])->name('ai.chat');
 
 Route::get('/t/{table}/{token}', [TableScanController::class, 'show'])
     ->middleware('signed')
