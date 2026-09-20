@@ -216,7 +216,9 @@
     </div>
   </section>
 
+  {{-- S18: Reservation Wizard (T035, FR61, FR62) --}}
+  <x-reserve />
+
   {{-- Section Anchor Hooks for subsequent Phase 6 tasks --}}
   <div id="table-order-info" class="visually-hidden" aria-hidden="true"></div>
-  <div id="reserve" class="visually-hidden" aria-hidden="true"></div>
 </x-layouts.public>

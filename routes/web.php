@@ -27,6 +27,7 @@ use App\Http\Controllers\Customer\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Customer\ReservationController as CustomerReservationController;
 use App\Http\Controllers\Public\AvailabilityController as PublicAvailabilityController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\MenuController;
@@ -91,6 +92,10 @@ Route::middleware('auth:customer')->group(function () {
 
     Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+
+    Route::post('/reservations', [CustomerReservationController::class, 'store'])
+        ->middleware('verified')
+        ->name('reservations.store');
 
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/state', [OrderController::class, 'state'])->name('orders.state');
