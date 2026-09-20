@@ -29,8 +29,7 @@ class StationController extends Controller
     public function __construct(
         private KitchenService $kitchen,
         private EtaService $eta,
-    ) {
-    }
+    ) {}
 
     private const ACTIVE_ORDER_STATUSES = [
         OrderStatus::Paid,

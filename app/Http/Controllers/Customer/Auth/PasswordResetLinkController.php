@@ -19,6 +19,6 @@ class PasswordResetLinkController extends Controller
     {
         Password::sendResetLink($request->only('email'));
 
-        return back()->with('status', "If that email matches an account, a reset link is on its way.");
+        return back()->with('status', 'If that email matches an account, a reset link is on its way.');
     }
 }

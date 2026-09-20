@@ -20,9 +20,7 @@ class OrderController extends Controller
 {
     private const TIMELINE_STEPS = ['paid', 'preparing', 'ready', 'served'];
 
-    public function __construct(private OrderService $orders)
-    {
-    }
+    public function __construct(private OrderService $orders) {}
 
     /**
      * FR39, UC11: View customer order history.

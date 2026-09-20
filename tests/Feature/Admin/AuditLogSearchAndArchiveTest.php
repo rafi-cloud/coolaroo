@@ -17,7 +17,9 @@ class AuditLogSearchAndArchiveTest extends TestCase
     use RefreshDatabase;
 
     private Staff $admin;
+
     private Staff $waitstaff;
+
     private Customer $customer;
 
     protected function setUp(): void

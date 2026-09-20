@@ -31,8 +31,7 @@ class RefundService
         private AuditLogger $auditLogger,
         private StockService $stock,
         private StripeService $stripe,
-    ) {
-    }
+    ) {}
 
     /** payment.method (PaymentMethod) and refund.method (RefundMethod) are separate enums; mapped via ::from() below. */
     public function request(OrderItem $item, int $quantity, string $reason, Staff $actor): Refund

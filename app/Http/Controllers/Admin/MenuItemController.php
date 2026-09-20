@@ -20,8 +20,7 @@ class MenuItemController extends Controller
     public function __construct(
         private MenuItemService $menuItems,
         private MenuImageService $images,
-    ) {
-    }
+    ) {}
 
     public function index(): View
     {

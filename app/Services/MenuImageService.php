@@ -15,11 +15,12 @@ use Intervention\Image\ImageManager;
 class MenuImageService
 {
     private const MAX_WIDTH = 1200;
+
     private const JPEG_QUALITY = 80;
 
     public function store(UploadedFile $file): string
     {
-        $manager = new ImageManager(new Driver());
+        $manager = new ImageManager(new Driver);
 
         $encoded = $manager->decode($file)
             ->scaleDown(width: self::MAX_WIDTH)

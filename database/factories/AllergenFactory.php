@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Allergen;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Allergen>
+ * @extends Factory<Allergen>
  */
 class AllergenFactory extends Factory
 {

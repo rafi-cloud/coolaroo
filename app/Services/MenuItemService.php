@@ -14,9 +14,7 @@ class MenuItemService
 {
     private const MAX_FEATURED = 12;
 
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function create(array $data, array $allergenIds, array $dietaryTagIds): MenuItem
     {

@@ -13,9 +13,7 @@ use App\Models\Staff;
  */
 class MenuAvailabilityService
 {
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function toggleMenuItem(MenuItem $item, Staff $actor): MenuItem
     {

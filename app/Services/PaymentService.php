@@ -37,8 +37,7 @@ class PaymentService
         private AuditLogger $auditLogger,
         private StripeService $stripe,
         private EtaService $eta,
-    ) {
-    }
+    ) {}
 
     /** BR25: the one place any caller (customer or staff, T073) turns a retrieved session into "paid" or not. */
     public function verifyStripePayment(Payment $payment, Staff|Customer|null $actor = null): bool
@@ -206,5 +205,4 @@ class PaymentService
 
         return $visit;
     }
-
 }

@@ -12,9 +12,7 @@ use App\Models\MenuItem;
  */
 class AddOnService
 {
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function createGroup(MenuItem $item, array $data): AddOnGroup
     {

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\MenuItem;
 use App\Models\MenuItemSize;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
@@ -44,7 +45,7 @@ class SpecialsService
             ->get();
     }
 
-    /** @return array{size: MenuItemSize, discount_percent: float, ends_at: ?\Illuminate\Support\Carbon}|null */
+    /** @return array{size: MenuItemSize, discount_percent: float, ends_at: ?Carbon}|null */
     public function topSpecial(): ?array
     {
         $best = null;

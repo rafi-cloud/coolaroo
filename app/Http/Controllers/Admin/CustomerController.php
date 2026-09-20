@@ -13,8 +13,7 @@ class CustomerController extends Controller
 {
     public function __construct(
         private readonly TrustService $trustService,
-    ) {
-    }
+    ) {}
 
     /**
      * FR103, UC38, S38: Searchable customer list with trust badges.

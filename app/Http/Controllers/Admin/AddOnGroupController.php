@@ -12,9 +12,7 @@ use Illuminate\Http\RedirectResponse;
 
 class AddOnGroupController extends Controller
 {
-    public function __construct(private AddOnService $addOns)
-    {
-    }
+    public function __construct(private AddOnService $addOns) {}
 
     public function store(StoreAddOnGroupRequest $request, MenuItem $menuItem): RedirectResponse
     {

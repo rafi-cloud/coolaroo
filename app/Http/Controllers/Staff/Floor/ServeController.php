@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Gate;
 /** FR60, UC21, BR28. Waitstaff delivers; KitchenService derives whether the whole order is now served. */
 class ServeController extends Controller
 {
-    public function __construct(private KitchenService $kitchen)
-    {
-    }
+    public function __construct(private KitchenService $kitchen) {}
 
     public function store(Request $request, Order $order, Destination $destination): RedirectResponse
     {

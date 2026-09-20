@@ -12,8 +12,8 @@ class AdminGateBypassTest extends TestCase
 {
     private function staff(string $roleName): Staff
     {
-        $staff = new Staff();
-        $staff->setRelation('role', (new Role())->forceFill(['role_name' => $roleName]));
+        $staff = new Staff;
+        $staff->setRelation('role', (new Role)->forceFill(['role_name' => $roleName]));
 
         return $staff;
     }

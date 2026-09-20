@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\Gate;
  */
 class ReceiptController extends Controller
 {
-    public function __construct(private ReceiptService $receipts)
-    {
-    }
+    public function __construct(private ReceiptService $receipts) {}
 
     public function show(Order $order): Response
     {

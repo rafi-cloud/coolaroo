@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\RestaurantTable;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<\App\Models\RestaurantTable>
+ * @extends Factory<RestaurantTable>
  */
 class RestaurantTableFactory extends Factory
 {

@@ -25,7 +25,7 @@ class MenuImageServiceTest extends TestCase
     {
         $file = UploadedFile::fake()->image('pizza.jpg', 1600, 1200);
 
-        $path = (new MenuImageService())->store($file);
+        $path = (new MenuImageService)->store($file);
 
         $this->assertStringStartsWith('menu/', $path);
         $this->assertStringEndsWith('.jpg', $path);
@@ -36,7 +36,7 @@ class MenuImageServiceTest extends TestCase
     {
         $file = UploadedFile::fake()->image('big.jpg', 3000, 2000);
 
-        $path = (new MenuImageService())->store($file);
+        $path = (new MenuImageService)->store($file);
 
         [$width] = getimagesizefromstring(Storage::disk('public')->get($path));
         $this->assertLessThanOrEqual(1200, $width);
@@ -46,7 +46,7 @@ class MenuImageServiceTest extends TestCase
     {
         $file = UploadedFile::fake()->image('small.jpg', 300, 200);
 
-        $path = (new MenuImageService())->store($file);
+        $path = (new MenuImageService)->store($file);
 
         [$width] = getimagesizefromstring(Storage::disk('public')->get($path));
         $this->assertSame(300, $width);
@@ -55,7 +55,7 @@ class MenuImageServiceTest extends TestCase
     public function test_delete_removes_the_stored_file(): void
     {
         $file = UploadedFile::fake()->image('to-delete.jpg', 500, 500);
-        $service = new MenuImageService();
+        $service = new MenuImageService;
         $path = $service->store($file);
 
         Storage::disk('public')->assertExists($path);
@@ -67,7 +67,7 @@ class MenuImageServiceTest extends TestCase
 
     public function test_delete_with_a_null_path_does_nothing(): void
     {
-        (new MenuImageService())->delete(null);
+        (new MenuImageService)->delete(null);
 
         $this->addToAssertionCount(1);
     }

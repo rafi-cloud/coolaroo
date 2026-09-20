@@ -24,9 +24,7 @@ use Stripe\Exception\ApiErrorException;
  */
 class PaymentController extends Controller
 {
-    public function __construct(private StripeService $stripe, private PaymentService $payments)
-    {
-    }
+    public function __construct(private StripeService $stripe, private PaymentService $payments) {}
 
     public function show(Order $order): View
     {

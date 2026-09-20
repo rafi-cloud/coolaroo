@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Mail;
 
-use App\Enums\ReservationStatus;
 use App\Mail\ReservationCancelledMail;
 use App\Mail\ReservationConfirmedMail;
 use App\Mail\ReservationDeclinedMail;
@@ -15,6 +14,7 @@ use App\Models\Role;
 use App\Models\SlotCapacity;
 use App\Models\Staff;
 use App\Services\ReservationService;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -25,14 +25,17 @@ class ReservationEmailsTest extends TestCase
     use RefreshDatabase;
 
     private ReservationService $service;
+
     private Customer $customer;
+
     private Staff $staff;
+
     private SlotCapacity $slot;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
 
         // Fixed test time: Tuesday 22 Sep 2026 12:00:00 (Tuesday is an open day)
         Carbon::setTestNow(Carbon::parse('2026-09-22 12:00:00', 'Australia/Melbourne'));

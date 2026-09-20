@@ -22,8 +22,7 @@ class TableScanController extends Controller
     public function __construct(
         private CartService $cart,
         private ReservationService $reservations,
-    ) {
-    }
+    ) {}
 
     public function show(Request $request, RestaurantTable $table, string $token): View|RedirectResponse
     {

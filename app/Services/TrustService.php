@@ -12,7 +12,9 @@ use App\Models\Reservation;
 class TrustService
 {
     public const BADGE_FLAGGED = 'Flagged';
+
     public const BADGE_REGULAR = 'Regular';
+
     public const BADGE_NEW = 'New';
 
     /**

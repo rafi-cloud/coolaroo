@@ -12,9 +12,7 @@ use Illuminate\Http\JsonResponse;
  */
 class TrustController extends Controller
 {
-    public function __construct(private TrustService $trustService)
-    {
-    }
+    public function __construct(private TrustService $trustService) {}
 
     public function show(Customer $customer): JsonResponse
     {

@@ -5,6 +5,7 @@ namespace Tests\Feature\Public;
 use App\Models\Setting;
 use App\Services\AiMenuService;
 use App\Services\SettingService;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,7 +17,7 @@ class ChatWidgetTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
     }
 
     /** S17 sits on the homepage and the menu, for visitors as well as customers. */

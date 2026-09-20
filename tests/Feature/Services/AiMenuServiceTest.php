@@ -8,6 +8,7 @@ use App\Models\DietaryTag;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use App\Services\AiMenuService;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -85,7 +86,7 @@ class AiMenuServiceTest extends TestCase
 
     public function test_build_context_includes_venue_and_available_items(): void
     {
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
 
         $category = MenuCategory::factory()->create(['category_name' => 'Mains']);
 
@@ -118,7 +119,7 @@ class AiMenuServiceTest extends TestCase
 
     public function test_build_context_uses_the_current_sale_price(): void
     {
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
 
         $item = MenuItem::factory()->create();
         $item->sizes()->create([
@@ -137,7 +138,7 @@ class AiMenuServiceTest extends TestCase
     /** BR47: the model can only return ids it was given. */
     public function test_build_context_exposes_size_and_option_ids(): void
     {
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
 
         $item = MenuItem::factory()->create();
         $regular = $item->sizes()->create(['size_name' => 'Regular', 'price' => 18]);
@@ -160,7 +161,7 @@ class AiMenuServiceTest extends TestCase
 
     public function test_chat_system_prompt_carries_the_guardrails_and_the_live_menu(): void
     {
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
 
         $item = MenuItem::factory()->create(['item_name' => 'Chicken Parma']);
         $item->sizes()->create(['size_name' => 'Regular', 'price' => 22.75]);
@@ -235,7 +236,7 @@ class AiMenuServiceTest extends TestCase
      */
     public function test_build_context_stays_under_the_token_budget_for_a_realistic_menu(): void
     {
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
 
         $categories = MenuCategory::factory()->count(6)->create();
 

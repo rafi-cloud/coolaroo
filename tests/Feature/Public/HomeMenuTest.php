@@ -5,7 +5,6 @@ namespace Tests\Feature\Public;
 use App\Models\DietaryTag;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
-use App\Models\MenuItemSize;
 use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

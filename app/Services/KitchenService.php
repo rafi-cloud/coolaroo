@@ -30,9 +30,7 @@ class KitchenService
         OrderStatus::Served,
     ];
 
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     /** FR58: Start. */
     public function start(Order $order, Destination $destination, Staff $actor): Order

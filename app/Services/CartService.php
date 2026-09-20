@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AddOnOption;
 use App\Models\MenuItem;
 use App\Models\MenuItemSize;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -63,7 +64,7 @@ class CartService
     }
 
     /**
-     * @return array<int, array{line_id: string, item: MenuItem, size: MenuItemSize, options: \Illuminate\Support\Collection, quantity: int, special_request: ?string, unit_price: float, line_total: float}>
+     * @return array<int, array{line_id: string, item: MenuItem, size: MenuItemSize, options: Collection, quantity: int, special_request: ?string, unit_price: float, line_total: float}>
      */
     public function lines(): array
     {

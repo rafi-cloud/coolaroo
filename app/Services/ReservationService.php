@@ -6,12 +6,6 @@ use App\Enums\ReservationStatus;
 use App\Enums\TableStatus;
 use App\Enums\VisitCloseReason;
 use App\Events\ReservationAlert;
-use App\Models\Customer;
-use App\Models\Reservation;
-use App\Models\RestaurantTable;
-use App\Models\Setting;
-use App\Models\SlotCapacity;
-use App\Models\Staff;
 use App\Mail\QueuedMailable;
 use App\Mail\ReservationCancelledMail;
 use App\Mail\ReservationConfirmedMail;
@@ -19,6 +13,12 @@ use App\Mail\ReservationDeclinedMail;
 use App\Mail\ReservationExpiredMail;
 use App\Mail\ReservationReceivedMail;
 use App\Mail\ReservationReminderMail;
+use App\Models\Customer;
+use App\Models\Reservation;
+use App\Models\RestaurantTable;
+use App\Models\Setting;
+use App\Models\SlotCapacity;
+use App\Models\Staff;
 use App\Models\Visit;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -39,8 +39,7 @@ class ReservationService
         private TableStatusService $tableStatus,
         private AvailabilityService $availability,
         private AuditLogger $auditLogger,
-    ) {
-    }
+    ) {}
 
     /**
      * FR62, BR31, BR35, BR42, BR58: Customer submits a reservation request.
@@ -147,7 +146,7 @@ class ReservationService
 
             $referenceCode = $this->generateReferenceCode();
 
-            $reservation = new Reservation();
+            $reservation = new Reservation;
             $reservation->forceFill([
                 'customer_id' => $customer->customer_id,
                 'slot_id' => $slot->slot_id,
@@ -242,7 +241,7 @@ class ReservationService
 
             $referenceCode = $this->generateReferenceCode();
 
-            $reservation = new Reservation();
+            $reservation = new Reservation;
             $reservation->forceFill([
                 'customer_id' => $customerId,
                 'guest_name' => $customerId ? null : $guestName,
@@ -610,7 +609,7 @@ class ReservationService
      * Checks active tables, total seats >= party_size, no overlapping reservation windows.
      * If assigned inside T-30, transitions Available tables to Reserved with place-sign alert.
      *
-     * @param array<int> $tableIds
+     * @param  array<int>  $tableIds
      * @return Collection<int, Visit>
      */
     public function assignTables(Reservation $reservation, array $tableIds, ?Staff $staff = null): Collection
@@ -675,7 +674,7 @@ class ReservationService
 
                         if ($start1->isBefore($end2) && $start2->isBefore($end1)) {
                             throw ValidationException::withMessages([
-                                'table_ids' => "Table {$table->table_number} is already assigned to reservation {$otherRes->reference_code} at ".substr($otherRes->booking_time, 0, 5).".",
+                                'table_ids' => "Table {$table->table_number} is already assigned to reservation {$otherRes->reference_code} at ".substr($otherRes->booking_time, 0, 5).'.',
                             ]);
                         }
                     }

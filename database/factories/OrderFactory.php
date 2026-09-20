@@ -4,12 +4,13 @@ namespace Database\Factories;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Models\Order;
 use App\Models\RestaurantTable;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<\App\Models\Order>
+ * @extends Factory<Order>
  *
  * status and payment_status are $guarded on the model (they belong to the
  * transition maps), so the states below set them through forceFill after

@@ -24,8 +24,7 @@ class AiMenuService
     public function __construct(
         private readonly SettingService $settings,
         private readonly SpecialsService $specials,
-    ) {
-    }
+    ) {}
 
     /**
      * BR49: a missing key, a timeout, a 429, a 5xx, or any other failure all
@@ -33,10 +32,10 @@ class AiMenuService
      * cause is logged to the `integrations` channel (07.11) here, once, so
      * nothing downstream needs to know GitHub Models' error shape.
      *
-     * @param array<int, array{role:string, content:string}> $messages
-     * @param array<string, mixed>|null $responseFormat Passed through as
-     *     `response_format` (OpenAI-compatible structured output) — T122
-     *     fills this in; optional here.
+     * @param  array<int, array{role:string, content:string}>  $messages
+     * @param  array<string, mixed>|null  $responseFormat  Passed through as
+     *                                                     `response_format` (OpenAI-compatible structured output) — T122
+     *                                                     fills this in; optional here.
      * @return array<string, mixed> Decoded chat completion response body.
      */
     public function chat(array $messages, ?array $responseFormat = null): array
@@ -46,7 +45,7 @@ class AiMenuService
         if (empty($apiKey)) {
             Log::channel('integrations')->error('AI request skipped: AI_API_KEY not configured');
 
-            throw new AiUnavailableException();
+            throw new AiUnavailableException;
         }
 
         $payload = array_filter([
@@ -63,7 +62,7 @@ class AiMenuService
         } catch (ConnectionException $e) {
             Log::channel('integrations')->error('AI request timed out', ['message' => $e->getMessage()]);
 
-            throw new AiUnavailableException();
+            throw new AiUnavailableException;
         }
 
         if ($response->failed()) {
@@ -72,7 +71,7 @@ class AiMenuService
                 'body' => $response->body(),
             ]);
 
-            throw new AiUnavailableException();
+            throw new AiUnavailableException;
         }
 
         return $response->json();
@@ -125,7 +124,7 @@ class AiMenuService
      * against the same context it was given, so an invented id simply
      * disappears (BR47).
      *
-     * @param array<int, array{role:string, content:string}> $history
+     * @param  array<int, array{role:string, content:string}>  $history
      * @return array{answer:string, items:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}}
      */
     public function answerQuestion(string $message, array $history = []): array
@@ -156,7 +155,7 @@ class AiMenuService
      * returned only if the whole basket is orderable as it stands and
      * still fits the budget once we have priced it ourselves.
      *
-     * @param array{budget:float|int|string, party_size:int, dietary?:array<int,string>, preferences?:?string} $brief
+     * @param  array{budget:float|int|string, party_size:int, dietary?:array<int,string>, preferences?:?string}  $brief
      * @return array{summary:string, suggestions:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}}
      */
     public function buildMeal(array $brief): array
@@ -213,8 +212,8 @@ class AiMenuService
      * A suggestion survives only whole: one unorderable line and the meal
      * goes, because a repriced remainder is no longer what was suggested.
      *
-     * @param array<string, mixed> $suggestion
-     * @param \Illuminate\Support\Collection<int, array<string, mixed>> $byId
+     * @param  array<string, mixed>  $suggestion
+     * @param  Collection<int, array<string, mixed>>  $byId
      * @return array<string, mixed>|null
      */
     private function priceSuggestion(array $suggestion, Collection $byId, float $budget): ?array
@@ -252,8 +251,8 @@ class AiMenuService
      * exactly what `AddCartLineRequest` expects, so T124's Add to cart can
      * post a line back unchanged.
      *
-     * @param array<string, mixed> $line
-     * @param \Illuminate\Support\Collection<int, array<string, mixed>> $byId
+     * @param  array<string, mixed>  $line
+     * @param  Collection<int, array<string, mixed>>  $byId
      * @return array<string, mixed>|null
      */
     private function priceLine(array $line, Collection $byId): ?array
@@ -287,7 +286,7 @@ class AiMenuService
     }
 
     /**
-     * @param array<string, mixed> $item
+     * @param  array<string, mixed>  $item
      * @return array{id:int, name:string, price:float}|null
      */
     private function sizeFrom(array $item, mixed $sizeId): ?array
@@ -308,8 +307,8 @@ class AiMenuService
      * outside its min/max by that drop makes the whole line unorderable,
      * because `AddCartLineRequest` would reject it too. Null says so.
      *
-     * @param array<string, mixed> $item
-     * @param array<int, mixed> $optionIds
+     * @param  array<string, mixed>  $item
+     * @param  array<int, mixed>  $optionIds
      * @return array<int, array<string, mixed>>|null
      */
     private function optionsFrom(array $item, array $optionIds): ?array
@@ -340,7 +339,7 @@ class AiMenuService
      * the message content. Anything that is not decodable JSON is a failed
      * request like any other (BR49) — same log channel, same exception.
      *
-     * @param array<string, mixed> $response
+     * @param  array<string, mixed>  $response
      * @return array<string, mixed>
      */
     private function decodeStructured(array $response): array
@@ -351,7 +350,7 @@ class AiMenuService
         if (! is_array($decoded)) {
             Log::channel('integrations')->error('AI response was not valid JSON', ['content' => $content]);
 
-            throw new AiUnavailableException();
+            throw new AiUnavailableException;
         }
 
         return $decoded;
@@ -361,7 +360,7 @@ class AiMenuService
      * 06.4.24's `tokens_in`/`tokens_out` — the provider's own measured
      * counts, not an estimate.
      *
-     * @param array<string, mixed> $response
+     * @param  array<string, mixed>  $response
      * @return array{tokens_in:int, tokens_out:int}
      */
     private function usage(array $response): array
@@ -375,8 +374,8 @@ class AiMenuService
     /**
      * BR47: drop any id that is not in the live context.
      *
-     * @param array<int, mixed> $itemIds
-     * @param array<string, mixed> $context
+     * @param  array<int, mixed>  $itemIds
+     * @param  array<string, mixed>  $context
      * @return array<int, array<string, mixed>>
      */
     private function resolveItems(array $itemIds, array $context): array
@@ -416,8 +415,8 @@ class AiMenuService
     /**
      * System prompt for the chat widget (S17, FR43).
      *
-     * @param array<string, mixed>|null $context Pass an already-built
-     *     context to avoid a second set of queries.
+     * @param  array<string, mixed>|null  $context  Pass an already-built
+     *                                              context to avoid a second set of queries.
      */
     public function chatSystemPrompt(?array $context = null): string
     {
@@ -432,7 +431,7 @@ class AiMenuService
      * System prompt for the meal builder (S16, FR44). BR47: the model picks
      * IDs, the server prices them — the prompt never asks for a number.
      *
-     * @param array<string, mixed>|null $context
+     * @param  array<string, mixed>|null  $context
      */
     public function mealBuilderSystemPrompt(?array $context = null): string
     {
@@ -540,7 +539,7 @@ class AiMenuService
      * words, not the model's, and anything it referenced is dropped. Shared
      * by both response shapes.
      *
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      * @return array<string, mixed>
      */
     public function applyOffTopicGuard(array $payload): array
@@ -568,7 +567,7 @@ class AiMenuService
      * BR47, BR48. The shared guardrails plus the live context; the task
      * paragraph is all that differs between the two assistants.
      *
-     * @param array<string, mixed>|null $context
+     * @param  array<string, mixed>|null  $context
      */
     private function basePrompt(string $task, ?array $context): string
     {

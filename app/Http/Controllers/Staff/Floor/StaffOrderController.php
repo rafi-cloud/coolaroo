@@ -38,8 +38,7 @@ class StaffOrderController extends Controller
         private PaymentService $payments,
         private CheckoutService $checkout,
         private CashPaymentService $cashPayments,
-    ) {
-    }
+    ) {}
 
     /** FR42, UC19. One route, two states — 07.6 lists no separate "order created" URI. */
     public function index(RestaurantTable $table): View
@@ -126,7 +125,7 @@ class StaffOrderController extends Controller
             $payment->update(['stripe_session_id' => $session->id]);
         }
 
-        $qrSvg = (new Builder(writer: new SvgWriter()))
+        $qrSvg = (new Builder(writer: new SvgWriter))
             ->build(data: $session->url, size: 300, margin: 10)
             ->getString();
 

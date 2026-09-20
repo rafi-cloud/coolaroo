@@ -7,7 +7,7 @@ use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\MenuItem>
+ * @extends Factory<MenuItem>
  */
 class MenuItemFactory extends Factory
 {

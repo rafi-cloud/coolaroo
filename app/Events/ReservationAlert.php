@@ -2,11 +2,11 @@
 
 namespace App\Events;
 
+use App\Events\Concerns\QueuedBroadcast;
 use App\Models\Reservation;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -28,9 +28,7 @@ class ReservationAlert implements ShouldBroadcast, ShouldDispatchAfterCommit
 
     public const NO_SHOW_SUGGESTED = 'no_show_suggested';
 
-    public function __construct(public Reservation $reservation, public string $kind)
-    {
-    }
+    public function __construct(public Reservation $reservation, public string $kind) {}
 
     /** @return array<int, PrivateChannel> */
     public function broadcastOn(): array

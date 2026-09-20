@@ -17,9 +17,7 @@ use Illuminate\View\View;
  */
 class WaiterCallController extends Controller
 {
-    public function __construct(private WaiterCallService $waiterCalls)
-    {
-    }
+    public function __construct(private WaiterCallService $waiterCalls) {}
 
     public function store(Request $request, RestaurantTable $table): RedirectResponse|View
     {

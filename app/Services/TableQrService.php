@@ -17,9 +17,7 @@ use Illuminate\Support\Str;
  */
 class TableQrService
 {
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function regenerate(RestaurantTable $table, Staff $actor): void
     {
@@ -38,14 +36,14 @@ class TableQrService
 
     public function png(RestaurantTable $table): string
     {
-        return (new Builder(writer: new PngWriter()))
+        return (new Builder(writer: new PngWriter))
             ->build(data: $this->signedUrl($table), size: 500, margin: 10)
             ->getString();
     }
 
     public function pdf(RestaurantTable $table): string
     {
-        $qrSvg = (new Builder(writer: new SvgWriter()))
+        $qrSvg = (new Builder(writer: new SvgWriter))
             ->build(data: $this->signedUrl($table), size: 400, margin: 10)
             ->getString();
 

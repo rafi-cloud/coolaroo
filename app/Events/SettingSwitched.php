@@ -2,11 +2,11 @@
 
 namespace App\Events;
 
+use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -19,9 +19,7 @@ class SettingSwitched implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;
 
-    public function __construct(public string $key, public string $value)
-    {
-    }
+    public function __construct(public string $key, public string $value) {}
 
     /** @return array<int, Channel|PrivateChannel> */
     public function broadcastOn(): array

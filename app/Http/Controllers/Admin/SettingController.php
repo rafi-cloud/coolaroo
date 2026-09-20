@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Staff;
 use App\Services\SettingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -102,7 +103,7 @@ class SettingController extends Controller
         $validated['reservations_online_enabled'] = $request->boolean('reservations_online_enabled') ? '1' : '0';
         $validated['ai_enabled'] = $request->boolean('ai_enabled') ? '1' : '0';
 
-        /** @var \App\Models\Staff $admin */
+        /** @var Staff $admin */
         $admin = $request->user('staff');
 
         $this->settingService->updateMany($validated, $admin);
@@ -115,7 +116,7 @@ class SettingController extends Controller
      */
     public function toggle(Request $request, string $key): RedirectResponse
     {
-        /** @var \App\Models\Staff $admin */
+        /** @var Staff $admin */
         $admin = $request->user('staff');
 
         try {

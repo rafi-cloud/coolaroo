@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\MenuItemDietaryTagFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class MenuItemDietaryTag extends Pivot
 {
-    /** @use HasFactory<\Database\Factories\MenuItemDietaryTagFactory> */
+    /** @use HasFactory<MenuItemDietaryTagFactory> */
     use HasFactory;
 
     protected $table = 'menu_item_dietary_tag';

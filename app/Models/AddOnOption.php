@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\AddOnOptionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AddOnOption extends Model
 {
-    /** @use HasFactory<\Database\Factories\AddOnOptionFactory> */
+    /** @use HasFactory<AddOnOptionFactory> */
     use HasFactory;
 
     protected $table = 'add_on_option';

@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use App\Models\Staff;
-use App\Support\AustralianDate;
-use App\Support\Money;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;

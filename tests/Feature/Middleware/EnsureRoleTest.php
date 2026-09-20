@@ -18,8 +18,8 @@ class EnsureRoleTest extends TestCase
 
     private function staffWithRole(string $roleName): Staff
     {
-        $staff = new Staff();
-        $staff->setRelation('role', (new Role())->forceFill(['role_name' => $roleName]));
+        $staff = new Staff;
+        $staff->setRelation('role', (new Role)->forceFill(['role_name' => $roleName]));
 
         return $staff;
     }

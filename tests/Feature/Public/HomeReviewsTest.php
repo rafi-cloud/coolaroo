@@ -5,7 +5,6 @@ namespace Tests\Feature\Public;
 use App\Models\Customer;
 use App\Models\Feedback;
 use App\Models\Order;
-use App\Models\RestaurantTable;
 use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

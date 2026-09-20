@@ -12,9 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
-    public function __construct(private CheckoutService $checkout, private CartService $cart)
-    {
-    }
+    public function __construct(private CheckoutService $checkout, private CartService $cart) {}
 
     public function store(Request $request): RedirectResponse
     {

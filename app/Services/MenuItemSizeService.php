@@ -11,9 +11,7 @@ use Illuminate\Validation\ValidationException;
  */
 class MenuItemSizeService
 {
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function create(MenuItem $item, array $data): MenuItemSize
     {

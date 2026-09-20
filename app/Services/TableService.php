@@ -14,9 +14,7 @@ use Illuminate\Support\Str;
  */
 class TableService
 {
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function create(array $data): RestaurantTable
     {

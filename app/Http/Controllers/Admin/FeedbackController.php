@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Feedback;
+use App\Models\Staff;
 use App\Services\FeedbackService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class FeedbackController extends Controller
             'reply' => ['required', 'string', 'min:1', 'max:1000'],
         ]);
 
-        /** @var \App\Models\Staff $admin */
+        /** @var Staff $admin */
         $admin = $request->user('staff');
 
         $this->feedbackService->reply($feedback, $admin, $validated['reply']);
@@ -69,7 +70,7 @@ class FeedbackController extends Controller
             'reason' => ['required', 'string', 'min:2', 'max:255'],
         ]);
 
-        /** @var \App\Models\Staff $admin */
+        /** @var Staff $admin */
         $admin = $request->user('staff');
 
         $this->feedbackService->hide($feedback, $admin, $validated['reason']);
@@ -82,7 +83,7 @@ class FeedbackController extends Controller
      */
     public function unhide(Request $request, Feedback $feedback): RedirectResponse
     {
-        /** @var \App\Models\Staff $admin */
+        /** @var Staff $admin */
         $admin = $request->user('staff');
 
         $this->feedbackService->unhide($feedback, $admin);
@@ -96,7 +97,7 @@ class FeedbackController extends Controller
      */
     public function toggleFeatured(Request $request, Feedback $feedback): RedirectResponse
     {
-        /** @var \App\Models\Staff $admin */
+        /** @var Staff $admin */
         $admin = $request->user('staff');
 
         try {

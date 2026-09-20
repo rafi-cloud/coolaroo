@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\HistoricalDataManagementFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class HistoricalDataManagement extends Model
 {
-    /** @use HasFactory<\Database\Factories\HistoricalDataManagementFactory> */
+    /** @use HasFactory<HistoricalDataManagementFactory> */
     use HasFactory;
 
     protected $table = 'historical_data_management';

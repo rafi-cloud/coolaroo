@@ -26,8 +26,7 @@ class OrderService
         private AuditLogger $auditLogger,
         private StripeService $stripe,
         private PaymentService $payments,
-    ) {
-    }
+    ) {}
 
     /** BR29: pending_payment only. UC12 step 2's local half — see class docblock. */
     public function cancelUnpaid(Order $order, Customer $actor): Order

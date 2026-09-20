@@ -13,16 +13,16 @@ class MenuItemPolicyTest extends TestCase
 {
     private function staff(string $roleName): Staff
     {
-        $staff = new Staff();
-        $staff->setRelation('role', (new Role())->forceFill(['role_name' => $roleName]));
+        $staff = new Staff;
+        $staff->setRelation('role', (new Role)->forceFill(['role_name' => $roleName]));
 
         return $staff;
     }
 
     public function test_only_kitchen_can_toggle_a_kitchen_item(): void
     {
-        $policy = new MenuItemPolicy();
-        $item = (new MenuItem())->forceFill(['destination' => Destination::Kitchen]);
+        $policy = new MenuItemPolicy;
+        $item = (new MenuItem)->forceFill(['destination' => Destination::Kitchen]);
 
         $this->assertTrue($policy->toggleAvailability($this->staff('kitchen'), $item));
         $this->assertFalse($policy->toggleAvailability($this->staff('bar'), $item));
@@ -31,8 +31,8 @@ class MenuItemPolicyTest extends TestCase
 
     public function test_only_bar_can_toggle_a_bar_item(): void
     {
-        $policy = new MenuItemPolicy();
-        $item = (new MenuItem())->forceFill(['destination' => Destination::Bar]);
+        $policy = new MenuItemPolicy;
+        $item = (new MenuItem)->forceFill(['destination' => Destination::Bar]);
 
         $this->assertTrue($policy->toggleAvailability($this->staff('bar'), $item));
         $this->assertFalse($policy->toggleAvailability($this->staff('kitchen'), $item));
@@ -40,6 +40,6 @@ class MenuItemPolicyTest extends TestCase
 
     public function test_manage_is_admin_only(): void
     {
-        $this->assertFalse((new MenuItemPolicy())->manage($this->staff('waitstaff')));
+        $this->assertFalse((new MenuItemPolicy)->manage($this->staff('waitstaff')));
     }
 }

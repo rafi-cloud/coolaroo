@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\SlotCapacityFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SlotCapacity extends Model
 {
-    /** @use HasFactory<\Database\Factories\SlotCapacityFactory> */
+    /** @use HasFactory<SlotCapacityFactory> */
     use HasFactory;
 
     protected $table = 'slot_capacity';

@@ -21,12 +21,10 @@ use Illuminate\Validation\ValidationException;
  */
 class CheckoutService
 {
-    public function __construct(private StockService $stock)
-    {
-    }
+    public function __construct(private StockService $stock) {}
 
     /**
-     * @param array<int, array{item_id:int,size_id:int,quantity:int,special_request:?string,add_on_option_ids:int[]}> $cartLines
+     * @param  array<int, array{item_id:int,size_id:int,quantity:int,special_request:?string,add_on_option_ids:int[]}>  $cartLines
      * @return array{order: Order, removed: string[]}
      */
     public function checkout(int $tableId, ?int $customerId, array $cartLines, string $idempotencyKey, ?Staff $staffActor = null): array
@@ -70,6 +68,7 @@ class CheckoutService
 
             if ($item === null || ! $item->is_active || ! $item->is_available || $size === null || $size->item_id !== $item->item_id || ! $size->is_active) {
                 $removed[] = $item?->item_name ?? 'An item';
+
                 continue;
             }
 
@@ -81,6 +80,7 @@ class CheckoutService
 
             if ($options->count() !== count($line['add_on_option_ids'])) {
                 $removed[] = $item->item_name;
+
                 continue;
             }
 

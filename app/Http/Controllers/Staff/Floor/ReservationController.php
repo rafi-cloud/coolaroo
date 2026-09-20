@@ -4,7 +4,12 @@ namespace App\Http\Controllers\Staff\Floor;
 
 use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Staff\StorePhoneBookingRequest;
+use App\Models\Customer;
 use App\Models\Reservation;
+use App\Models\RestaurantTable;
+use App\Models\Setting;
+use App\Models\SlotCapacity;
 use App\Services\ReservationService;
 use App\Services\TrustService;
 use Illuminate\Http\RedirectResponse;
@@ -20,8 +25,7 @@ class ReservationController extends Controller
     public function __construct(
         private ReservationService $reservationService,
         private TrustService $trustService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): View
     {
@@ -87,15 +91,15 @@ class ReservationController extends Controller
                 && in_array($reservation->status, [ReservationStatus::Confirmed, ReservationStatus::Requested], true);
 
             // BR39: grace elapsed check
-            $graceMinutes = (int) (\App\Models\Setting::find('reservation_grace_minutes')?->setting_value ?? 15);
+            $graceMinutes = (int) (Setting::find('reservation_grace_minutes')?->setting_value ?? 15);
             $graceCutoff = $bookedAt->copy()->addMinutes($graceMinutes);
             $reservation->is_grace_elapsed = $reservation->status === ReservationStatus::Confirmed && now()->gte($graceCutoff);
             $reservation->can_seat = $reservation->status === ReservationStatus::Confirmed && $reservation->assigned_tables->isNotEmpty();
         });
 
-        $activeSlots = \App\Models\SlotCapacity::where('is_active', true)->orderBy('slot_time')->get();
-        $recentCustomers = \App\Models\Customer::where('is_active', true)->orderBy('full_name')->take(50)->get();
-        $allTables = \App\Models\RestaurantTable::where('is_active', true)->orderBy('table_number')->get();
+        $activeSlots = SlotCapacity::where('is_active', true)->orderBy('slot_time')->get();
+        $recentCustomers = Customer::where('is_active', true)->orderBy('full_name')->take(50)->get();
+        $allTables = RestaurantTable::where('is_active', true)->orderBy('table_number')->get();
 
         return view('staff.reservations.index', [
             'reservations' => $reservations,
@@ -109,7 +113,7 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function store(\App\Http\Requests\Staff\StorePhoneBookingRequest $request): RedirectResponse
+    public function store(StorePhoneBookingRequest $request): RedirectResponse
     {
         $staff = $request->user('staff');
 

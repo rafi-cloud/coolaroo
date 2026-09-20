@@ -13,9 +13,7 @@ use Illuminate\View\View;
 
 class AuthenticatedStaffController extends Controller
 {
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function create(): View
     {

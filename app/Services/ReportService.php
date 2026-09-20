@@ -19,6 +19,7 @@ use App\Models\Reservation;
 use App\Models\Staff;
 use App\Models\Visit;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -40,8 +41,7 @@ class ReportService
     public function __construct(
         private readonly StockService $stock,
         private readonly ReservationService $reservations,
-    ) {
-    }
+    ) {}
 
     /**
      * All 15 widgets in one call, so the controller stays a single line.
@@ -363,7 +363,7 @@ class ReportService
             ->get();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Builder<Order> */
+    /** @return Builder<Order> */
     private function paidToday()
     {
         return Order::whereNotNull('paid_at')
@@ -953,8 +953,8 @@ class ReportService
     }
 
     /**
-     * @param resource $handle
-     * @param array<string, mixed> $data
+     * @param  resource  $handle
+     * @param  array<string, mixed>  $data
      */
     private function writeSalesCsv($handle, array $data): void
     {
@@ -982,8 +982,8 @@ class ReportService
     }
 
     /**
-     * @param resource $handle
-     * @param array<string, mixed> $data
+     * @param  resource  $handle
+     * @param  array<string, mixed>  $data
      */
     private function writeItemsCsv($handle, array $data): void
     {
@@ -1012,8 +1012,8 @@ class ReportService
     }
 
     /**
-     * @param resource $handle
-     * @param array<string, mixed> $data
+     * @param  resource  $handle
+     * @param  array<string, mixed>  $data
      */
     private function writeOperationsCsv($handle, array $data): void
     {
@@ -1039,8 +1039,8 @@ class ReportService
     }
 
     /**
-     * @param resource $handle
-     * @param array<string, mixed> $data
+     * @param  resource  $handle
+     * @param  array<string, mixed>  $data
      */
     private function writeReservationsCsv($handle, array $data): void
     {
@@ -1062,8 +1062,8 @@ class ReportService
     }
 
     /**
-     * @param resource $handle
-     * @param array<string, mixed> $data
+     * @param  resource  $handle
+     * @param  array<string, mixed>  $data
      */
     private function writeFeedbackCsv($handle, array $data): void
     {
@@ -1090,8 +1090,8 @@ class ReportService
     }
 
     /**
-     * @param resource $handle
-     * @param array<string, mixed> $data
+     * @param  resource  $handle
+     * @param  array<string, mixed>  $data
      */
     private function writeStaffCsv($handle, array $data): void
     {
@@ -1172,8 +1172,8 @@ class ReportService
     }
 
     /**
-     * @param resource $handle
-     * @param array<string, mixed> $data
+     * @param  resource  $handle
+     * @param  array<string, mixed>  $data
      */
     private function writeAiCsv($handle, array $data): void
     {
@@ -1220,4 +1220,3 @@ class ReportService
         }
     }
 }
-

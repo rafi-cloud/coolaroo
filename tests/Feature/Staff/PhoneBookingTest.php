@@ -19,9 +19,13 @@ class PhoneBookingTest extends TestCase
     use RefreshDatabase;
 
     private Staff $waitstaff;
+
     private Staff $admin;
+
     private Staff $kitchen;
+
     private SlotCapacity $slot;
+
     private Customer $customer;
 
     protected function setUp(): void

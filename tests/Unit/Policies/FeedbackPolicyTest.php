@@ -14,21 +14,21 @@ class FeedbackPolicyTest extends TestCase
 {
     public function test_moderate_is_admin_only(): void
     {
-        $waitstaff = new Staff();
-        $waitstaff->setRelation('role', (new Role())->forceFill(['role_name' => 'waitstaff']));
+        $waitstaff = new Staff;
+        $waitstaff->setRelation('role', (new Role)->forceFill(['role_name' => 'waitstaff']));
 
-        $this->assertFalse((new FeedbackPolicy())->moderate($waitstaff));
+        $this->assertFalse((new FeedbackPolicy)->moderate($waitstaff));
     }
 
     public function test_customer_can_only_submit_feedback_on_their_own_served_qr_order(): void
     {
-        $policy = new FeedbackPolicy();
-        $customer = (new Customer())->forceFill(['customer_id' => 3]);
-        $ownOrder = (new Order())->forceFill(['order_id' => 1, 'customer_id' => 3, 'status' => OrderStatus::Served]);
-        $othersOrder = (new Order())->forceFill(['order_id' => 2, 'customer_id' => 4, 'status' => OrderStatus::Served]);
-        $guestOrder = (new Order())->forceFill(['order_id' => 3, 'customer_id' => null, 'status' => OrderStatus::Served]);
-        $notServedOrder = (new Order())->forceFill(['order_id' => 4, 'customer_id' => 3, 'status' => OrderStatus::Paid]);
-        $staffTakenOrder = (new Order())->forceFill(['order_id' => 5, 'customer_id' => 3, 'status' => OrderStatus::Served, 'taken_by_staff_id' => 9]);
+        $policy = new FeedbackPolicy;
+        $customer = (new Customer)->forceFill(['customer_id' => 3]);
+        $ownOrder = (new Order)->forceFill(['order_id' => 1, 'customer_id' => 3, 'status' => OrderStatus::Served]);
+        $othersOrder = (new Order)->forceFill(['order_id' => 2, 'customer_id' => 4, 'status' => OrderStatus::Served]);
+        $guestOrder = (new Order)->forceFill(['order_id' => 3, 'customer_id' => null, 'status' => OrderStatus::Served]);
+        $notServedOrder = (new Order)->forceFill(['order_id' => 4, 'customer_id' => 3, 'status' => OrderStatus::Paid]);
+        $staffTakenOrder = (new Order)->forceFill(['order_id' => 5, 'customer_id' => 3, 'status' => OrderStatus::Served, 'taken_by_staff_id' => 9]);
 
         $this->assertTrue($policy->create($customer, $ownOrder));
         $this->assertFalse($policy->create($customer, $othersOrder));

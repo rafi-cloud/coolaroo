@@ -8,6 +8,7 @@ use App\Models\Reservation;
 use App\Models\Setting;
 use App\Models\SlotCapacity;
 use App\Services\SettingService;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -17,12 +18,13 @@ class ReservationWizardTest extends TestCase
     use RefreshDatabase;
 
     private SlotCapacity $slot;
+
     private Customer $customer;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
 
         // Fixed test time: Tuesday 22 Sep 2026 12:00:00 (Tuesday is an open day)
         Carbon::setTestNow(Carbon::parse('2026-09-22 12:00:00', 'Australia/Melbourne'));

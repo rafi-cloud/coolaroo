@@ -22,8 +22,7 @@ class AiController extends Controller
         private readonly AiMenuService $ai,
         private readonly SettingService $settings,
         private readonly AuditLogger $audit,
-    ) {
-    }
+    ) {}
 
     public function chat(AiChatRequest $request): JsonResponse
     {

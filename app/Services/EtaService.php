@@ -16,9 +16,7 @@ use Illuminate\Validation\ValidationException;
 /** BR30. Calculation (T071's original formula, relocated here) and staff adjustment (FR59). */
 class EtaService
 {
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     /** BR30: longest prep time at the station + orders ahead x avg minutes per order. */
     public function estimate(Order $order, Collection $items, Destination $destination): ?Carbon

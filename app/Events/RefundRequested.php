@@ -2,11 +2,11 @@
 
 namespace App\Events;
 
+use App\Events\Concerns\QueuedBroadcast;
 use App\Models\Refund;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -15,9 +15,7 @@ class RefundRequested implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;
 
-    public function __construct(public Refund $refund)
-    {
-    }
+    public function __construct(public Refund $refund) {}
 
     /** @return array<int, PrivateChannel> */
     public function broadcastOn(): array

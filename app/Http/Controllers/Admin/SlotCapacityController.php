@@ -13,9 +13,7 @@ use Illuminate\View\View;
 
 class SlotCapacityController extends Controller
 {
-    public function __construct(private SlotCapacityService $slots)
-    {
-    }
+    public function __construct(private SlotCapacityService $slots) {}
 
     public function index(): View
     {

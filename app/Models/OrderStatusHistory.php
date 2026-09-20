@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\OrderStatusHistoryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderStatusHistory extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrderStatusHistoryFactory> */
+    /** @use HasFactory<OrderStatusHistoryFactory> */
     use HasFactory;
 
     protected $table = 'order_status_history';

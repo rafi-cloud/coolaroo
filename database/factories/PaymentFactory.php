@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Enums\PaymentMethod;
+use App\Models\Payment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Payment>
+ * @extends Factory<Payment>
  */
 class PaymentFactory extends Factory
 {

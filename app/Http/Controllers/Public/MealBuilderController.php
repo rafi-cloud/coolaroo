@@ -13,9 +13,7 @@ use Illuminate\View\View;
  */
 class MealBuilderController extends Controller
 {
-    public function __construct(private readonly SettingService $settings)
-    {
-    }
+    public function __construct(private readonly SettingService $settings) {}
 
     public function show(): View
     {

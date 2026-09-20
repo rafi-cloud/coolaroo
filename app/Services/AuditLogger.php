@@ -32,7 +32,7 @@ class AuditLogger
      * `entity_id` stays null. The IP is kept because BR49 gives the
      * assistant no app rate limit — it is the only abuse signal there is.
      *
-     * @param array{tokens_in:int, tokens_out:int} $usage
+     * @param  array{tokens_in:int, tokens_out:int}  $usage
      */
     public function logAi(?Customer $actor, string $feature, array $usage, ?string $ipAddress = null): AuditLog
     {

@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Customer;
 use App\Models\Order;
-use App\Models\Role;
 use App\Models\RestaurantTable;
+use App\Models\Role;
 use App\Models\Staff;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;

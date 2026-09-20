@@ -6,7 +6,6 @@ use App\Enums\ReservationStatus;
 use App\Enums\TableStatus;
 use App\Enums\VisitCloseReason;
 use App\Exceptions\InvalidTransitionException;
-use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\RestaurantTable;
@@ -14,8 +13,8 @@ use App\Models\Role;
 use App\Models\Setting;
 use App\Models\SlotCapacity;
 use App\Models\Staff;
-use App\Services\AvailabilityService;
 use App\Services\ReservationService;
+use App\Services\SettingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
@@ -26,8 +25,11 @@ class ReservationServiceTest extends TestCase
     use RefreshDatabase;
 
     private ReservationService $service;
+
     private SlotCapacity $slot;
+
     private Customer $customer;
+
     private Staff $staff;
 
     protected function setUp(): void
@@ -96,7 +98,7 @@ class ReservationServiceTest extends TestCase
             ['setting_key' => 'reservations_online_enabled'],
             ['setting_value' => '0', 'value_type' => 'bool']
         );
-        app(\App\Services\SettingService::class)->clearCache();
+        app(SettingService::class)->clearCache();
 
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('Online reservations are currently paused');

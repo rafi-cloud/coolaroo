@@ -47,7 +47,7 @@ class FeedbackService
     /**
      * FR77: Paginated feedback list for admin moderation.
      *
-     * @param array{status?: string, rating?: int|string, search?: string} $filters
+     * @param  array{status?: string, rating?: int|string, search?: string}  $filters
      */
     public function listForAdmin(array $filters = []): LengthAwarePaginator
     {

@@ -20,8 +20,7 @@ class TableController extends Controller
     public function __construct(
         private TableService $tables,
         private TableQrService $tableQr,
-    ) {
-    }
+    ) {}
 
     public function index(): View
     {

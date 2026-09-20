@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\MenuItemSizeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuItemSize extends Model
 {
-    /** @use HasFactory<\Database\Factories\MenuItemSizeFactory> */
+    /** @use HasFactory<MenuItemSizeFactory> */
     use HasFactory;
 
     protected $table = 'menu_item_size';

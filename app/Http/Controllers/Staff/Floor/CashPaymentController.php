@@ -21,9 +21,7 @@ use Illuminate\Validation\ValidationException;
  */
 class CashPaymentController extends Controller
 {
-    public function __construct(private CashPaymentService $cash, private PaymentService $payments)
-    {
-    }
+    public function __construct(private CashPaymentService $cash, private PaymentService $payments) {}
 
     public function store(RecordCashPaymentRequest $request, Order $order): RedirectResponse
     {

@@ -16,8 +16,7 @@ class ReservationController extends Controller
 {
     public function __construct(
         private readonly ReservationService $reservationService,
-    ) {
-    }
+    ) {}
 
     /**
      * FR72, UC14: Customer views their upcoming and past reservations.
@@ -70,7 +69,7 @@ class ReservationController extends Controller
         return redirect(route('home').'#reserve')
             ->with('status', 'reservation-requested')
             ->with('reservation_code', $reservation->reference_code)
-            ->with('message', "Your reservation request {$reservation->reference_code} for {$reservation->party_size} guests on {$reservation->booking_date->format('d/m/Y')} at ".substr($reservation->booking_time, 0, 5)." has been received.");
+            ->with('message', "Your reservation request {$reservation->reference_code} for {$reservation->party_size} guests on {$reservation->booking_date->format('d/m/Y')} at ".substr($reservation->booking_time, 0, 5).' has been received.');
     }
 
     /**

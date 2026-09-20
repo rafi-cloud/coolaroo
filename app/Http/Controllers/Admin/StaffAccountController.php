@@ -15,9 +15,7 @@ use Illuminate\View\View;
 
 class StaffAccountController extends Controller
 {
-    public function __construct(private StaffAccountService $staffAccounts)
-    {
-    }
+    public function __construct(private StaffAccountService $staffAccounts) {}
 
     public function index(): View
     {

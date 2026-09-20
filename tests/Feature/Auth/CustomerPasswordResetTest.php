@@ -18,7 +18,7 @@ class CustomerPasswordResetTest extends TestCase
         Notification::fake();
 
         $customer = Customer::factory()->create();
-        $message = "If that email matches an account, a reset link is on its way.";
+        $message = 'If that email matches an account, a reset link is on its way.';
 
         $this->post('/forgot-password', ['email' => $customer->email])
             ->assertSessionHas('status', $message);

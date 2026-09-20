@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Enums\PaymentAttemptStatus;
 use App\Enums\RefundStatus;
 use App\Models\Order;
+use App\Models\Payment;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Collection;
 
 /**
  * FR53. Assembles the receipt data (lines, sale discounts, the succeeded
@@ -18,7 +20,7 @@ class ReceiptService
         return Pdf::loadView('pdf.receipt', $this->data($order))->output();
     }
 
-    /** @return array{order: Order, lines: \Illuminate\Support\Collection, payment: ?\App\Models\Payment, refunds: \Illuminate\Support\Collection} */
+    /** @return array{order: Order, lines: Collection, payment: ?Payment, refunds: Collection} */
     public function data(Order $order): array
     {
         $order->loadMissing(['items', 'restaurantTable']);

@@ -42,7 +42,7 @@ class RateLimitingTest extends TestCase
 
     public function test_checkout_allows_ten_attempts_then_blocks_the_eleventh(): void
     {
-        $customer = (new Customer())->forceFill(['customer_id' => 1]);
+        $customer = (new Customer)->forceFill(['customer_id' => 1]);
         $this->actingAs($customer, 'customer');
 
         for ($i = 0; $i < 10; $i++) {
@@ -54,7 +54,7 @@ class RateLimitingTest extends TestCase
 
     public function test_checkout_throttle_is_keyed_per_customer_not_shared_globally(): void
     {
-        $customerOne = (new Customer())->forceFill(['customer_id' => 1]);
+        $customerOne = (new Customer)->forceFill(['customer_id' => 1]);
         $this->actingAs($customerOne, 'customer');
 
         for ($i = 0; $i < 10; $i++) {
@@ -63,7 +63,7 @@ class RateLimitingTest extends TestCase
 
         $this->postJson('/__test/checkout')->assertStatus(429);
 
-        $customerTwo = (new Customer())->forceFill(['customer_id' => 2]);
+        $customerTwo = (new Customer)->forceFill(['customer_id' => 2]);
         $this->actingAs($customerTwo, 'customer');
 
         $this->postJson('/__test/checkout')->assertOk();

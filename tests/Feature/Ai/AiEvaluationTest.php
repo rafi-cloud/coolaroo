@@ -22,8 +22,11 @@ class AiEvaluationTest extends TestCase
     use RefreshDatabase;
 
     private MenuItem $parma;
+
     private MenuItem $steak;
+
     private MenuItem $risotto;
+
     private AddOnOption $gravy;
 
     protected function setUp(): void

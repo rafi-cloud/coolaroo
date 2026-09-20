@@ -2,12 +2,12 @@
 
 namespace App\Events;
 
+use App\Events\Concerns\QueuedBroadcast;
 use App\Models\AddOnOption;
 use App\Models\MenuItem;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -20,9 +20,7 @@ class MenuAvailabilityChanged implements ShouldBroadcast, ShouldDispatchAfterCom
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;
 
-    public function __construct(public MenuItem|AddOnOption $entity)
-    {
-    }
+    public function __construct(public MenuItem|AddOnOption $entity) {}
 
     /** @return array<int, Channel> */
     public function broadcastOn(): array

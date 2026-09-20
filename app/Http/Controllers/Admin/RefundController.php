@@ -18,9 +18,7 @@ use Illuminate\View\View;
  */
 class RefundController extends Controller
 {
-    public function __construct(private RefundService $refunds)
-    {
-    }
+    public function __construct(private RefundService $refunds) {}
 
     public function index(Request $request): View
     {

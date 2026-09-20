@@ -12,9 +12,7 @@ use App\Models\Order;
  */
 class CashPaymentService
 {
-    public function __construct(private StockService $stock)
-    {
-    }
+    public function __construct(private StockService $stock) {}
 
     /** BR22: nearest 5 cents. */
     public function roundedTotal(Order $order): float

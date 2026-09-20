@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\DietaryTagFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DietaryTag extends Model
 {
-    /** @use HasFactory<\Database\Factories\DietaryTagFactory> */
+    /** @use HasFactory<DietaryTagFactory> */
     use HasFactory;
 
     protected $table = 'dietary_tag';

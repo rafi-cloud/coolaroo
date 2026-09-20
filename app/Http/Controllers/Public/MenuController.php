@@ -86,7 +86,7 @@ class MenuController extends Controller
         // Table context check
         $tableId = $request->session()->get('table_id');
         $table = $tableId ? RestaurantTable::find($tableId) : null;
-        $tableLabel = $table ? ('Table ' . $table->table_number) : null;
+        $tableLabel = $table ? ('Table '.$table->table_number) : null;
 
         return view('public.menu', [
             'venue' => $this->settingService->venue(),

@@ -16,6 +16,7 @@ class TrustServiceTest extends TestCase
     use RefreshDatabase;
 
     private TrustService $trustService;
+
     private SlotCapacity $slot;
 
     protected function setUp(): void

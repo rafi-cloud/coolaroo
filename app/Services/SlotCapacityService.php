@@ -11,9 +11,7 @@ use Illuminate\Validation\ValidationException;
  */
 class SlotCapacityService
 {
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function create(array $data, Staff $actor): SlotCapacity
     {

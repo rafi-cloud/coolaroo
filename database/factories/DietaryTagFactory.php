@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\DietaryTag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\DietaryTag>
+ * @extends Factory<DietaryTag>
  */
 class DietaryTagFactory extends Factory
 {

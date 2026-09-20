@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Staff;
 
-use App\Enums\ReservationAlert;
 use App\Enums\ReservationStatus;
 use App\Enums\TableStatus;
 use App\Enums\VisitCloseReason;
@@ -24,9 +23,13 @@ class TableAssignmentTest extends TestCase
     use RefreshDatabase;
 
     private Staff $waitstaff;
+
     private Staff $admin;
+
     private Staff $kitchen;
+
     private SlotCapacity $slot;
+
     private Customer $customer;
 
     protected function setUp(): void

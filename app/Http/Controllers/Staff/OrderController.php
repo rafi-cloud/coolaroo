@@ -16,9 +16,7 @@ use Illuminate\Support\Facades\Gate;
  */
 class OrderController extends Controller
 {
-    public function __construct(private OrderService $orders)
-    {
-    }
+    public function __construct(private OrderService $orders) {}
 
     public function cancel(CancelOrderRequest $request, Order $order): RedirectResponse
     {

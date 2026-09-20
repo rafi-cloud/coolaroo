@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\SlotCapacity;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\SlotCapacity>
+ * @extends Factory<SlotCapacity>
  */
 class SlotCapacityFactory extends Factory
 {

@@ -31,7 +31,7 @@ class ErrorPagesTest extends TestCase
         // Visiting customer profile as an unauthenticated visitor aborts or redirects
         // Let's hit a route that directly aborts with 403 or trigger a 403 via tampered QR scan
         $table = RestaurantTable::factory()->create();
-        $tamperedUrl = route('table.scan', ['table' => $table->table_id, 'token' => 'invalid-token-signature']) . '&signature=bad';
+        $tamperedUrl = route('table.scan', ['table' => $table->table_id, 'token' => 'invalid-token-signature']).'&signature=bad';
 
         $response = $this->get($tamperedUrl);
 

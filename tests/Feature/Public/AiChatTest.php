@@ -6,6 +6,8 @@ use App\Models\AuditLog;
 use App\Models\MenuItem;
 use App\Models\Setting;
 use App\Services\AiMenuService;
+use App\Services\SettingService;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -19,7 +21,7 @@ class AiChatTest extends TestCase
         parent::setUp();
 
         config(['services.ai.api_key' => 'test-key']);
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
     }
 
     /** @param array<string, mixed> $payload */
@@ -92,7 +94,7 @@ class AiChatTest extends TestCase
     public function test_it_is_not_found_when_the_assistant_is_switched_off(): void
     {
         Setting::where('setting_key', 'ai_enabled')->update(['setting_value' => '0']);
-        app(\App\Services\SettingService::class)->clearCache();
+        app(SettingService::class)->clearCache();
         Http::fake();
 
         $this->postJson(route('ai.chat'), ['message' => 'Hi'])->assertNotFound();

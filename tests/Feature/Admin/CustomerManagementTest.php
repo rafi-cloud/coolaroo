@@ -3,7 +3,6 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\ReservationStatus;
-use App\Models\AuditLog;
 use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\Role;
@@ -19,7 +18,9 @@ class CustomerManagementTest extends TestCase
     use RefreshDatabase;
 
     private Staff $admin;
+
     private Staff $waitstaff;
+
     private SlotCapacity $slot;
 
     protected function setUp(): void

@@ -16,9 +16,7 @@ use Illuminate\Support\Facades\Gate;
  */
 class RefundRequestController extends Controller
 {
-    public function __construct(private RefundService $refunds)
-    {
-    }
+    public function __construct(private RefundService $refunds) {}
 
     public function store(RequestRefundRequest $request, Order $order): RedirectResponse
     {

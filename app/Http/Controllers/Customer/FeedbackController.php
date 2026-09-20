@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Gate;
 /** FR76, UC15. */
 class FeedbackController extends Controller
 {
-    public function __construct(private FeedbackService $feedback)
-    {
-    }
+    public function __construct(private FeedbackService $feedback) {}
 
     public function store(StoreFeedbackRequest $request, Order $order): RedirectResponse
     {

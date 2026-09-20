@@ -6,9 +6,12 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Customer;
+use App\Models\MenuCategory;
+use App\Models\MenuItem;
 use App\Models\Order;
-use App\Models\OrderItem;
+use App\Models\Payment;
 use App\Models\RestaurantTable;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,7 +24,7 @@ class MyOrdersTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
 
         $this->customer = Customer::factory()->create([
             'email_verified_at' => now(),
@@ -59,14 +62,14 @@ class MyOrdersTest extends TestCase
             'total_amount' => 45.50,
         ]);
 
-        \App\Models\Payment::factory()->create([
+        Payment::factory()->create([
             'order_id' => $order->order_id,
             'method' => PaymentMethod::Stripe,
             'amount' => 45.50,
         ]);
 
-        $menuItem = \App\Models\MenuItem::factory()->create([
-            'category_id' => \App\Models\MenuCategory::factory(),
+        $menuItem = MenuItem::factory()->create([
+            'category_id' => MenuCategory::factory(),
             'item_name' => 'Chicken Parma',
         ]);
         $size = $menuItem->sizes()->create(['size_name' => 'Regular', 'price' => 22.75]);

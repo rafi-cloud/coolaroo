@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 class SettingService
 {
     private const CACHE_KEY = 'app_settings_map';
+
     private const CACHE_TTL_SECONDS = 3600;
 
     public function __construct(
@@ -84,7 +85,7 @@ class SettingService
     /**
      * FR91: Bulk update settings with change detection, audit logging, and switch broadcasting.
      *
-     * @param array<string, mixed> $values
+     * @param  array<string, mixed>  $values
      * @return list<string> list of updated setting keys
      */
     public function updateMany(array $values, Staff $admin): array
@@ -238,7 +239,7 @@ class SettingService
 
         return [
             "Open {$openTime} to {$closeTime}",
-            implode(', ', $closedNames) . ': closed',
+            implode(', ', $closedNames).': closed',
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Feature\Public;
 
 use App\Models\AuditLog;
 use App\Models\MenuItem;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -17,7 +18,7 @@ class AiMealBuilderTest extends TestCase
         parent::setUp();
 
         config(['services.ai.api_key' => 'test-key']);
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
     }
 
     /** @param array<string, mixed> $payload */

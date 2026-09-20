@@ -92,8 +92,8 @@ class ItemDetailModalTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Signature Wagyu Burger');
-        $response->assertSee('data-testid="item-modal-' . $item->item_id . '"', false);
-        $response->assertSee('data-testid="item-modal-nutrition-' . $item->item_id . '"', false);
+        $response->assertSee('data-testid="item-modal-'.$item->item_id.'"', false);
+        $response->assertSee('data-testid="item-modal-nutrition-'.$item->item_id.'"', false);
         $response->assertSee('750');
         $response->assertSee('45g');
         $response->assertSee('60g');
@@ -146,9 +146,9 @@ class ItemDetailModalTest extends TestCase
         $response = $this->get(route('menu.index'));
 
         $response->assertOk();
-        $response->assertSee('data-testid="item-modal-no-table-' . $item->item_id . '"', false);
+        $response->assertSee('data-testid="item-modal-no-table-'.$item->item_id.'"', false);
         $response->assertSee('Scan the QR code on your table to order (BR57).');
-        $response->assertDontSee('data-testid="item-modal-add-to-cart-' . $item->item_id . '"', false);
+        $response->assertDontSee('data-testid="item-modal-add-to-cart-'.$item->item_id.'"', false);
     }
 
     public function test_modal_displays_add_to_cart_form_with_table_context(): void
@@ -166,11 +166,11 @@ class ItemDetailModalTest extends TestCase
             ->get(route('menu.index'));
 
         $response->assertOk();
-        $response->assertSee('data-testid="item-modal-form-' . $item->item_id . '"', false);
-        $response->assertSee('data-testid="item-modal-add-to-cart-' . $item->item_id . '"', false);
+        $response->assertSee('data-testid="item-modal-form-'.$item->item_id.'"', false);
+        $response->assertSee('data-testid="item-modal-add-to-cart-'.$item->item_id.'"', false);
         $response->assertSee('Add to cart');
-        $response->assertSee('data-testid="item-modal-qty-' . $item->item_id . '"', false);
-        $response->assertSee('data-testid="item-modal-special-request-' . $item->item_id . '"', false);
+        $response->assertSee('data-testid="item-modal-qty-'.$item->item_id.'"', false);
+        $response->assertSee('data-testid="item-modal-special-request-'.$item->item_id.'"', false);
     }
 
     public function test_modal_displays_paused_notice_when_qr_ordering_disabled(): void
@@ -193,9 +193,9 @@ class ItemDetailModalTest extends TestCase
             ->get(route('menu.index'));
 
         $response->assertOk();
-        $response->assertSee('data-testid="item-modal-paused-' . $item->item_id . '"', false);
+        $response->assertSee('data-testid="item-modal-paused-'.$item->item_id.'"', false);
         $response->assertSee('Online ordering is temporarily paused');
-        $response->assertDontSee('data-testid="item-modal-add-to-cart-' . $item->item_id . '"', false);
+        $response->assertDontSee('data-testid="item-modal-add-to-cart-'.$item->item_id.'"', false);
     }
 
     public function test_modal_displays_soldout_when_item_is_unavailable(): void
@@ -213,9 +213,9 @@ class ItemDetailModalTest extends TestCase
             ->get(route('menu.index'));
 
         $response->assertOk();
-        $response->assertSee('data-testid="item-modal-soldout-' . $item->item_id . '"', false);
+        $response->assertSee('data-testid="item-modal-soldout-'.$item->item_id.'"', false);
         $response->assertSee('Sold out tonight');
-        $response->assertDontSee('data-testid="item-modal-add-to-cart-' . $item->item_id . '"', false);
+        $response->assertDontSee('data-testid="item-modal-add-to-cart-'.$item->item_id.'"', false);
     }
 
     public function test_modal_form_submission_adds_item_to_cart(): void

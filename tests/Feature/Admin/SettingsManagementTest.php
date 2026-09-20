@@ -18,6 +18,7 @@ class SettingsManagementTest extends TestCase
     use RefreshDatabase;
 
     private Staff $admin;
+
     private Staff $waitstaff;
 
     protected function setUp(): void

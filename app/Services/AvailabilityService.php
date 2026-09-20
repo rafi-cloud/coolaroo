@@ -7,7 +7,6 @@ use App\Models\Reservation;
 use App\Models\SlotCapacity;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Illuminate\Support\Collection;
 
 /**
  * FR61, BR32, BR33, BR34, BR35, BR58: Reservation availability calculations.

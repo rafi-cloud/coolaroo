@@ -21,19 +21,19 @@ use App\Http\Controllers\Admin\SlotCapacityController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
-use App\Http\Controllers\Customer\CartController;
-use App\Http\Controllers\Customer\CheckoutController;
-use App\Http\Controllers\Customer\FeedbackController;
-use App\Http\Controllers\Customer\OrderController;
-use App\Http\Controllers\Customer\PaymentController;
-use App\Http\Controllers\Customer\ReceiptController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Customer\Auth\NewPasswordController;
 use App\Http\Controllers\Customer\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
+use App\Http\Controllers\Customer\CartController;
+use App\Http\Controllers\Customer\CheckoutController;
+use App\Http\Controllers\Customer\FeedbackController;
+use App\Http\Controllers\Customer\OrderController;
+use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Customer\ReceiptController;
 use App\Http\Controllers\Customer\ReservationController as CustomerReservationController;
 use App\Http\Controllers\Public\AiController;
 use App\Http\Controllers\Public\AvailabilityController as PublicAvailabilityController;
@@ -46,8 +46,8 @@ use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\Floor\FloorController;
-use App\Http\Controllers\Staff\Floor\ServeController;
 use App\Http\Controllers\Staff\Floor\ReservationController as StaffReservationController;
+use App\Http\Controllers\Staff\Floor\ServeController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
 use App\Http\Controllers\Staff\Floor\TableController as StaffTableController;
 use App\Http\Controllers\Staff\Floor\TrustController;
@@ -271,7 +271,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
 });
 
-//have to delete this block when the real pages done.
+// have to delete this block when the real pages done.
 if (app()->isLocal()) {
     Route::prefix('_preview')->group(function () {
         Route::view('public', 'preview.public');

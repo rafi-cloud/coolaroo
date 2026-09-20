@@ -6,21 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\AddCartLineRequest;
 use App\Http\Requests\Customer\UpdateCartLineRequest;
 use App\Services\CartService;
+use App\Services\SettingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class CartController extends Controller
 {
-    public function __construct(private CartService $cart)
-    {
-    }
+    public function __construct(private CartService $cart) {}
 
     public function index(): View
     {
         return view('customer.cart', [
             'lines' => $this->cart->lines(),
             'total' => $this->cart->total(),
-            'qrOrderingEnabled' => app(\App\Services\SettingService::class)->getBool('qr_ordering_enabled', true),
+            'qrOrderingEnabled' => app(SettingService::class)->getBool('qr_ordering_enabled', true),
         ]);
     }
 

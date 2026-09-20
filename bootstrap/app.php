@@ -2,6 +2,11 @@
 
 use App\Exceptions\AiUnavailableException;
 use App\Exceptions\InvalidTransitionException;
+use App\Http\Middleware\EnsureQrOrderingEnabled;
+use App\Http\Middleware\EnsureRole;
+use App\Http\Middleware\EnsureStaffSessionIsActive;
+use App\Http\Middleware\EnsureTableContext;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,14 +24,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
 
         $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
+            SecurityHeaders::class,
         ]);
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\EnsureRole::class,
-            'staff.session' => \App\Http\Middleware\EnsureStaffSessionIsActive::class,
-            'table.context' => \App\Http\Middleware\EnsureTableContext::class,
-            'qr.ordering.enabled' => \App\Http\Middleware\EnsureQrOrderingEnabled::class,
+            'role' => EnsureRole::class,
+            'staff.session' => EnsureStaffSessionIsActive::class,
+            'table.context' => EnsureTableContext::class,
+            'qr.ordering.enabled' => EnsureQrOrderingEnabled::class,
         ]);
 
         $middleware->redirectGuestsTo(fn (Request $request) => $request->is('staff*', 'admin*')

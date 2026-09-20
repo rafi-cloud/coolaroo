@@ -18,7 +18,7 @@ class AuditLogService
     /**
      * FR90: Search and filter immutable audit records.
      *
-     * @param array{action_type?: string, entity_name?: string, staff_id?: int|string, from?: string, to?: string, search?: string} $filters
+     * @param  array{action_type?: string, entity_name?: string, staff_id?: int|string, from?: string, to?: string, search?: string}  $filters
      */
     public function searchLogs(array $filters = []): LengthAwarePaginator
     {
@@ -66,7 +66,7 @@ class AuditLogService
     /**
      * FR99, BR62: Search and view archived record snapshots.
      *
-     * @param array{entity_name?: string, search?: string} $filters
+     * @param  array{entity_name?: string, search?: string}  $filters
      */
     public function searchArchives(array $filters = []): LengthAwarePaginator
     {

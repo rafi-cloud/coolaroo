@@ -2,12 +2,11 @@
 
 namespace Tests\Feature\Public;
 
-use App\Models\Category;
-use App\Models\Customer;
 use App\Models\RestaurantTable;
 use App\Models\Role;
 use App\Models\Staff;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class AccessibilityTest extends TestCase
@@ -31,7 +30,7 @@ class AccessibilityTest extends TestCase
             'table_number' => 12,
             'seat_capacity' => 4,
             'is_active' => true,
-            'qr_token' => \Illuminate\Support\Str::random(64),
+            'qr_token' => Str::random(64),
         ]);
 
         $response = $this->withSession(['table_id' => $table->table_id])

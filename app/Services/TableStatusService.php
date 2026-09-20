@@ -25,9 +25,7 @@ class TableStatusService
         OrderStatus::Ready,
     ];
 
-    public function __construct(private AuditLogger $auditLogger)
-    {
-    }
+    public function __construct(private AuditLogger $auditLogger) {}
 
     public function transition(RestaurantTable $table, TableStatus $to, ?Staff $actor = null): void
     {

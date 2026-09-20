@@ -14,8 +14,7 @@ class NoShowController extends Controller
 {
     public function __construct(
         private readonly ReservationService $reservationService,
-    ) {
-    }
+    ) {}
 
     /**
      * FR10, UC38, S38: Admin clears a customer's no-show flag with required reason.

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\StaffFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -9,7 +10,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Staff extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\StaffFactory> */
+    /** @use HasFactory<StaffFactory> */
     use HasFactory, Notifiable;
 
     const UPDATED_AT = null;

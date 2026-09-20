@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Services;
 
-use App\Enums\ReservationStatus;
 use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\Setting;

@@ -3,10 +3,8 @@
 namespace Tests\Feature\Staff;
 
 use App\Enums\ReservationStatus;
-use App\Enums\TableStatus;
 use App\Models\Customer;
 use App\Models\Reservation;
-use App\Models\RestaurantTable;
 use App\Models\Role;
 use App\Models\SlotCapacity;
 use App\Models\Staff;
@@ -19,9 +17,13 @@ class ReservationBoardTest extends TestCase
     use RefreshDatabase;
 
     private Staff $waitstaff;
+
     private Staff $admin;
+
     private Staff $kitchen;
+
     private SlotCapacity $slot;
+
     private Customer $customer;
 
     protected function setUp(): void

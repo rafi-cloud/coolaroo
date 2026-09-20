@@ -6,6 +6,7 @@ use App\Models\DietaryTag;
 use App\Models\Setting;
 use App\Services\AiMenuService;
 use App\Services\SettingService;
+use Database\Seeders\SettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,7 +18,7 @@ class MealBuilderPageTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(SettingSeeder::class);
     }
 
     public function test_it_shows_the_brief_form_with_the_live_dietary_tags(): void

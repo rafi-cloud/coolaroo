@@ -26,7 +26,6 @@ use App\Models\MenuItem;
 use App\Models\MenuItemSize;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\OrderStatusHistory;
 use App\Models\Payment;
 use App\Models\Refund;
 use App\Models\Reservation;
@@ -37,7 +36,6 @@ use App\Models\Staff;
 use App\Models\Visit;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 
 /**
  * SDD 09.1, TC-UC35-01.
@@ -174,9 +172,9 @@ class DemoSeeder extends Seeder
     }
 
     /**
-     * @param array<string, MenuCategory> $categories
-     * @param array<string, Allergen> $allergens
-     * @param array<string, DietaryTag> $tags
+     * @param  array<string, MenuCategory>  $categories
+     * @param  array<string, Allergen>  $allergens
+     * @param  array<string, DietaryTag>  $tags
      * @return array<string, MenuItem>
      */
     private function seedMenuItems(array $categories, array $allergens, array $tags): array
@@ -595,7 +593,7 @@ class DemoSeeder extends Seeder
         for ($i = 1; $i <= 4; $i++) {
             $date = Carbon::today()->subDays($i * 6);
             $res = Reservation::firstOrCreate(
-                ['reference_code' => 'CR-H00' . $i],
+                ['reference_code' => 'CR-H00'.$i],
                 [
                     'customer_id' => $customers['jack']->customer_id,
                     'slot_id' => $slot1830->slot_id,
@@ -626,7 +624,7 @@ class DemoSeeder extends Seeder
         for ($i = 1; $i <= 3; $i++) {
             $date = Carbon::today()->subDays($i * 7);
             $res = Reservation::firstOrCreate(
-                ['reference_code' => 'CR-S00' . $i],
+                ['reference_code' => 'CR-S00'.$i],
                 [
                     'customer_id' => $customers['sarah']->customer_id,
                     'slot_id' => $slot1900->slot_id,
@@ -774,7 +772,7 @@ class DemoSeeder extends Seeder
         // 8. Upcoming bookings over next 3 days
         for ($d = 1; $d <= 3; $d++) {
             Reservation::firstOrCreate(
-                ['reference_code' => 'CR-UPC-00' . $d],
+                ['reference_code' => 'CR-UPC-00'.$d],
                 [
                     'customer_id' => $customers['cara']->customer_id,
                     'slot_id' => $slot1830->slot_id,
@@ -803,11 +801,11 @@ class DemoSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
             $placed = $lastWeekDate->copy()->setTime(12 + $i, 15);
             $order = Order::firstOrCreate(
-                ['order_number' => 'ORD-LW-' . $i],
+                ['order_number' => 'ORD-LW-'.$i],
                 [
-                    'table_id' => $tables['T' . $i]->table_id,
+                    'table_id' => $tables['T'.$i]->table_id,
                     'customer_id' => $customers['jack']->customer_id,
-                    'idempotency_key' => 'idem-lw-' . $i,
+                    'idempotency_key' => 'idem-lw-'.$i,
                     'status' => OrderStatus::Served->value,
                     'payment_status' => PaymentStatus::Paid->value,
                     'total_amount' => 75.50,
@@ -830,8 +828,8 @@ class DemoSeeder extends Seeder
                     'method' => PaymentMethod::Stripe->value,
                     'amount' => 75.50,
                     'status' => PaymentAttemptStatus::Succeeded->value,
-                    'stripe_session_id' => 'cs_test_lw_' . $i,
-                    'provider_payment_id' => 'pi_test_lw_' . $i,
+                    'stripe_session_id' => 'cs_test_lw_'.$i,
+                    'provider_payment_id' => 'pi_test_lw_'.$i,
                     'paid_at' => $placed->copy()->addMinutes(2),
                     'created_at' => $placed,
                 ]
@@ -855,11 +853,11 @@ class DemoSeeder extends Seeder
             $isCash = $t['method'] === 'cash';
 
             $order = Order::firstOrCreate(
-                ['order_number' => 'ORD-TDY-' . $idx],
+                ['order_number' => 'ORD-TDY-'.$idx],
                 [
                     'table_id' => $tables[$t['table']]->table_id,
                     'customer_id' => $customers[$t['cust']]->customer_id,
-                    'idempotency_key' => 'idem-tdy-' . $idx,
+                    'idempotency_key' => 'idem-tdy-'.$idx,
                     'status' => OrderStatus::Served->value,
                     'payment_status' => PaymentStatus::Paid->value,
                     'total_amount' => 88.50,
@@ -898,8 +896,8 @@ class DemoSeeder extends Seeder
                         'method' => PaymentMethod::Stripe->value,
                         'amount' => 88.50,
                         'status' => PaymentAttemptStatus::Succeeded->value,
-                        'stripe_session_id' => 'cs_test_tdy_' . $idx,
-                        'provider_payment_id' => 'pi_test_tdy_' . $idx,
+                        'stripe_session_id' => 'cs_test_tdy_'.$idx,
+                        'provider_payment_id' => 'pi_test_tdy_'.$idx,
                         'paid_at' => $placed->copy()->addMinutes(3),
                         'created_at' => $placed,
                     ]
@@ -1078,7 +1076,7 @@ class DemoSeeder extends Seeder
         ];
 
         foreach ($reviewsData as $i => $data) {
-            if (!isset($orders[$i])) {
+            if (! isset($orders[$i])) {
                 break;
             }
             $order = $orders[$i];

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\MenuItemAllergenFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class MenuItemAllergen extends Pivot
 {
-    /** @use HasFactory<\Database\Factories\MenuItemAllergenFactory> */
+    /** @use HasFactory<MenuItemAllergenFactory> */
     use HasFactory;
 
     protected $table = 'menu_item_allergen';

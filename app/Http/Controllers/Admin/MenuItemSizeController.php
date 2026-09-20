@@ -12,9 +12,7 @@ use Illuminate\Http\RedirectResponse;
 
 class MenuItemSizeController extends Controller
 {
-    public function __construct(private MenuItemSizeService $sizes)
-    {
-    }
+    public function __construct(private MenuItemSizeService $sizes) {}
 
     public function store(StoreMenuItemSizeRequest $request, MenuItem $menuItem): RedirectResponse
     {

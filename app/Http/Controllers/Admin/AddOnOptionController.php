@@ -13,9 +13,7 @@ use Illuminate\Http\RedirectResponse;
 
 class AddOnOptionController extends Controller
 {
-    public function __construct(private AddOnService $addOns)
-    {
-    }
+    public function __construct(private AddOnService $addOns) {}
 
     public function store(StoreAddOnOptionRequest $request, MenuItem $menuItem, AddOnGroup $group): RedirectResponse
     {

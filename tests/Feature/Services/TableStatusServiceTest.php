@@ -123,7 +123,7 @@ class TableStatusServiceTest extends TestCase
 
     private function makeOrder(RestaurantTable $table, string $status, ?Carbon $paidAt = null): Order
     {
-        $order = new Order();
+        $order = new Order;
         $order->forceFill([
             'table_id' => $table->table_id,
             'order_number' => 'ORD'.fake()->unique()->numberBetween(1000, 9999),
