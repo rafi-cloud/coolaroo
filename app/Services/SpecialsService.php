@@ -68,7 +68,7 @@ class SpecialsService
         }
 
         return [
-            'size' => $best,
+            'size' => $best->loadMissing('menuItem'),
             'discount_percent' => round($bestDiscount * 100),
             'ends_at' => $best->sale_ends_at,
         ];

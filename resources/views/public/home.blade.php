@@ -55,9 +55,108 @@
     </div>
   </section>
 
+  {{-- S01: Menu Section (T031, FR32, BR59) --}}
+  <section class="section menu-section" id="menu" data-testid="home-menu-section">
+    <div class="wrap">
+      <div class="center">
+        <div class="rule center"></div>
+        <h2 class="section-title">Our Daily Menu</h2>
+      </div>
+
+      {{-- Category filter navigation --}}
+      <nav class="menu-filter" aria-label="Menu categories" data-testid="home-menu-filter">
+        <a class="on" href="{{ url('/#menu') }}" data-testid="home-filter-featured">Featured</a>
+        @if($hasSpecials)
+          <a href="{{ url('/menu?category=specials') }}" data-testid="home-filter-specials">Specials</a>
+        @endif
+        @foreach($categories as $category)
+          <a href="{{ url('/menu?category=' . $category->category_id) }}" data-testid="home-filter-category-{{ $category->category_id }}">
+            {{ $category->category_name }}
+          </a>
+        @endforeach
+      </nav>
+
+      {{-- Specials offer block (hidden when none per BR59) --}}
+      @if($topSpecial)
+        @php
+          $specialSize = $topSpecial['size'];
+          $specialItem = $specialSize->menuItem;
+        @endphp
+        <div class="offer offer-single" data-testid="home-offer-block">
+          <img class="offer-img" src="{{ $specialItem->image_url ? asset($specialItem->image_url) : asset('images/offer-burger.jpg') }}" alt="{{ $specialItem->item_name }}">
+          <div class="offer-shade"></div>
+
+          <div class="offer-copy">
+            <p class="kicker">
+              SPECIAL OFFER
+              @if($topSpecial['ends_at'])
+                &middot; UNTIL {{ strtoupper($topSpecial['ends_at']->format('l')) }}
+              @endif
+            </p>
+            <h3>{{ $specialItem->item_name }} @money($specialSize->sale_price)</h3>
+            <p class="items">{{ $specialItem->description }} &mdash; usually @money($specialSize->price)</p>
+            <a class="btn btn-white" href="{{ url('/#reserve') }}" data-testid="home-offer-reserve">Reserve now</a>
+          </div>
+        </div>
+      @endif
+
+      {{-- Featured items grid (up to 12 items) --}}
+      <div class="menu-grid" data-testid="home-featured-grid">
+        @forelse($featuredItems as $item)
+          @php
+            $activeSizes = $item->sizes;
+            $lowestSize = $activeSizes->first();
+            $hasMultipleSizes = $activeSizes->count() > 1;
+            $isOnSale = $lowestSize && app(\App\Services\SpecialsService::class)->isSaleActive($lowestSize);
+          @endphp
+          <article class="dish @if(! $item->is_available) is-soldout @endif" data-testid="home-dish-{{ $item->item_id }}">
+            <span class="thumb">
+              <img src="{{ $item->image_url ? asset($item->image_url) : asset('images/dish-burger.jpg') }}" alt="{{ $item->item_name }}">
+            </span>
+            <div class="dish-body">
+              <div class="dish-head">
+                <h4>{{ $item->item_name }}</h4>
+                <span class="lead"></span>
+                <span class="price">
+                  @if(! $item->is_available)
+                    @if($lowestSize)
+                      @money($lowestSize->price)
+                    @endif
+                  @elseif($isOnSale)
+                    <s>@money($lowestSize->price)</s> @money($lowestSize->sale_price)
+                  @elseif($hasMultipleSizes)
+                    <small>from</small> @money($lowestSize->price)
+                  @elseif($lowestSize)
+                    @money($lowestSize->price)
+                  @endif
+                </span>
+              </div>
+              <p>{{ $item->description }}</p>
+              @if(! $item->is_available)
+                <p class="tags"><span class="soldout" data-testid="home-dish-soldout-{{ $item->item_id }}">Sold out tonight</span></p>
+              @elseif($item->dietaryTags->isNotEmpty())
+                <p class="tags">
+                  @foreach($item->dietaryTags as $tag)
+                    <span class="tag" title="{{ $tag->tag_name }}">{{ strtoupper(str_starts_with(strtoupper($tag->tag_name), 'GF') ? 'GF' : substr($tag->tag_name, 0, 1)) }}</span>
+                  @endforeach
+                </p>
+              @endif
+            </div>
+          </article>
+        @empty
+          <p data-testid="home-featured-empty">Check back soon for our featured specials.</p>
+        @endforelse
+      </div>
+
+      <div class="menu-cta">
+        <a class="btn btn-outline" href="{{ url('/menu') }}" data-testid="home-view-full-menu">View full menu</a>
+        <p class="menu-note">At your table? Scan the QR code to order and pay from your phone.</p>
+      </div>
+    </div>
+  </section>
+
   {{-- Section Anchor Hooks for subsequent Phase 6 tasks --}}
   <div id="table-order-info" class="visually-hidden" aria-hidden="true"></div>
-  <div id="menu" class="visually-hidden" aria-hidden="true"></div>
   <div id="reviews" class="visually-hidden" aria-hidden="true"></div>
   <div id="reserve" class="visually-hidden" aria-hidden="true"></div>
 </x-layouts.public>
