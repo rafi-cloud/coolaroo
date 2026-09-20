@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Force HTTPS
+    |--------------------------------------------------------------------------
+    |
+    | NFR01: every generated URL, asset and redirect uses https, and secure
+    | cookies follow. On by default outside local development, where the app
+    | is served over plain http by `php artisan serve`.
+    |
+    */
+
+    'force_https' => (bool) env('FORCE_HTTPS', env('APP_ENV', 'production') === 'production'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

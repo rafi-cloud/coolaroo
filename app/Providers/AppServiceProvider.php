@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -22,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // NFR01, T218: https for every generated URL, including Vite assets and
+        // the Reverb endpoint, once the app is served over TLS (10.2 step 7).
+        if (config('app.force_https')) {
+            URL::forceScheme('https');
+        }
+
         Gate::before(function ($user, string $ability) {
             return $user instanceof Staff && $user->role->role_name === 'admin' ? true : null;
         });
