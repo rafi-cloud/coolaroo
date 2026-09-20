@@ -29,6 +29,7 @@ use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
+use App\Http\Controllers\Staff\Kds\StationController;
 use App\Http\Controllers\Staff\OrderController as StaffOrderActionsController;
 use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
 use App\Http\Controllers\Staff\RefundRequestController;
@@ -123,6 +124,9 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
 
 Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:kitchen,bar'])->group(function () {
     Route::post('/orders/{order}/stock-conflict/resolve', [StaffOrderActionsController::class, 'resolveConflict'])->name('staff.orders.stock-conflict.resolve');
+
+    Route::get('/kds/{destination}', [StationController::class, 'index'])->name('staff.kds.index');
+    Route::get('/kds/{destination}/state', [StationController::class, 'state'])->name('staff.kds.state');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {
