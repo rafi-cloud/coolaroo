@@ -2,17 +2,23 @@
 
 namespace App\Services;
 
+use App\Events\SettingSwitched;
 use App\Models\Setting;
 use App\Models\Staff;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * FR91, BR58: Settings cache, typed getters, venue details.
+ * FR91, FR96, FR97, FR98, BR49, BR58: Settings management, cache, typed getters,
+ * venue details, and operational switches.
  */
 class SettingService
 {
     private const CACHE_KEY = 'app_settings_map';
     private const CACHE_TTL_SECONDS = 3600;
+
+    public function __construct(
+        private readonly AuditLogger $auditLogger,
+    ) {}
 
     /**
      * Get all settings as a key => value map.
@@ -69,6 +75,90 @@ class SettingService
         $this->clearCache();
 
         return $setting;
+    }
+
+    /**
+     * FR91: Bulk update settings with change detection, audit logging, and switch broadcasting.
+     *
+     * @param array<string, mixed> $values
+     * @return list<string> list of updated setting keys
+     */
+    public function updateMany(array $values, Staff $admin): array
+    {
+        $current = $this->all();
+        $switches = ['qr_ordering_enabled', 'reservations_online_enabled', 'ai_enabled'];
+        $changed = [];
+
+        foreach ($values as $key => $newValue) {
+            $newValue = (string) $newValue;
+            $oldValue = (string) ($current[$key] ?? '');
+
+            if ($oldValue !== $newValue) {
+                $setting = Setting::updateOrCreate(
+                    ['setting_key' => $key],
+                    [
+                        'setting_value' => $newValue,
+                        'updated_by_staff_id' => $admin->staff_id,
+                        'updated_at' => now(),
+                    ]
+                );
+
+                $this->auditLogger->log(
+                    $admin,
+                    'setting_update',
+                    $setting,
+                    "Updated {$key} from '{$oldValue}' to '{$newValue}'"
+                );
+
+                if (in_array($key, $switches, true)) {
+                    event(new SettingSwitched($key, $newValue));
+                }
+
+                $changed[] = $key;
+            }
+        }
+
+        if (! empty($changed)) {
+            $this->clearCache();
+        }
+
+        return $changed;
+    }
+
+    /**
+     * FR96, FR97, FR98, BR58, BR49: Toggle an operational switch.
+     */
+    public function toggleSwitch(string $key, Staff $admin): bool
+    {
+        $allowed = ['qr_ordering_enabled', 'reservations_online_enabled', 'ai_enabled'];
+        if (! in_array($key, $allowed, true)) {
+            throw new \InvalidArgumentException("Invalid switch key: {$key}");
+        }
+
+        $current = $this->getBool($key, true);
+        $newBool = ! $current;
+        $newValue = $newBool ? '1' : '0';
+
+        $setting = Setting::updateOrCreate(
+            ['setting_key' => $key],
+            [
+                'setting_value' => $newValue,
+                'updated_by_staff_id' => $admin->staff_id,
+                'updated_at' => now(),
+            ]
+        );
+
+        $this->auditLogger->log(
+            $admin,
+            'setting_update',
+            $setting,
+            "Switched {$key} to '{$newValue}'"
+        );
+
+        event(new SettingSwitched($key, $newValue));
+        $this->clearCache();
+
+        return $newBool;
     }
 
     /**

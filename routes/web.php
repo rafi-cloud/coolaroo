@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\NoShowController as AdminNoShowController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SlotCapacityController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Admin\TableController;
@@ -256,6 +257,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::patch('reports/ai/toggle', [ReportController::class, 'toggleAi'])->name('reports.ai.toggle');
     Route::get('reports/{type}/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('reports/{type}', [ReportController::class, 'show'])->name('reports.show');
+
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::patch('/settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::patch('/settings/toggle/{key}', [SettingController::class, 'toggle'])->name('settings.toggle');
 });
 
 //have to delete this block when the real pages done.
