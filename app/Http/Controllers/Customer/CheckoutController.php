@@ -35,9 +35,7 @@ class CheckoutController extends Controller
         $request->session()->forget('checkout_idempotency_key');
         $this->cart->clear();
 
-        return redirect()->route('cart.index')
-            ->with('status', 'order-placed')
-            ->with('order_number', $result['order']->order_number)
+        return redirect()->route('orders.pay.show', $result['order'])
             ->with('removed_items', $result['removed']);
     }
 }

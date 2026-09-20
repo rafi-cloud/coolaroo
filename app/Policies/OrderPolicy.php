@@ -52,4 +52,11 @@ class OrderPolicy
     {
         return $order->customer_id !== null && $order->customer_id === $customer->customer_id;
     }
+
+    public function pay(Customer $customer, Order $order): bool
+    {
+        return $order->customer_id !== null
+            && $order->customer_id === $customer->customer_id
+            && $order->status === OrderStatus::PendingPayment;
+    }
 }

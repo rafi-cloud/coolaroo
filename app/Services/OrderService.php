@@ -19,7 +19,7 @@ use Illuminate\Validation\ValidationException;
  */
 class OrderService
 {
-    public function __construct(private AuditLogger $auditLogger)
+    public function __construct(private AuditLogger $auditLogger, private StripeService $stripe)
     {
     }
 
@@ -58,13 +58,19 @@ class OrderService
         });
     }
 
-    /** UC12 step 2: no live Stripe call yet — StripeService is T070. */
+    /** UC12 step 2: the real Stripe call, wired now that StripeService (T070) exists. */
     private function expirePendingStripeAttempts(Order $order): void
     {
         $order->payments()
             ->where('method', PaymentMethod::Stripe)
             ->where('status', PaymentAttemptStatus::Pending)
             ->get()
-            ->each(fn (Payment $payment) => $payment->forceFill(['status' => PaymentAttemptStatus::Expired])->save());
+            ->each(function (Payment $payment): void {
+                if ($payment->stripe_session_id !== null) {
+                    $this->stripe->expireSession($payment->stripe_session_id);
+                }
+
+                $payment->forceFill(['status' => PaymentAttemptStatus::Expired])->save();
+            });
     }
 }

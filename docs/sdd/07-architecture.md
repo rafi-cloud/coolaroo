@@ -127,6 +127,7 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 |---|---|---|---|
 | GET/POST/PATCH/DELETE | /cart, /cart/lines/{line?} | Customer\CartController | FR35, FR36 |
 | POST | /checkout | Customer\CheckoutController@store | FR37 |
+| GET | /orders/{order}/pay | Customer\PaymentController@show | FR46, FR48 |
 | POST | /orders/{order}/pay/stripe | Customer\PaymentController@stripe | FR46 |
 | POST | /orders/{order}/pay/cash | Customer\PaymentController@cash | FR48 |
 | GET | /payment/success, /payment/cancelled | Customer\PaymentController@return | FR47 |

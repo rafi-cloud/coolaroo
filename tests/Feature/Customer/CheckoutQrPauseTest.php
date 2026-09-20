@@ -47,7 +47,7 @@ class CheckoutQrPauseTest extends TestCase
 
         $this->actingAs($customer, 'customer')
             ->post('/checkout')
-            ->assertRedirect(route('cart.index'));
+            ->assertRedirect(route('orders.pay.show', Order::sole()));
 
         $this->assertSame(1, Order::count());
     }

@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Customer;
 
+use App\Enums\PaymentAttemptStatus;
 use App\Models\Customer;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\RestaurantTable;
+use App\Services\StripeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -121,5 +124,26 @@ class OrderTest extends TestCase
             ->assertForbidden();
 
         $this->assertSame('paid', $order->fresh()->status->value);
+    }
+
+    public function test_cancelling_an_order_expires_its_pending_stripe_session(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->orderFor($customer, 'pending_payment');
+        $payment = Payment::create([
+            'order_id' => $order->order_id,
+            'method' => 'stripe',
+            'amount' => 12,
+            'stripe_session_id' => 'cs_test_expire_me',
+        ]);
+
+        $this->mock(StripeService::class, function ($mock) {
+            $mock->shouldReceive('expireSession')->with('cs_test_expire_me')->once();
+        });
+
+        $this->actingAs($customer, 'customer')
+            ->post(route('orders.cancel', $order));
+
+        $this->assertSame(PaymentAttemptStatus::Expired, $payment->fresh()->status);
     }
 }

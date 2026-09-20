@@ -5,6 +5,18 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
       <span>Order cancelled.</span>
     </div>
+  @elseif (session('status') === 'order-paid')
+    <div class="auth-error auth-success" role="status" data-testid="order-paid-notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>Payment received.</span>
+    </div>
+  @endif
+
+  @if (session('error'))
+    <div class="auth-error" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>{{ session('error') }}</span>
+    </div>
   @endif
 
   <h1>Order #{{ $order->order_number }}</h1>
@@ -17,6 +29,10 @@
     <form method="POST" action="{{ route('orders.cancel', $order) }}">
       @csrf
       <button class="btn btn-outline" type="submit" data-testid="order-cancel">Cancel order</button>
+    </form>
+    <form method="POST" action="{{ route('orders.pay.check', $order) }}">
+      @csrf
+      <button class="btn btn-outline" type="submit" data-testid="order-check-payment">Check payment status</button>
     </form>
   @elseif ($order->status->value === 'cancelled')
     <p data-testid="order-cancelled">This order was cancelled.</p>
