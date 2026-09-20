@@ -49,6 +49,12 @@
     <p data-testid="cart-empty">Your cart is empty.</p>
   @endforelse
 
+  @if (! ($qrOrderingEnabled ?? true))
+    <div style="margin-bottom:1.5rem">
+      <x-site.paused-notice type="qr_ordering" />
+    </div>
+  @endif
+
   @if (count($lines) > 0)
     <p><strong>Total: @money($total)</strong></p>
     <form method="POST" action="{{ route('cart.clear') }}">
@@ -56,10 +62,16 @@
       @method('DELETE')
       <button class="btn btn-outline" type="submit" data-testid="cart-clear">Clear cart</button>
     </form>
-    <form method="POST" action="{{ route('checkout.store') }}">
-      @csrf
-      <button class="btn btn-orange" type="submit" data-testid="cart-checkout">Checkout</button>
-    </form>
+    @if ($qrOrderingEnabled ?? true)
+      <form method="POST" action="{{ route('checkout.store') }}">
+        @csrf
+        <button class="btn btn-orange" type="submit" data-testid="cart-checkout">Checkout</button>
+      </form>
+    @else
+      <div style="margin-top:1rem">
+        <button class="btn btn-orange" type="button" disabled style="opacity:0.6;cursor:not-allowed" data-testid="cart-checkout-disabled">Ordering Paused</button>
+      </div>
+    @endif
   @endif
 </div>
 </x-layouts.customer>

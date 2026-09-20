@@ -20,6 +20,7 @@ class CartController extends Controller
         return view('customer.cart', [
             'lines' => $this->cart->lines(),
             'total' => $this->cart->total(),
+            'qrOrderingEnabled' => app(\App\Services\SettingService::class)->getBool('qr_ordering_enabled', true),
         ]);
     }
 
