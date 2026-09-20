@@ -7,6 +7,7 @@ use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Staff\AdjustEtaRequest;
+use App\Models\MenuItem;
 use App\Models\Order;
 use App\Services\EtaService;
 use App\Services\KitchenService;
@@ -50,6 +51,7 @@ class StationController extends Controller
             'orders' => $this->queue($request, $destination),
             'status' => $request->query('status'),
             'window' => $request->query('window'),
+            'availabilityItems' => $this->availabilityItems($destination),
         ]);
     }
 
@@ -110,6 +112,16 @@ class StationController extends Controller
         $this->eta->adjust($order, $destination, (int) $request->validated('minutes'), $request->user('staff'));
 
         return back()->with('status', 'eta-adjusted');
+    }
+
+    /** FR29, S31: this station's active items with their add-on options, for the drawer. */
+    private function availabilityItems(Destination $destination): Collection
+    {
+        return MenuItem::where('destination', $destination)
+            ->where('is_active', true)
+            ->with('addOnGroups.options')
+            ->orderBy('item_name')
+            ->get();
     }
 
     /** FR56: oldest first, this station's active lines only. */

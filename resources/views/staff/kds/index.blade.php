@@ -11,7 +11,7 @@
   @if (session('status'))
     <div class="auth-error auth-success" role="status">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
-      <span>{{ match(session('status')) { 'lines-started' => 'Started.', 'lines-ready' => 'Marked ready.', 'eta-adjusted' => 'ETA updated.', default => '' } }}</span>
+      <span>{{ match(session('status')) { 'lines-started' => 'Started.', 'lines-ready' => 'Marked ready.', 'eta-adjusted' => 'ETA updated.', 'availability-toggled' => 'Availability updated.', default => '' } }}</span>
     </div>
   @endif
 
@@ -48,6 +48,8 @@
       >Switch to {{ $destination === \App\Enums\Destination::Kitchen ? 'bar' : 'kitchen' }}</a>
     @endif
   </form>
+
+  <x-kds.availability :destination="$destination" :items="$availabilityItems" />
 
   <div class="kds-grid">
     @forelse ($orders as $order)

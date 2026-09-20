@@ -18,6 +18,7 @@ class MenuItemFactory extends Factory
             'item_name' => fake()->unique()->words(2, true),
             'destination' => Destination::Kitchen,
             'is_active' => true,
+            'is_available' => true,
         ];
     }
 

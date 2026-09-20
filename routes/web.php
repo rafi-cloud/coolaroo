@@ -29,6 +29,7 @@ use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
+use App\Http\Controllers\Staff\Kds\AvailabilityController;
 use App\Http\Controllers\Staff\Kds\StationController;
 use App\Http\Controllers\Staff\OrderController as StaffOrderActionsController;
 use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
@@ -130,6 +131,8 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:kitchen
     Route::post('/kds/orders/{order}/{destination}/start', [StationController::class, 'start'])->name('staff.kds.start');
     Route::post('/kds/orders/{order}/{destination}/ready', [StationController::class, 'ready'])->name('staff.kds.ready');
     Route::patch('/kds/orders/{order}/{destination}/eta', [StationController::class, 'adjustEta'])->name('staff.kds.eta');
+    Route::patch('/menu-items/{menuItem}/availability', [AvailabilityController::class, 'toggleMenuItem'])->name('staff.menu-items.availability');
+    Route::patch('/add-on-options/{option}/availability', [AvailabilityController::class, 'toggleAddOnOption'])->name('staff.add-on-options.availability');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {

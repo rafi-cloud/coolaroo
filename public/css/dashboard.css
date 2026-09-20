@@ -926,3 +926,15 @@ input{font:inherit}
 
 .kds-eta-form{display:inline-flex}
 .kds-eta-form .btn{min-width:44px;min-height:44px;padding:0 .6rem}
+
+/* ---------- availability drawer (S31) ---------- */
+.kds-drawer{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:.9rem 1.1rem;margin-bottom:1.1rem;
+}
+.kds-drawer summary{cursor:pointer;font-weight:600;color:var(--ink);min-height:44px;display:flex;align-items:center}
+.kds-availability-list{list-style:none;margin:.7rem 0 0;padding:0;display:flex;flex-direction:column;gap:.5rem}
+.kds-availability-list li{display:flex;justify-content:space-between;align-items:center;gap:.8rem}
+.kds-availability-suboption{padding-left:1.2rem;font-size:.86rem;color:var(--body)}
+.kds-availability-list .btn{min-height:36px;padding:0 .8rem;font-size:.8rem}

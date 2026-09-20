@@ -83,6 +83,7 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | AvailabilityService | Slots, capacity, closed weekdays, lead time, max days, online switch | BR32–BR35, BR58 |
 | TrustService | Badge on read | BR40 |
 | WaiterCallService | Call waiter cooldown and floor alert | BR50 |
+| MenuAvailabilityService | Station-scoped sold-out toggle for items and add-on options | FR29, BR14 |
 | AiMenuService | Build context, call GitHub Models, validate IDs, totals, busy handling | BR46–BR49 |
 | SpecialsService | Active sale detection, Specials list, homepage top Special | BR59 |
 | ReportService | Dashboard widgets and reports, exports | FR81–FR88 |
