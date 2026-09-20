@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Policies;
 
+use App\Enums\OrderStatus;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Role;
@@ -37,17 +38,19 @@ class OrderPolicyTest extends TestCase
         }
     }
 
-    public function test_customer_can_cancel_their_own_order_only(): void
+    public function test_customer_can_cancel_their_own_pending_payment_order_only(): void
     {
         $policy = new OrderPolicy();
         $customer = (new Customer())->forceFill(['customer_id' => 7]);
-        $ownOrder = (new Order())->forceFill(['order_id' => 1, 'customer_id' => 7]);
-        $othersOrder = (new Order())->forceFill(['order_id' => 2, 'customer_id' => 9]);
-        $guestOrder = (new Order())->forceFill(['order_id' => 3, 'customer_id' => null]);
+        $ownOrder = (new Order())->forceFill(['order_id' => 1, 'customer_id' => 7, 'status' => OrderStatus::PendingPayment]);
+        $othersOrder = (new Order())->forceFill(['order_id' => 2, 'customer_id' => 9, 'status' => OrderStatus::PendingPayment]);
+        $guestOrder = (new Order())->forceFill(['order_id' => 3, 'customer_id' => null, 'status' => OrderStatus::PendingPayment]);
+        $ownPaidOrder = (new Order())->forceFill(['order_id' => 4, 'customer_id' => 7, 'status' => OrderStatus::Paid]);
 
         $this->assertTrue($policy->cancel($customer, $ownOrder));
         $this->assertFalse($policy->cancel($customer, $othersOrder));
         $this->assertFalse($policy->cancel($customer, $guestOrder));
+        $this->assertFalse($policy->cancel($customer, $ownPaidOrder), 'BR29: paid orders need staff, not the customer cancel path');
     }
 
     public function test_waitstaff_can_cancel_any_order_kitchen_cannot(): void

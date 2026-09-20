@@ -4,19 +4,25 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\OrderService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 /**
- * FR38, UC11, BR30. show() renders the timeline; state() is the JSON
- * endpoint the page polls to stay live (NFR09) until T110-T112 wire a
- * real broadcast channel for order.{id}.
+ * FR38, FR41, UC11, UC12, BR30. show()/state() render and poll the
+ * timeline (T062); cancel() is BR29's customer cancel (T063).
  */
 class OrderController extends Controller
 {
     private const TIMELINE_STEPS = ['paid', 'preparing', 'ready', 'served'];
+
+    public function __construct(private OrderService $orders)
+    {
+    }
 
     public function show(Order $order): View
     {
@@ -40,6 +46,15 @@ class OrderController extends Controller
             'status' => $order->status->value,
             'payment_status' => $order->payment_status->value,
         ]);
+    }
+
+    public function cancel(Request $request, Order $order): RedirectResponse
+    {
+        Gate::authorize('cancel', $order);
+
+        $this->orders->cancelUnpaid($order, $request->user('customer'));
+
+        return redirect()->route('orders.show', $order)->with('status', 'order-cancelled');
     }
 
     /** @return array<int, array{step:string, done:bool, current:bool, at:?Carbon}> */

@@ -68,6 +68,7 @@ Route::middleware('auth:customer')->group(function () {
 
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/state', [OrderController::class, 'state'])->name('orders.state');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     Route::middleware(['table.context', 'qr.ordering.enabled'])->group(function () {
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

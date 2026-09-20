@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\OrderStatus;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Staff;
@@ -42,7 +43,9 @@ class OrderPolicy
             return $user->role->role_name === 'waitstaff';
         }
 
-        return $order->customer_id !== null && $order->customer_id === $user->customer_id;
+        return $order->customer_id !== null
+            && $order->customer_id === $user->customer_id
+            && $order->status === OrderStatus::PendingPayment;
     }
 
     public function view(Customer $customer, Order $order): bool

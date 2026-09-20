@@ -1,5 +1,12 @@
 <x-layouts.customer title="Order #{{ $order->order_number }}">
 <div class="panel" data-order-page data-state-url="{{ route('orders.state', $order) }}" data-status="{{ $order->status->value }}" data-testid="order-status-page">
+  @if (session('status') === 'order-cancelled')
+    <div class="auth-error auth-success" role="status" data-testid="order-cancelled-notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>Order cancelled.</span>
+    </div>
+  @endif
+
   <h1>Order #{{ $order->order_number }}</h1>
   <p>Placed @auDateTime($order->placed_at)</p>
 
@@ -7,8 +14,14 @@
 
   @if ($order->status->value === 'pending_payment')
     <p data-testid="order-waiting-payment">Waiting for payment to be confirmed.</p>
+    <form method="POST" action="{{ route('orders.cancel', $order) }}">
+      @csrf
+      <button class="btn btn-outline" type="submit" data-testid="order-cancel">Cancel order</button>
+    </form>
   @elseif ($order->status->value === 'cancelled')
     <p data-testid="order-cancelled">This order was cancelled.</p>
+  @elseif (in_array($order->status->value, ['paid', 'preparing', 'ready'], true))
+    <p data-testid="order-cancel-unavailable">This order has been paid — ask a staff member if you need to cancel it.</p>
   @endif
 
   <ol class="order-timeline" data-testid="order-timeline">

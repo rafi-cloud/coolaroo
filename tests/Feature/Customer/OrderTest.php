@@ -15,7 +15,7 @@ class OrderTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function orderFor(Customer $customer): Order
+    private function orderFor(Customer $customer, string $status = 'paid'): Order
     {
         $item = MenuItem::factory()->create(['category_id' => MenuCategory::factory()]);
         $size = $item->sizes()->create(['size_name' => 'Regular', 'price' => 12]);
@@ -23,13 +23,19 @@ class OrderTest extends TestCase
         $order = Order::create([
             'table_id' => RestaurantTable::factory()->create()->table_id,
             'customer_id' => $customer->customer_id,
-            'order_number' => '20260920-001',
+            'order_number' => '20260920-'.random_int(100, 999),
             'idempotency_key' => (string) Str::uuid(),
             'total_amount' => 12,
             'gst_amount' => 1.09,
         ]);
-        $order->forceFill(['status' => 'paid', 'payment_status' => 'paid'])->save();
-        $order->update(['paid_at' => now()]);
+        $order->forceFill([
+            'status' => $status,
+            'payment_status' => $status === 'pending_payment' ? 'unpaid' : 'paid',
+        ])->save();
+
+        if ($status !== 'pending_payment') {
+            $order->update(['paid_at' => now()]);
+        }
 
         $order->items()->create([
             'line_no' => 1,
@@ -79,5 +85,41 @@ class OrderTest extends TestCase
             ->getJson(route('orders.state', $order))
             ->assertOk()
             ->assertJson(['status' => 'paid', 'payment_status' => 'paid']);
+    }
+
+    public function test_a_customer_can_cancel_their_own_pending_payment_order(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->orderFor($customer, 'pending_payment');
+
+        $this->actingAs($customer, 'customer')
+            ->post(route('orders.cancel', $order))
+            ->assertRedirect(route('orders.show', $order));
+
+        $this->assertSame('cancelled', $order->fresh()->status->value);
+        $this->assertNotNull($order->fresh()->cancelled_at);
+    }
+
+    public function test_a_customer_cannot_cancel_someone_elses_order(): void
+    {
+        $owner = Customer::factory()->create();
+        $order = $this->orderFor($owner, 'pending_payment');
+        $other = Customer::factory()->create();
+
+        $this->actingAs($other, 'customer')
+            ->post(route('orders.cancel', $order))
+            ->assertForbidden();
+    }
+
+    public function test_a_customer_cannot_cancel_an_already_paid_order(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->orderFor($customer, 'paid');
+
+        $this->actingAs($customer, 'customer')
+            ->post(route('orders.cancel', $order))
+            ->assertForbidden();
+
+        $this->assertSame('paid', $order->fresh()->status->value);
     }
 }
