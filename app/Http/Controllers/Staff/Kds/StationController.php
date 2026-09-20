@@ -7,18 +7,26 @@ use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\KitchenService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 /**
- * FR56, FR57, S30, UC28. Read-only: FR58's Start/Ready actions are T081,
- * added to this same controller.
+ * FR56, FR57 (queue and filters, T080) and FR58 (Start/Ready, T081).
+ * S30, UC28. The order status behind the two actions is derived by
+ * KitchenService, never set here (BR28).
  */
 class StationController extends Controller
 {
+    public function __construct(private KitchenService $kitchen)
+    {
+    }
+
     private const ACTIVE_ORDER_STATUSES = [
         OrderStatus::Paid,
         OrderStatus::Preparing,
@@ -68,6 +76,26 @@ class StationController extends Controller
                 ])->values(),
             ])->values(),
         ]);
+    }
+
+    /** FR58. No Form Request: the order and the station both come from the URL. */
+    public function start(Request $request, Order $order, Destination $destination): RedirectResponse
+    {
+        Gate::authorize('updateStation', [Order::class, $destination]);
+
+        $this->kitchen->start($order, $destination, $request->user('staff'));
+
+        return back()->with('status', 'lines-started');
+    }
+
+    /** FR58. */
+    public function ready(Request $request, Order $order, Destination $destination): RedirectResponse
+    {
+        Gate::authorize('updateStation', [Order::class, $destination]);
+
+        $this->kitchen->ready($order, $destination, $request->user('staff'));
+
+        return back()->with('status', 'lines-ready');
     }
 
     /** FR56: oldest first, this station's active lines only. */

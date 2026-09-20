@@ -920,3 +920,6 @@ input{font:inherit}
   .kds-grid{grid-template-columns:1fr}
   .kds-filters select,.kds-filters .btn{min-height:44px}
 }
+
+.kds-actions{display:flex;gap:.5rem;margin-top:.9rem}
+.kds-actions .btn{min-height:44px;flex:1}

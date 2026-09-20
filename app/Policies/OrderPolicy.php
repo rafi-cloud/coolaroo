@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Destination;
 use App\Enums\OrderStatus;
 use App\Models\Customer;
 use App\Models\Order;
@@ -30,6 +31,12 @@ class OrderPolicy
     public function requestRefund(Staff $staff): bool
     {
         return in_array($staff->role->role_name, ['waitstaff', 'kitchen', 'bar'], true);
+    }
+
+    /** FR58: a station may only move its own lines. Admin passes via Gate::before. */
+    public function updateStation(Staff $staff, Destination $destination): bool
+    {
+        return $staff->role->role_name === $destination->value;
     }
 
     public function resolveStockConflict(Staff $staff): bool

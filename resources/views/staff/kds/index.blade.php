@@ -8,6 +8,20 @@
   data-destination="{{ $destination->value }}"
   data-state-url="{{ route('staff.kds.state', ['destination' => $destination->value] + request()->query()) }}"
 >
+  @if (session('status'))
+    <div class="auth-error auth-success" role="status">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>{{ session('status') === 'lines-started' ? 'Started.' : 'Marked ready.' }}</span>
+    </div>
+  @endif
+
+  @if ($errors->any())
+    <div class="auth-error" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>{{ $errors->first() }}</span>
+    </div>
+  @endif
+
   <form class="kds-filters" method="GET" action="{{ route('staff.kds.index', $destination->value) }}">
     <label for="kds-status">Line status</label>
     <select id="kds-status" name="status" data-testid="kds-filter-status">
@@ -80,6 +94,23 @@
             </li>
           @endforeach
         </ul>
+
+        @php($lineStatuses = $order->items->pluck('status')->map->value)
+        <footer class="kds-actions">
+          @if ($lineStatuses->contains('pending'))
+            <form method="POST" action="{{ route('staff.kds.start', [$order, $destination->value]) }}">
+              @csrf
+              <button type="submit" class="btn btn-solid" data-testid="kds-start-{{ $order->order_id }}">Start</button>
+            </form>
+          @endif
+
+          @if ($lineStatuses->contains('preparing'))
+            <form method="POST" action="{{ route('staff.kds.ready', [$order, $destination->value]) }}">
+              @csrf
+              <button type="submit" class="btn btn-solid" data-testid="kds-ready-{{ $order->order_id }}">Ready</button>
+            </form>
+          @endif
+        </footer>
       </article>
     @empty
       <p data-testid="kds-empty">Nothing waiting at this station.</p>

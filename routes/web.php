@@ -127,6 +127,8 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:kitchen
 
     Route::get('/kds/{destination}', [StationController::class, 'index'])->name('staff.kds.index');
     Route::get('/kds/{destination}/state', [StationController::class, 'state'])->name('staff.kds.state');
+    Route::post('/kds/orders/{order}/{destination}/start', [StationController::class, 'start'])->name('staff.kds.start');
+    Route::post('/kds/orders/{order}/{destination}/ready', [StationController::class, 'ready'])->name('staff.kds.ready');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {
