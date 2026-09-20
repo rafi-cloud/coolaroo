@@ -1,5 +1,5 @@
 <x-layouts.admin title="Staff accounts" page-title="Staff accounts">
-<div class="panel">
+<div class="card">
   @if (session('status'))
     <div class="auth-error auth-success" role="status">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
