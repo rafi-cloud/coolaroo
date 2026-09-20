@@ -2,7 +2,7 @@
 <main class="auth">
   <div class="auth-card">
     <div class="auth-head">
-      <img src="{{ asset('images/logo.svg') }}" alt="">
+      <img src="{{ asset('images/logo.svg') }}" alt="Coolaroo Restaurant Logo">
       <h1>Reset your password</h1>
       <p>Enter your account email and we'll send you a link to choose a new one.</p>
     </div>

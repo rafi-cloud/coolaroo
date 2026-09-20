@@ -2,7 +2,7 @@
 <main class="auth">
   <div class="auth-card">
     <div class="auth-head">
-      <img src="{{ asset('images/logo.svg') }}" alt="">
+      <img src="{{ asset('images/logo.svg') }}" alt="Coolaroo Restaurant Logo">
       <h1>Welcome back</h1>
       <p>Log in to view your bookings and past orders</p>
     </div>
@@ -42,7 +42,7 @@
       </div>
 
       <div class="auth-row">
-        <label><input type="checkbox" name="remember" data-testid="login-remember"> Remember me</label>
+        <label for="remember"><input type="checkbox" id="remember" name="remember" data-testid="login-remember"> Remember me</label>
         <a href="{{ route('password.request') }}" data-testid="login-forgot-link">Forgot password?</a>
       </div>
 

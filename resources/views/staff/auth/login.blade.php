@@ -2,7 +2,7 @@
 <main class="auth">
   <div class="auth-card">
     <div class="auth-head">
-      <img src="{{ asset('images/logo.svg') }}" alt="">
+      <img src="{{ asset('images/logo.svg') }}" alt="Coolaroo Restaurant Logo">
       <h1>Staff sign in</h1>
       <p>Sign in with your Coolaroo staff account</p>
     </div>

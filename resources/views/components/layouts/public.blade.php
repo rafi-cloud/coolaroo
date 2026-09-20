@@ -3,6 +3,7 @@
     'description' => null,
 ])
 <x-document css="style.css" suffix="Coolaroo Restaurant & Bistro" :title="$title" :description="$description">
+<a class="skip-link" href="#top" data-testid="site-skip-link">Skip to main content</a>
 <x-site.header />
 
 <main id="top">

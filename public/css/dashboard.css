@@ -51,7 +51,7 @@ img,svg{display:block;max-width:100%}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 input{font:inherit}
 
-:focus-visible{outline:2.5px solid var(--orange);outline-offset:2px;border-radius:4px}
+:focus-visible{outline:2.5px solid var(--orange-dark);outline-offset:2px;border-radius:4px}
 
 /* screen reader only text, used on the icon buttons */
 .sr-only{
@@ -544,7 +544,7 @@ input{font:inherit}
   font-family:var(--serif);font-style:italic;font-size:.88rem;
 }
 
-.muted{color:var(--cancelled)}
+.muted{color:#635043}
 .btn-lg{padding:.55rem 1.1rem;font-size:.82rem}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
@@ -1175,6 +1175,28 @@ input{font:inherit}
   font-family:inherit;font-size:.82rem;color:var(--ink);background:var(--cream);
 }
 .preset-links{display:flex;gap:.35rem;align-items:center}
+
+/* Accessibility: 44px minimum touch targets on mobile (NFR11, SDD 8.7) */
+@media (max-width:900px){
+  .btn,
+  .nav-item,
+  .burger,
+  .tab-btn,
+  .kds-btn{
+    min-height:44px;min-width:44px;
+    display:inline-flex;align-items:center;
+  }
+}
+
+/* Reduced-motion support (NFR11, SDD 8.7) */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
 
 
 

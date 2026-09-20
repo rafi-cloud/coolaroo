@@ -5,7 +5,7 @@
       <span class="logo-text"><strong>COOLAROO</strong><span>RESTAURANT &amp; BISTRO</span></span>
     </a>
 
-    <input class="nav-toggle" id="nav-toggle" type="checkbox" data-testid="site-nav-toggle">
+    <input class="nav-toggle" id="nav-toggle" type="checkbox" aria-label="Toggle navigation menu" data-testid="site-nav-toggle">
     <label class="hamburger" for="nav-toggle">
       <span class="visually-hidden">Open menu</span>
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>

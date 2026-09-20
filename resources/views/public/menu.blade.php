@@ -31,7 +31,8 @@
         <div class="filter-grid">
           <div class="filter-col">
             <h4>Search</h4>
-            <input type="text" name="q" value="{{ $search }}" placeholder="Search dishes..." data-testid="menu-search-input">
+            <label for="menu-search-input" class="visually-hidden">Search dishes</label>
+            <input type="text" id="menu-search-input" name="q" value="{{ $search }}" placeholder="Search dishes..." data-testid="menu-search-input">
           </div>
           <div class="filter-col">
             <h4>Dietary Requirements</h4>

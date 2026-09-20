@@ -33,8 +33,8 @@
       <form method="POST" action="{{ route('cart.lines.update', $line['line_id']) }}">
         @csrf
         @method('PATCH')
-        <input type="number" name="quantity" min="1" value="{{ $line['quantity'] }}" data-testid="cart-quantity-{{ $line['line_id'] }}">
-        <input type="text" name="special_request" maxlength="200" value="{{ $line['special_request'] }}" placeholder="Special request" data-testid="cart-special-request-{{ $line['line_id'] }}">
+        <input type="number" name="quantity" min="1" value="{{ $line['quantity'] }}" aria-label="Quantity for {{ $line['item']->item_name }}" data-testid="cart-quantity-{{ $line['line_id'] }}">
+        <input type="text" name="special_request" maxlength="200" value="{{ $line['special_request'] }}" placeholder="Special request" aria-label="Special request for {{ $line['item']->item_name }}" data-testid="cart-special-request-{{ $line['line_id'] }}">
         <button class="btn btn-orange" type="submit" data-testid="cart-update-{{ $line['line_id'] }}">Update</button>
       </form>
       <form method="POST" action="{{ route('cart.lines.destroy', $line['line_id']) }}">

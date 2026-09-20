@@ -20,12 +20,12 @@
 @if ($bare)
 {{ $slot }}
 @else
-<input class="nav-state" type="checkbox" id="nav-open" data-testid="staff-nav-toggle">
+<input class="nav-state" type="checkbox" id="nav-open" aria-label="Toggle navigation menu" data-testid="staff-nav-toggle">
 <label class="scrim" for="nav-open" aria-hidden="true"></label>
 
 <aside class="sidebar">
   <a class="brand" href="{{ $staffHome }}" data-testid="staff-home">
-    <img src="{{ asset('images/logo.svg') }}" alt="">
+    <img src="{{ asset('images/logo.svg') }}" alt="Coolaroo Restaurant Logo">
     <span class="brand-text"><strong>COOLAROO</strong><span>STAFF</span></span>
   </a>
   <x-dashboard.nav-staff />
