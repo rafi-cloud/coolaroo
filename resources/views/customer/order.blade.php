@@ -59,5 +59,7 @@
   @endforeach
 
   <p><strong>Total: @money($order->total_amount)</strong></p>
+
+  <p><a href="{{ route('orders.receipt', $order) }}" target="_blank" data-testid="order-receipt-link">Download receipt (PDF)</a></p>
 </div>
 </x-layouts.customer>

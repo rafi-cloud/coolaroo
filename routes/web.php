@@ -14,6 +14,7 @@ use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Customer\OrderController;
+use App\Http\Controllers\Customer\ReceiptController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Customer\Auth\NewPasswordController;
@@ -69,6 +70,7 @@ Route::middleware('auth:customer')->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/state', [OrderController::class, 'state'])->name('orders.state');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('/orders/{order}/receipt', [ReceiptController::class, 'show'])->name('orders.receipt');
 
     Route::middleware(['table.context', 'qr.ordering.enabled'])->group(function () {
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
