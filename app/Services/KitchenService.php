@@ -46,6 +46,12 @@ class KitchenService
         return $this->advanceLines($order, $destination, $actor, OrderItemStatus::Preparing, OrderItemStatus::Ready);
     }
 
+    /** FR60. Waitstaff only — no per-station restriction, unlike Start/Ready. */
+    public function serve(Order $order, Destination $destination, Staff $actor): Order
+    {
+        return $this->advanceLines($order, $destination, $actor, OrderItemStatus::Ready, OrderItemStatus::Served);
+    }
+
     private function advanceLines(
         Order $order,
         Destination $destination,

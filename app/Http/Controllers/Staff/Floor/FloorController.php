@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Staff\Floor;
 
+use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentAttemptStatus;
 use App\Enums\PaymentMethod;
@@ -53,6 +54,7 @@ class FloorController extends Controller
                 'order_number' => $order->order_number,
                 'table_number' => $order->restaurantTable?->table_number,
                 'ready_at' => $order->ready_at?->toIso8601String(),
+                'destinations' => $order->items->pluck('destination')->unique()->map(fn ($d) => $d->value)->values(),
             ])->values(),
             'cash_waiting' => $this->cashWaiting()->map(fn (Payment $payment) => [
                 'payment_id' => $payment->payment_id,
@@ -100,7 +102,10 @@ class FloorController extends Controller
     private function readyToServe(): Collection
     {
         return Order::where('status', OrderStatus::Ready)
-            ->with('restaurantTable')
+            ->with([
+                'restaurantTable',
+                'items' => fn ($query) => $query->where('status', OrderItemStatus::Ready),
+            ])
             ->orderBy('ready_at')
             ->get();
     }

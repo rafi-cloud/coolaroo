@@ -4,7 +4,7 @@
   @if (session('status'))
     <div class="auth-error auth-success" role="status">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
-      <span>{{ match(session('status')) { 'table-seated' => 'Table seated.', 'table-cleared' => 'Table cleared.', default => '' } }}</span>
+      <span>{{ match(session('status')) { 'table-seated' => 'Table seated.', 'table-cleared' => 'Table cleared.', 'order-served' => 'Marked served.', default => '' } }}</span>
     </div>
   @endif
 
@@ -59,7 +59,15 @@
     <h2>Ready to serve</h2>
     <ul data-ready-to-serve-list data-testid="floor-ready-list">
       @forelse ($readyToServe as $order)
-        <li data-order-row="{{ $order->order_id }}">#{{ $order->order_number }} &mdash; table {{ $order->restaurantTable?->table_number }}</li>
+        <li data-order-row="{{ $order->order_id }}">
+          #{{ $order->order_number }} &mdash; table {{ $order->restaurantTable?->table_number }}
+          @foreach ($order->items->pluck('destination')->unique() as $destination)
+            <form method="POST" action="{{ route('staff.orders.serve', [$order, $destination->value]) }}" style="display:inline">
+              @csrf
+              <button type="submit" class="btn btn-ghost" data-testid="floor-serve-{{ $order->order_id }}-{{ $destination->value }}">Serve {{ ucfirst($destination->value) }}</button>
+            </form>
+          @endforeach
+        </li>
       @empty
         <li data-testid="floor-ready-empty">Nothing ready.</li>
       @endforelse
@@ -116,8 +124,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const readyList = page.querySelector('[data-ready-to-serve-list]');
     if (readyList) {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
       readyList.innerHTML = state.ready_to_serve.length
-        ? state.ready_to_serve.map((order) => `<li data-order-row="${order.order_id}">#${order.order_number} &mdash; table ${order.table_number ?? '&mdash;'}</li>`).join('')
+        ? state.ready_to_serve.map((order) => {
+            const buttons = order.destinations.map((destination) => `
+              <form method="POST" action="/staff/orders/${order.order_id}/serve/${destination}" style="display:inline">
+                <input type="hidden" name="_token" value="${csrfToken}">
+                <button type="submit" class="btn btn-ghost">Serve ${destination}</button>
+              </form>
+            `).join('');
+            return `<li data-order-row="${order.order_id}">#${order.order_number} &mdash; table ${order.table_number ?? '&mdash;'} ${buttons}</li>`;
+          }).join('')
         : '<li>Nothing ready.</li>';
     }
 

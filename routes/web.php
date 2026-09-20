@@ -29,6 +29,7 @@ use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\Floor\FloorController;
+use App\Http\Controllers\Staff\Floor\ServeController;
 use App\Http\Controllers\Staff\Floor\TableController as StaffTableController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
 use App\Http\Controllers\Staff\Kds\AvailabilityController;
@@ -125,6 +126,7 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
     Route::post('/tables/clear', [StaffTableController::class, 'clear'])->name('staff.tables.clear');
     Route::get('/tables/{table}/order', [StaffOrderController::class, 'index'])->name('staff.tables.order');
     Route::post('/tables/{table}/order', [StaffOrderController::class, 'store'])->name('staff.tables.order.store');
+    Route::post('/orders/{order}/serve/{destination}', [ServeController::class, 'store'])->name('staff.orders.serve');
     Route::post('/orders/{order}/cash', [CashPaymentController::class, 'store'])->name('staff.orders.cash.store');
     Route::get('/orders/{order}/stripe-qr', [StaffOrderController::class, 'stripeQr'])->name('staff.orders.stripe-qr');
     Route::post('/orders/{order}/payment-check', [StaffOrderController::class, 'check'])->name('staff.orders.payment-check');

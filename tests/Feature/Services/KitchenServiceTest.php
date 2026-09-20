@@ -112,6 +112,32 @@ class KitchenServiceTest extends TestCase
         );
     }
 
+    /** FR60, BR28: the order climbs to served once every station's ready lines are served. */
+    public function test_serving_the_last_stations_lines_completes_the_order(): void
+    {
+        $order = $this->orderWithLines([[Destination::Kitchen, 'ready']]);
+
+        app(KitchenService::class)->serve($order, Destination::Kitchen, $this->staffWithRole('waitstaff'));
+
+        $order->refresh();
+        $this->assertSame(OrderStatus::Served, $order->status);
+        $this->assertSame('served', $order->items->first()->status->value);
+        $this->assertNotNull($order->served_at);
+    }
+
+    /** A two-station order isn't served until both are delivered. */
+    public function test_serving_one_station_does_not_complete_a_two_station_order(): void
+    {
+        $order = $this->orderWithLines([
+            [Destination::Kitchen, 'ready'],
+            [Destination::Bar, 'ready'],
+        ]);
+
+        app(KitchenService::class)->serve($order, Destination::Kitchen, $this->staffWithRole('waitstaff'));
+
+        $this->assertSame(OrderStatus::Ready, $order->fresh()->status);
+    }
+
     public function test_starting_a_station_with_no_pending_lines_is_rejected(): void
     {
         $order = $this->orderWithLines([[Destination::Kitchen, 'ready']]);
