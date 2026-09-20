@@ -7,3 +7,6 @@
  */
 
 import './echo';
+import { initOrderStatus } from './order-status';
+
+document.addEventListener('DOMContentLoaded', initOrderStatus);

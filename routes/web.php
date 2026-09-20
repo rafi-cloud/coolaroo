@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Customer\Auth\AuthenticatedCustomerController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
+use App\Http\Controllers\Customer\OrderController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Customer\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Customer\Auth\NewPasswordController;
@@ -64,6 +65,9 @@ Route::middleware('auth:customer')->group(function () {
 
     Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/state', [OrderController::class, 'state'])->name('orders.state');
 
     Route::middleware(['table.context', 'qr.ordering.enabled'])->group(function () {
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

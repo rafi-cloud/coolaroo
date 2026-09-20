@@ -44,4 +44,9 @@ class OrderPolicy
 
         return $order->customer_id !== null && $order->customer_id === $user->customer_id;
     }
+
+    public function view(Customer $customer, Order $order): bool
+    {
+        return $order->customer_id !== null && $order->customer_id === $customer->customer_id;
+    }
 }
