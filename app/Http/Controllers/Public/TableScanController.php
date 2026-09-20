@@ -29,6 +29,8 @@ class TableScanController extends Controller
     {
         abort_unless(hash_equals($table->qr_token, $token), 403);
 
+        $request->session()->put('qr.table_id', $table->table_id);
+
         if (! $table->is_active) {
             return view('public.table-unavailable', ['table' => $table]);
         }
@@ -37,7 +39,6 @@ class TableScanController extends Controller
 
         if ($customer === null) {
             $request->session()->put('url.intended', $request->fullUrl());
-            $request->session()->put('qr.table_id', $table->table_id);
 
             return redirect()->route('customer.login');
         }

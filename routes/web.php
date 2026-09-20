@@ -25,6 +25,7 @@ use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Public\TableScanController;
+use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
@@ -42,6 +43,9 @@ Route::get('/t/{table}/{token}', [TableScanController::class, 'show'])
 Route::post('/t/{table}/switch', [TableScanController::class, 'switchTable'])
     ->middleware('auth:customer')
     ->name('table.scan.switch');
+
+Route::post('/t/{table}/call-waiter', [WaiterCallController::class, 'store'])
+    ->name('table.call-waiter');
 
 Route::middleware('guest:customer')->group(function () {
     Route::get('/register', [RegisteredCustomerController::class, 'create'])->name('register');
