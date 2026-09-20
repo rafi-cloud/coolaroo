@@ -21,6 +21,8 @@ use App\Models\Staff;
 use App\Models\Visit;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * FR55, 07.7, BR01, BR10, BR25, BR30, BR54. Shared by Stripe (T070) and cash
@@ -50,6 +52,54 @@ class PaymentService
         }
 
         return false;
+    }
+
+    /**
+     * BR25, FR47, 07.10. The reconcile job's half of "no webhooks": every
+     * pending Stripe attempt is re-read from Stripe, so a customer who paid
+     * and then closed the tab still reaches the kitchen. An attempt Stripe
+     * has expired is closed off locally — the order itself stays
+     * pending_payment until the closing-time cleanup (BR26).
+     *
+     * @return array{checked:int, paid:int, expired:int, failed:int}
+     */
+    public function reconcilePendingStripePayments(): array
+    {
+        $attempts = Payment::query()
+            ->where('method', PaymentMethod::Stripe)
+            ->where('status', PaymentAttemptStatus::Pending)
+            ->whereNotNull('stripe_session_id')
+            ->get();
+
+        $result = ['checked' => $attempts->count(), 'paid' => 0, 'expired' => 0, 'failed' => 0];
+
+        foreach ($attempts as $payment) {
+            try {
+                $session = $this->stripe->retrieveSession($payment->stripe_session_id);
+
+                if ($session->payment_status === 'paid') {
+                    $this->markPaid($payment);
+                    $result['paid']++;
+
+                    continue;
+                }
+
+                if ($session->status === 'expired') {
+                    $payment->forceFill(['status' => PaymentAttemptStatus::Expired])->save();
+                    $result['expired']++;
+                }
+            } catch (Throwable $e) {
+                $result['failed']++;
+
+                Log::channel('integrations')->error('Stripe reconcile failed for payment attempt.', [
+                    'payment_id' => $payment->payment_id,
+                    'stripe_session_id' => $payment->stripe_session_id,
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     public function markPaid(Payment $payment, Staff|Customer|null $actor = null): Order

@@ -22,6 +22,7 @@ use App\Mail\ReservationReminderMail;
 use App\Models\Visit;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -1025,6 +1026,171 @@ class ReservationService
         $this->queueMail($reservation, new ReservationReminderMail($reservation));
 
         $reservation->forceFill(['reminder_sent_at' => now()])->save();
+
+        return true;
+    }
+
+    /**
+     * BR37, FR71, 07.10: Expire every request still unreviewed inside the
+     * expiry window before its booking time. Past-dated requests go too —
+     * nobody is reviewing yesterday's.
+     */
+    public function expireStaleRequests(): int
+    {
+        $minutes = (int) (Setting::find('reservation_request_expiry_minutes')?->setting_value ?? 60);
+        $cutoff = now()->addMinutes($minutes);
+
+        $expired = 0;
+
+        $requests = Reservation::where('status', ReservationStatus::Requested)
+            ->whereDate('booking_date', '<=', $cutoff->toDateString())
+            ->get();
+
+        foreach ($requests as $reservation) {
+            if ($this->bookedAt($reservation)->lte($cutoff)) {
+                $this->expire($reservation);
+                $expired++;
+            }
+        }
+
+        return $expired;
+    }
+
+    /**
+     * FR75, 07.10: Queue the reminder for every confirmed booking now inside
+     * the reminder window. `sendReminder()` owns the once-only rule.
+     */
+    public function sendDueReminders(): int
+    {
+        $hours = (int) (Setting::find('reservation_reminder_hours')?->setting_value ?? 24);
+        $cutoff = now()->addHours($hours);
+
+        $sent = 0;
+
+        $upcoming = Reservation::where('status', ReservationStatus::Confirmed)
+            ->whereNull('reminder_sent_at')
+            ->whereDate('booking_date', '>=', now()->toDateString())
+            ->whereDate('booking_date', '<=', $cutoff->toDateString())
+            ->get();
+
+        foreach ($upcoming as $reservation) {
+            $bookedAt = $this->bookedAt($reservation);
+
+            if ($bookedAt->gt(now()) && $bookedAt->lte($cutoff) && $this->sendReminder($reservation)) {
+                $sent++;
+            }
+        }
+
+        return $sent;
+    }
+
+    /**
+     * BR04, FR71, 07.10: At T-30 an assigned table goes Reserved with a
+     * place-sign alert; a table still occupied raises the warning instead, and
+     * a booking with no table at all raises the unassigned alert — once for the
+     * floor at T-30, again for admin at T-15.
+     *
+     * @return array{switched:int, alerts:int}
+     */
+    public function switchReservedTables(): array
+    {
+        $switchBefore = (int) (Setting::find('reserved_switch_before_minutes')?->setting_value ?? 30);
+        $adminBefore = (int) (Setting::find('unassigned_admin_alert_minutes')?->setting_value ?? 15);
+        $grace = (int) (Setting::find('reservation_grace_minutes')?->setting_value ?? 15);
+
+        $result = ['switched' => 0, 'alerts' => 0];
+
+        $bookings = Reservation::where('status', ReservationStatus::Confirmed)
+            ->whereDate('booking_date', now()->toDateString())
+            ->get();
+
+        foreach ($bookings as $reservation) {
+            $minutesAway = now()->diffInMinutes($this->bookedAt($reservation), false);
+
+            if ($minutesAway > $switchBefore || $minutesAway < -$grace) {
+                continue;
+            }
+
+            $visits = $reservation->visits()
+                ->whereNull('closed_at')
+                ->with('restaurantTable')
+                ->get();
+
+            if ($visits->isEmpty()) {
+                if ($this->alertOnce($reservation, ReservationAlert::UNASSIGNED, 'floor')) {
+                    $result['alerts']++;
+                }
+
+                if ($minutesAway <= $adminBefore && $this->alertOnce($reservation, ReservationAlert::UNASSIGNED, 'admin')) {
+                    $result['alerts']++;
+                }
+
+                continue;
+            }
+
+            foreach ($visits as $visit) {
+                $table = $visit->restaurantTable;
+
+                if ($table === null) {
+                    continue;
+                }
+
+                if ($table->status === TableStatus::Available) {
+                    $this->tableStatus->transition($table, TableStatus::Reserved);
+                    event(new ReservationAlert($reservation, ReservationAlert::PLACE_SIGN));
+                    $result['switched']++;
+                } elseif ($table->status === TableStatus::Occupied
+                    && $this->alertOnce($reservation, ReservationAlert::STILL_OCCUPIED, (string) $table->table_id)) {
+                    $result['alerts']++;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * FR70, BR39, 07.10: Past grace and not seated — the system suggests, and
+     * stops there. The status stays confirmed until a staff member confirms
+     * the no-show through markNoShow().
+     */
+    public function suggestNoShows(): int
+    {
+        $grace = (int) (Setting::find('reservation_grace_minutes')?->setting_value ?? 15);
+
+        $suggested = 0;
+
+        $bookings = Reservation::where('status', ReservationStatus::Confirmed)
+            ->whereDate('booking_date', '<=', now()->toDateString())
+            ->get();
+
+        foreach ($bookings as $reservation) {
+            if (now()->lt($this->bookedAt($reservation)->addMinutes($grace))) {
+                continue;
+            }
+
+            if ($this->alertOnce($reservation, ReservationAlert::NO_SHOW_SUGGESTED, 'suggest')) {
+                $suggested++;
+            }
+        }
+
+        return $suggested;
+    }
+
+    /**
+     * The minute-by-minute jobs would otherwise repeat the same alert on every
+     * run; the cache key holds one alert per reservation, kind and subject for
+     * the rest of the service period.
+     */
+    private function alertOnce(Reservation $reservation, string $kind, string $subject): bool
+    {
+        $key = "reservation_alert:{$reservation->reservation_id}:{$kind}:{$subject}";
+
+        if (! Cache::add($key, true, now()->addHours(6))) {
+            return false;
+        }
+
+        event(new ReservationAlert($reservation, $kind));
 
         return true;
     }

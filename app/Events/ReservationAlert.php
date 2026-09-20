@@ -10,7 +10,9 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * FR71, 07.8. One event, three alerts — the kinds are FR71's own list.
+ * FR71, 07.8. One event, the alert kinds FR71 lists, plus FR70/BR39's no-show
+ * suggestion (T160) — the scheduler's only way of telling the floor a booking
+ * is past grace, since only staff may confirm the no-show itself.
  * Constants rather than a backed enum: no column stores these.
  */
 class ReservationAlert implements ShouldBroadcast, ShouldDispatchAfterCommit
@@ -22,6 +24,8 @@ class ReservationAlert implements ShouldBroadcast, ShouldDispatchAfterCommit
     public const PLACE_SIGN = 'place_sign';
 
     public const STILL_OCCUPIED = 'still_occupied';
+
+    public const NO_SHOW_SUGGESTED = 'no_show_suggested';
 
     public function __construct(public Reservation $reservation, public string $kind)
     {
