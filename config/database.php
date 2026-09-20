@@ -118,6 +118,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Database Backups
+    |--------------------------------------------------------------------------
+    |
+    | NFR10, 10.2 step 8: `db:backup` writes a daily mysqldump to
+    | storage/backups and keeps it for two weeks. The binary lives somewhere
+    | different on XAMPP than on the VPS, hence the configurable path.
+    |
+    */
+
+    'mysqldump_path' => env('MYSQLDUMP_PATH', 'mysqldump'),
+
+    'backup_keep_days' => (int) env('BACKUP_KEEP_DAYS', 14),
+
+    /*
+    |--------------------------------------------------------------------------
     | Migration Repository Table
     |--------------------------------------------------------------------------
     |

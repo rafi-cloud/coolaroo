@@ -32,3 +32,8 @@ Schedule::command('reservations:switch-reserved')->everyMinute()->withoutOverlap
 Schedule::command('reservations:expire-requests')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('reservations:send-reminders')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('reservations:suggest-no-shows')->everyMinute()->withoutOverlapping();
+
+// NFR10, T222. Housekeeping: the nightly dump (10.2 step 8) and the failed-job
+// table, pruned on the same two-week window so the two records expire together.
+Schedule::command('db:backup')->dailyAt('03:00')->withoutOverlapping();
+Schedule::command('queue:prune-failed --hours=336')->daily();

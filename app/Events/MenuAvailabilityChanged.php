@@ -7,6 +7,7 @@ use App\Models\MenuItem;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -17,7 +18,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class MenuAvailabilityChanged implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public function __construct(public MenuItem|AddOnOption $entity)
     {

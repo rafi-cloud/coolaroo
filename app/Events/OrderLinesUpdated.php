@@ -7,13 +7,14 @@ use App\Models\Order;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /** FR58, FR59, 07.8. Line status or ETA moved at one station (T081, T082). */
 class OrderLinesUpdated implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public function __construct(public Order $order, public Destination $destination)
     {

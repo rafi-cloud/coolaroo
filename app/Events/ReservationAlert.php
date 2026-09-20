@@ -6,6 +6,7 @@ use App\Models\Reservation;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -17,7 +18,7 @@ use Illuminate\Queue\SerializesModels;
  */
 class ReservationAlert implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public const UNASSIGNED = 'unassigned';
 

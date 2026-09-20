@@ -6,13 +6,14 @@ use App\Models\RestaurantTable;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /** 07.8. Floor grid and admin dashboard live updates. */
 class TableStatusChanged implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public function __construct(public RestaurantTable $table)
     {

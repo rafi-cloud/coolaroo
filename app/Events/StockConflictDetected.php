@@ -7,13 +7,14 @@ use App\Models\Order;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use App\Events\Concerns\QueuedBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /** BR54, 07.8. Alerts the affected station and admin to resolve later (FR94). */
 class StockConflictDetected implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public function __construct(public Order $order, public Destination $destination)
     {
