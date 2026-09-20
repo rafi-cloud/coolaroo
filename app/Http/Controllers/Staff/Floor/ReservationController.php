@@ -87,13 +87,32 @@ class ReservationController extends Controller
                 && in_array($reservation->status, [ReservationStatus::Confirmed, ReservationStatus::Requested], true);
         });
 
+        $activeSlots = \App\Models\SlotCapacity::where('is_active', true)->orderBy('slot_time')->get();
+        $recentCustomers = \App\Models\Customer::where('is_active', true)->orderBy('full_name')->take(50)->get();
+
         return view('staff.reservations.index', [
             'reservations' => $reservations,
             'date' => $date,
             'statusFilter' => $statusFilter,
             'counts' => $counts,
             'isToday' => $isToday,
+            'activeSlots' => $activeSlots,
+            'recentCustomers' => $recentCustomers,
         ]);
+    }
+
+    public function store(\App\Http\Requests\Staff\StorePhoneBookingRequest $request): RedirectResponse
+    {
+        $staff = $request->user('staff');
+
+        $reservation = $this->reservationService->createPhoneBooking(
+            $staff,
+            $request->validated()
+        );
+
+        return redirect()->route('staff.reservations.index', ['date' => $reservation->booking_date->toDateString()])
+            ->with('status', 'reservation-created')
+            ->with('message', "Phone booking {$reservation->reference_code} created and confirmed for {$reservation->party_size} guests.");
     }
 
     public function approve(Request $request, Reservation $reservation): RedirectResponse

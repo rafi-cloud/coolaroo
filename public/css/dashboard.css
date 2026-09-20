@@ -1067,3 +1067,17 @@ input{font:inherit}
 .decline-form label{font-size:.75rem;display:block;margin-bottom:.2rem;color:var(--body)}
 .decline-form input{width:100%;font-size:.82rem;padding:.3rem .5rem;border:1px solid var(--line);border-radius:4px}
 
+/* phone booking drawer (FR64) */
+.phone-booking-drawer{margin:1rem 0 1.2rem;background:var(--white)}
+.phone-booking-form{margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line)}
+.phone-form-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;
+}
+.phone-form-grid label{display:block;font-size:.78rem;font-weight:600;color:var(--ink);margin-bottom:.25rem}
+.phone-form-grid input, .phone-form-grid select, .phone-booking-form input[type="text"]{
+  width:100%;padding:.4rem .6rem;border:1px solid var(--line);border-radius:6px;
+  font-family:inherit;font-size:.85rem;color:var(--ink);background:var(--white);
+}
+.phone-form-actions{display:flex;justify-content:flex-end}
+
+

@@ -156,6 +156,102 @@ class ReservationService
     }
 
     /**
+     * FR64, BR31, BR33, BR58: Staff creates a phone booking.
+     * Confirmed immediately; allowed even when online reservations paused.
+     */
+    public function createPhoneBooking(Staff $staff, array $data): Reservation
+    {
+        $partySize = (int) ($data['party_size'] ?? 0);
+        if ($partySize < 1) {
+            throw ValidationException::withMessages([
+                'party_size' => 'Party size must be at least 1 guest.',
+            ]);
+        }
+
+        if (empty($data['booking_date'])) {
+            throw ValidationException::withMessages([
+                'booking_date' => 'A booking date is required.',
+            ]);
+        }
+
+        $bookingDate = $data['booking_date'] instanceof Carbon
+            ? $data['booking_date']->copy()->startOfDay()
+            : Carbon::parse($data['booking_date'])->startOfDay();
+
+        if ($bookingDate->isBefore(today())) {
+            throw ValidationException::withMessages([
+                'booking_date' => 'Reservations cannot be made for past dates.',
+            ]);
+        }
+
+        $customerId = $data['customer_id'] ?? null;
+        $guestName = $data['guest_name'] ?? null;
+        $guestPhone = $data['guest_phone'] ?? null;
+
+        if (! $customerId && (empty(trim((string) $guestName)) || empty(trim((string) $guestPhone)))) {
+            throw ValidationException::withMessages([
+                'guest' => 'Either an existing customer account or guest name and phone number is required.',
+            ]);
+        }
+
+        $slot = null;
+        if (! empty($data['slot_id'])) {
+            $slot = SlotCapacity::find($data['slot_id']);
+        } elseif (! empty($data['booking_time'])) {
+            $timeStr = substr($data['booking_time'], 0, 5);
+            $slot = SlotCapacity::where('slot_time', $timeStr)
+                ->orWhere('slot_time', $timeStr.':00')
+                ->first();
+        }
+
+        if (! $slot || ! $slot->is_active) {
+            throw ValidationException::withMessages([
+                'slot' => 'The selected time slot is invalid or inactive.',
+            ]);
+        }
+
+        if (isset($data['special_requests']) && strlen($data['special_requests']) > 500) {
+            throw ValidationException::withMessages([
+                'special_requests' => 'Special requests cannot exceed 500 characters.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($staff, $slot, $bookingDate, $partySize, $customerId, $guestName, $guestPhone, $data) {
+            SlotCapacity::whereKey($slot->slot_id)->lockForUpdate()->first();
+
+            if (! $this->availability->hasSlotCapacity($slot, $bookingDate, $partySize)) {
+                throw ValidationException::withMessages([
+                    'slot' => 'No availability for the selected time slot and party size.',
+                ]);
+            }
+
+            $referenceCode = $this->generateReferenceCode();
+
+            $reservation = new Reservation();
+            $reservation->forceFill([
+                'customer_id' => $customerId,
+                'guest_name' => $customerId ? null : $guestName,
+                'guest_phone' => $customerId ? null : $guestPhone,
+                'slot_id' => $slot->slot_id,
+                'reference_code' => $referenceCode,
+                'booking_date' => $bookingDate->toDateString(),
+                'booking_time' => $slot->slot_time,
+                'party_size' => $partySize,
+                'special_requests' => $data['special_requests'] ?? null,
+                'status' => ReservationStatus::Confirmed,
+                'created_by_staff_id' => $staff->staff_id,
+                'reviewed_by_staff_id' => $staff->staff_id,
+                'reviewed_at' => now(),
+            ]);
+            $reservation->save();
+
+            $this->auditLogger->log($staff, 'reservation_phone_created', $reservation);
+
+            return $reservation;
+        });
+    }
+
+    /**
      * FR63, BR31, BR33: Staff approves a reservation request.
      * Checks slot capacity, transitions requested -> confirmed, records reviewer and timestamp.
      */

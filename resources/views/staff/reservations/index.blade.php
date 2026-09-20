@@ -33,6 +33,78 @@
       </div>
     @endif
 
+    @if ($errors->any())
+      <div class="alert alert-danger" data-testid="reservations-error-alert">
+        <ul class="error-list">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
+    <!-- Phone booking drawer (FR64, S27) -->
+    <details class="kds-drawer phone-booking-drawer" data-testid="reservations-phone-booking-drawer">
+      <summary class="btn btn-orange btn-sm" data-testid="reservations-phone-booking-summary">
+        + New phone booking
+      </summary>
+
+      <form method="POST" action="{{ route('staff.reservations.store') }}" class="phone-booking-form" data-testid="reservations-phone-booking-form">
+        @csrf
+        <div class="phone-form-grid">
+          <div class="form-group">
+            <label for="phone-customer-id">Existing customer (optional)</label>
+            <select id="phone-customer-id" name="customer_id" data-testid="phone-booking-customer-select">
+              <option value="">— Guest booking (enter name &amp; phone below) —</option>
+              @foreach ($recentCustomers as $c)
+                <option value="{{ $c->customer_id }}">{{ $c->full_name }} ({{ $c->phone ?? $c->email }})</option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="phone-guest-name">Guest name</label>
+            <input type="text" id="phone-guest-name" name="guest_name" maxlength="100" placeholder="Full name" data-testid="phone-booking-guest-name">
+          </div>
+
+          <div class="form-group">
+            <label for="phone-guest-phone">Guest mobile phone</label>
+            <input type="text" id="phone-guest-phone" name="guest_phone" maxlength="20" placeholder="e.g. 0412345678" data-testid="phone-booking-guest-phone">
+          </div>
+
+          <div class="form-group">
+            <label for="phone-booking-date">Booking date</label>
+            <input type="date" id="phone-booking-date" name="booking_date" value="{{ $date }}" required data-testid="phone-booking-date">
+          </div>
+
+          <div class="form-group">
+            <label for="phone-slot-id">Time slot</label>
+            <select id="phone-slot-id" name="slot_id" required data-testid="phone-booking-slot-select">
+              @foreach ($activeSlots as $slot)
+                <option value="{{ $slot->slot_id }}">{{ substr($slot->slot_time, 0, 5) }} (max {{ $slot->max_covers }} covers)</option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="phone-party-size">Party size (guests)</label>
+            <input type="number" id="phone-party-size" name="party_size" min="1" max="50" value="2" required data-testid="phone-booking-party-size">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:0.6rem">
+          <label for="phone-special-requests">Special requests (optional)</label>
+          <input type="text" id="phone-special-requests" name="special_requests" maxlength="500" placeholder="Dietary requirements, high chair, seating preference" data-testid="phone-booking-special-requests">
+        </div>
+
+        <div class="phone-form-actions" style="margin-top:0.8rem">
+          <button type="submit" class="btn btn-orange" data-testid="phone-booking-submit-btn">
+            Create confirmed booking
+          </button>
+        </div>
+      </form>
+    </details>
+
     <!-- Status filter navigation tabs -->
     <div class="filter-tabs" data-testid="reservations-filter-tabs">
       <a href="{{ route('staff.reservations.index', ['date' => $date]) }}" class="filter-pill {{ empty($statusFilter) ? 'active' : '' }}" data-testid="reservations-filter-all">
