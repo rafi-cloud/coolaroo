@@ -1149,6 +1149,34 @@ input{font:inherit}
 .stock-item-info strong{display:block;font-size:.85rem;color:var(--ink)}
 .stock-item-info span{font-size:.74rem;color:var(--cancelled)}
 
+/* ---------- report pages (FR82–FR87, S41) ---------- */
+.report-nav{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.2rem}
+.report-nav-item{
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.45rem .9rem;border-radius:100px;
+  background:var(--white);border:1px solid var(--line);
+  font-size:.82rem;font-weight:600;color:var(--body);
+  transition:all .15s ease;
+}
+.report-nav-item:hover{border-color:var(--orange);color:var(--orange-dark)}
+.report-nav-item.is-active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+.report-filter-bar{
+  display:flex;flex-wrap:wrap;gap:1rem;
+  align-items:center;justify-content:space-between;
+  padding:1rem 1.25rem;background:var(--white);
+  border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);margin-bottom:1.25rem;
+}
+.report-dates-form{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem}
+.date-input-group{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--ink);font-weight:500}
+.date-input-group input[type="date"]{
+  padding:.35rem .65rem;border-radius:6px;border:1px solid var(--line);
+  font-family:inherit;font-size:.82rem;color:var(--ink);background:var(--cream);
+}
+.preset-links{display:flex;gap:.35rem;align-items:center}
+
+
 
 
 

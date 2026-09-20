@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\MenuItemSizeController;
 use App\Http\Controllers\Admin\NoShowController as AdminNoShowController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\RefundController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SlotCapacityController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Admin\TableController;
@@ -243,6 +244,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
     Route::get('/customers/{customer}', [AdminCustomerController::class, 'show'])->name('customers.show');
     Route::post('/customers/{customer}/no-shows/{reservation}/clear', [AdminNoShowController::class, 'clear'])->name('customers.no-shows.clear');
+
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/{type}', [ReportController::class, 'show'])->name('reports.show');
 });
 
 //have to delete this block when the real pages done.
