@@ -34,6 +34,16 @@ class StockService
         return ($item->daily_limit - $item->sold_today) >= $quantity;
     }
 
+    /** Raw remaining units before the limit, ignoring the QR buffer — used by exact (staff) contexts. */
+    public function remaining(MenuItem $item): int
+    {
+        if ($item->daily_limit === null) {
+            return PHP_INT_MAX;
+        }
+
+        return max(0, $item->daily_limit - $item->sold_today);
+    }
+
     public function isSoldOutForQr(MenuItem $item): bool
     {
         if ($item->daily_limit === null) {

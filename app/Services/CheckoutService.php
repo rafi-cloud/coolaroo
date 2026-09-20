@@ -8,13 +8,16 @@ use App\Models\MenuItemSize;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
+use App\Models\Staff;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR37, BR08, BR09, BR15-BR19, BR21. Takes CartService::rawLines()'s plain
- * array, not the cart itself — checkout doesn't need to know a cart is
- * session-backed.
+ * FR37, FR42, BR08, BR09, BR15-BR19, BR21, BR53. Takes CartService::rawLines()'s
+ * plain array, not the cart itself — checkout doesn't need to know a cart is
+ * session-backed. $staffActor (T092) is null for the QR customer path and
+ * switches BR53's staff-order differences: exact stock check (not the 5x QR
+ * buffer), taken_by_staff_id recorded, event_source 'waitstaff'.
  */
 class CheckoutService
 {
@@ -26,7 +29,7 @@ class CheckoutService
      * @param array<int, array{item_id:int,size_id:int,quantity:int,special_request:?string,add_on_option_ids:int[]}> $cartLines
      * @return array{order: Order, removed: string[]}
      */
-    public function checkout(int $tableId, ?int $customerId, array $cartLines, string $idempotencyKey): array
+    public function checkout(int $tableId, ?int $customerId, array $cartLines, string $idempotencyKey, ?Staff $staffActor = null): array
     {
         $existing = Order::where('idempotency_key', $idempotencyKey)->first();
 
@@ -44,9 +47,9 @@ class CheckoutService
             throw ValidationException::withMessages(['cart' => 'Every item in your cart is no longer available.']);
         }
 
-        $this->checkBuffer($validLines);
+        $this->checkStock($validLines, exact: $staffActor !== null);
 
-        $order = DB::transaction(fn () => $this->createOrder($tableId, $customerId, $idempotencyKey, $validLines));
+        $order = DB::transaction(fn () => $this->createOrder($tableId, $customerId, $idempotencyKey, $validLines, $staffActor));
 
         return ['order' => $order, 'removed' => $removed];
     }
@@ -94,9 +97,10 @@ class CheckoutService
     }
 
     /**
-     * BR09, aggregated per item_id across every valid line that ordered it.
+     * BR09 (buffered, QR) or BR53 (exact, staff), aggregated per item_id
+     * across every valid line that ordered it.
      */
-    private function checkBuffer(array $validLines): void
+    private function checkStock(array $validLines, bool $exact): void
     {
         $quantityByItem = [];
         $itemsById = [];
@@ -110,15 +114,17 @@ class CheckoutService
         foreach ($quantityByItem as $itemId => $quantity) {
             $item = $itemsById[$itemId];
 
-            if (! $this->stock->hasQrStock($item, $quantity)) {
-                $max = $this->stock->maxOrderableQuantity($item);
+            $hasStock = $exact ? $this->stock->hasExactStock($item, $quantity) : $this->stock->hasQrStock($item, $quantity);
+
+            if (! $hasStock) {
+                $max = $exact ? $this->stock->remaining($item) : $this->stock->maxOrderableQuantity($item);
 
                 throw ValidationException::withMessages(['cart' => "You can order up to {$max} of \"{$item->item_name}\" right now."]);
             }
         }
     }
 
-    private function createOrder(int $tableId, ?int $customerId, string $idempotencyKey, array $validLines): Order
+    private function createOrder(int $tableId, ?int $customerId, string $idempotencyKey, array $validLines, ?Staff $staffActor = null): Order
     {
         $rows = [];
         $total = 0.0;
@@ -156,6 +162,7 @@ class CheckoutService
         $order = Order::create([
             'table_id' => $tableId,
             'customer_id' => $customerId,
+            'taken_by_staff_id' => $staffActor?->staff_id,
             'order_number' => $this->nextOrderNumber(),
             'idempotency_key' => $idempotencyKey,
             'total_amount' => $total,
@@ -171,7 +178,7 @@ class CheckoutService
             'status_seq' => 1,
             'status' => 'pending_payment',
             'occurred_at' => now(),
-            'event_source' => 'customer',
+            'event_source' => $staffActor !== null ? 'waitstaff' : 'customer',
         ]);
 
         return $order->refresh();

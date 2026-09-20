@@ -123,6 +123,8 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
     Route::get('/floor/state', [FloorController::class, 'state'])->name('staff.floor.state');
     Route::post('/tables/{table}/seat', [StaffTableController::class, 'seat'])->name('staff.tables.seat');
     Route::post('/tables/clear', [StaffTableController::class, 'clear'])->name('staff.tables.clear');
+    Route::get('/tables/{table}/order', [StaffOrderController::class, 'index'])->name('staff.tables.order');
+    Route::post('/tables/{table}/order', [StaffOrderController::class, 'store'])->name('staff.tables.order.store');
     Route::post('/orders/{order}/cash', [CashPaymentController::class, 'store'])->name('staff.orders.cash.store');
     Route::get('/orders/{order}/stripe-qr', [StaffOrderController::class, 'stripeQr'])->name('staff.orders.stripe-qr');
     Route::post('/orders/{order}/payment-check', [StaffOrderController::class, 'check'])->name('staff.orders.payment-check');
