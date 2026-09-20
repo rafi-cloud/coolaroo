@@ -1,6 +1,20 @@
 <x-layouts.staff title="Floor view" page-title="Floor view" page-sub="{{ $tables->count() }} table(s)">
 <div data-floor-page data-state-url="{{ route('staff.floor.state') }}">
 
+  @if (session('status'))
+    <div class="auth-error auth-success" role="status">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>{{ match(session('status')) { 'table-seated' => 'Table seated.', 'table-cleared' => 'Table cleared.', default => '' } }}</span>
+    </div>
+  @endif
+
+  @if ($errors->any())
+    <div class="auth-error" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>{{ $errors->first() }}</span>
+    </div>
+  @endif
+
   <div data-paused-banner class="floor-paused-banner" role="status" @if (! $qrOrderingPaused) hidden @endif data-testid="floor-paused-banner">
     QR ordering is paused &mdash; customers can browse but not order.
   </div>
@@ -35,6 +49,8 @@
             No upcoming reservation
           @endif
         </p>
+
+        <x-floor.table-drawer :table="$table" :tables="$tables" />
       </article>
     @endforeach
   </div>

@@ -8,6 +8,8 @@ use App\Events\TableStatusChanged;
 use App\Models\RestaurantTable;
 use App\Models\Staff;
 use App\Models\Visit;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -44,8 +46,15 @@ class TableStatusService
         event(new TableStatusChanged($table));
     }
 
+    /** FR17, UC17: "Reserved or inactive tables blocked" — a walk-in never displaces a reservation. */
     public function seatWalkIn(RestaurantTable $table, Staff $actor, ?int $guestCount = null): Visit
     {
+        if ($table->status !== TableStatus::Available) {
+            throw ValidationException::withMessages([
+                'table' => 'Only an available table can be seated as a walk-in.',
+            ]);
+        }
+
         $this->transition($table, TableStatus::Occupied, $actor);
 
         return $table->visits()->create([
@@ -53,6 +62,14 @@ class TableStatusService
             'guest_count' => $guestCount,
             'opened_at' => now(),
         ]);
+    }
+
+    /** FR17: "one or more tables" — each gets its own transition and visit row, one guest count. */
+    public function seatGroup(Collection $tables, Staff $actor, ?int $guestCount = null): Collection
+    {
+        return DB::transaction(fn () => $tables->map(
+            fn (RestaurantTable $table) => $this->seatWalkIn($table, $actor, $guestCount)
+        ));
     }
 
     public function clearTable(RestaurantTable $table, ?Staff $actor = null, bool $force = false): void
@@ -74,6 +91,20 @@ class TableStatusService
         }
 
         $this->transition($table, TableStatus::Available, $actor);
+    }
+
+    /** FR18, BR06: any table in the group needing confirmation blocks the whole group. */
+    public function clearGroup(Collection $tables, Staff $actor, bool $force = false): void
+    {
+        if (! $force && $tables->contains(fn (RestaurantTable $table) => $this->hasActiveOrders($table))) {
+            throw ValidationException::withMessages([
+                'table' => 'One or more tables in this group has active orders — confirm before clearing.',
+            ]);
+        }
+
+        DB::transaction(function () use ($tables, $actor, $force) {
+            $tables->each(fn (RestaurantTable $table) => $this->clearTable($table, $actor, $force));
+        });
     }
 
     public function autoClearIdleTables(int $idleMinutes = 45): int
