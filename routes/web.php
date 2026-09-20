@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AddOnOptionController;
 use App\Http\Controllers\Admin\AllergenController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DietaryTagController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MenuItemSizeController;
@@ -183,6 +184,7 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:kitchen
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
 

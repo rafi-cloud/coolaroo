@@ -32,7 +32,7 @@ class StaffAuthenticationTest extends TestCase
 
     public function test_login_falls_back_to_the_homepage_when_the_landing_screen_route_does_not_exist_yet(): void
     {
-        $role = Role::factory()->admin()->create();
+        $role = Role::factory()->create(['landing_screen' => 'nonexistent.route']);
         $staff = Staff::factory()->create(['role_id' => $role->role_id, 'password_hash' => 'password123']);
 
         $response = $this->post('/staff/login', [
@@ -41,6 +41,19 @@ class StaffAuthenticationTest extends TestCase
         ]);
 
         $response->assertRedirect('/');
+    }
+
+    public function test_admin_is_redirected_to_admin_dashboard(): void
+    {
+        $role = Role::factory()->admin()->create();
+        $staff = Staff::factory()->create(['role_id' => $role->role_id, 'password_hash' => 'password123']);
+
+        $response = $this->post('/staff/login', [
+            'email' => $staff->email,
+            'password' => 'password123',
+        ]);
+
+        $response->assertRedirect('/admin');
     }
 
     public function test_login_fails_with_the_wrong_password(): void

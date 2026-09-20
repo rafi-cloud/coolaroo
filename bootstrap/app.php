@@ -22,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'qr.ordering.enabled' => \App\Http\Middleware\EnsureQrOrderingEnabled::class,
         ]);
 
-        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('staff/*', 'admin/*')
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('staff*', 'admin*')
             ? route('staff.login')
             : route('customer.login'));
     })
