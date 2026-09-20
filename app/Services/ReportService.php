@@ -338,7 +338,8 @@ class ReportService
      */
     public function lowStock(): array
     {
-        return MenuItem::where('is_active', true)
+        return MenuItem::with('category')
+            ->where('is_active', true)
             ->where(fn ($query) => $query
                 ->where('is_available', false)
                 ->orWhereNotNull('daily_limit'))

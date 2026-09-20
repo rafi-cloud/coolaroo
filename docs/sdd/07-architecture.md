@@ -214,7 +214,7 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | CashPaymentRequested | floor | Cash waiting list |
 | WaiterCalled | floor | Call waiter alert |
 | TableStatusChanged | floor, admin | Floor grid |
-| ReservationAlert | floor, admin | Place sign, unassigned, still occupied |
+| ReservationAlert | floor, admin | Place sign, unassigned, still occupied, no-show suggested (BR39 — the scheduler suggests, staff confirm) |
 | RefundRequested | admin | Refund queue |
 | MenuAvailabilityChanged | menu (public) | Sold-out / Specials updates |
 | SettingSwitched | menu (public), floor | QR ordering paused, AI on/off |

@@ -31,7 +31,7 @@ class OrderController extends Controller
 
         $orders = Order::where('customer_id', $customer->customer_id)
             ->with(['restaurantTable', 'items', 'payments', 'refunds'])
-            ->orderByDesc('created_at')
+            ->orderByDesc('placed_at')
             ->paginate(10);
 
         return view('customer.orders', [

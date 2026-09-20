@@ -34,7 +34,7 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        $response->headers->set('Content-Security-Policy', implode('; ', self::POLICY));
+        $response->headers->set('Content-Security-Policy', implode('; ', $this->policy()));
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'DENY');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -45,5 +45,33 @@ class SecurityHeaders
         }
 
         return $response;
+    }
+
+    /**
+     * While `npm run dev` is running, Vite serves the bundle and its HMR socket
+     * from its own port, which `'self'` does not cover — the page would load
+     * with its scripts silently blocked. The allowance is keyed on the hot file
+     * Vite writes, so it disappears the moment the dev server stops, and it can
+     * never apply to a built deployment.
+     *
+     * @return array<int, string>
+     */
+    private function policy(): array
+    {
+        $policy = self::POLICY;
+
+        if (app()->isProduction() || ! file_exists(public_path('hot'))) {
+            return $policy;
+        }
+
+        $origin = rtrim((string) file_get_contents(public_path('hot')), "\r\n /");
+
+        foreach ($policy as $index => $directive) {
+            if (str_starts_with($directive, 'script-src ') || str_starts_with($directive, 'connect-src ')) {
+                $policy[$index] = $directive.' '.$origin;
+            }
+        }
+
+        return $policy;
     }
 }

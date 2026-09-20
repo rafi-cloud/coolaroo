@@ -15,8 +15,8 @@
 4. Nginx site: root `public/`, PHP-FPM, `/app` WebSocket proxy to Reverb (port 8080) with Upgrade headers.
 5. Supervisor programs: `reverb` (`php artisan reverb:start`), `queue` (`php artisan queue:work --queue=broadcasts,mail,default --tries=3`).
 6. Cron: `* * * * * cd /var/www/coolaroo && php artisan schedule:run >> /dev/null 2>&1`.
-7. HTTPS with Certbot; force HTTPS.
-8. Daily `mysqldump` backup kept 14 days.
+7. HTTPS with Certbot; force HTTPS, and set `FORCE_HTTPS=true`, `SESSION_SECURE_COOKIE=true`, `REVERB_SCHEME=https` in `.env`.
+8. Daily `mysqldump` backup kept 14 days — carried by the scheduler's `db:backup` (03:00), so step 6's cron entry is the only one needed. Set `MYSQLDUMP_PATH` if the binary is not on PATH.
 No inbound Stripe configuration is needed (no webhooks).
 
 ## 10.3 Environment variables

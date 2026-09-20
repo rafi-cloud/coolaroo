@@ -907,7 +907,7 @@ class DemoSeeder extends Seeder
 
         // C. Operational signal: Cash waiting > 10 min (Widget 12 Needs Attention)
         $cashOrder = Order::firstOrCreate(
-            ['order_number' => 'ORD-WAIT-CASH'],
+            ['order_number' => 'ORD-WAITCASH'],
             [
                 'table_id' => $tables['T7']->table_id,
                 'customer_id' => $customers['james']->customer_id,

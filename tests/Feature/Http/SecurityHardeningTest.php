@@ -38,6 +38,25 @@ class SecurityHardeningTest extends TestCase
         $this->get('https://localhost/')->assertHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     }
 
+    public function test_the_policy_admits_the_vite_dev_server_only_while_it_is_running(): void
+    {
+        $hot = public_path('hot');
+        $this->assertFileDoesNotExist($hot, 'Stop `npm run dev` before running the suite.');
+
+        $this->assertStringNotContainsString('5173', $this->get('/')->headers->get('Content-Security-Policy'));
+
+        file_put_contents($hot, 'http://localhost:5173');
+
+        try {
+            $policy = $this->get('/')->headers->get('Content-Security-Policy');
+
+            $this->assertStringContainsString("script-src 'self' 'unsafe-inline' http://localhost:5173", $policy);
+            $this->assertStringContainsString('connect-src', $policy);
+        } finally {
+            @unlink($hot);
+        }
+    }
+
     public function test_csrf_protection_has_no_exemptions(): void
     {
         $except = new ReflectionProperty(PreventRequestForgery::class, 'except');
