@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DietaryTagController;
+use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MenuItemSizeController;
 use App\Http\Controllers\Admin\NoShowController as AdminNoShowController;
@@ -244,6 +245,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
     Route::get('/customers/{customer}', [AdminCustomerController::class, 'show'])->name('customers.show');
     Route::post('/customers/{customer}/no-shows/{reservation}/clear', [AdminNoShowController::class, 'clear'])->name('customers.no-shows.clear');
+
+    Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback.index');
+    Route::post('/feedback/{feedback}/reply', [AdminFeedbackController::class, 'reply'])->name('feedback.reply');
+    Route::patch('/feedback/{feedback}/hide', [AdminFeedbackController::class, 'hide'])->name('feedback.hide');
+    Route::patch('/feedback/{feedback}/unhide', [AdminFeedbackController::class, 'unhide'])->name('feedback.unhide');
+    Route::patch('/feedback/{feedback}/feature', [AdminFeedbackController::class, 'toggleFeatured'])->name('feedback.feature');
 
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
     Route::patch('reports/ai/toggle', [ReportController::class, 'toggleAi'])->name('reports.ai.toggle');
