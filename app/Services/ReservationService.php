@@ -878,6 +878,39 @@ class ReservationService
         });
     }
 
+    /**
+     * FR10: Clear no-show flag on a reservation.
+     * Records admin, reason and timestamp; audits action; recalculates trust badge on read.
+     */
+    public function clearNoShow(Reservation $reservation, Staff $admin, string $reason): Reservation
+    {
+        return DB::transaction(function () use ($reservation, $admin, $reason) {
+            $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->status !== ReservationStatus::NoShow || $locked->no_show_at === null) {
+                throw ValidationException::withMessages([
+                    'reservation' => 'Only reservations marked as no-show can have their no-show flag cleared.',
+                ]);
+            }
+
+            if ($locked->no_show_cleared_at !== null) {
+                throw ValidationException::withMessages([
+                    'reservation' => 'This no-show flag has already been cleared.',
+                ]);
+            }
+
+            $locked->forceFill([
+                'no_show_cleared_by_staff_id' => $admin->staff_id,
+                'no_show_cleared_at' => now(),
+                'no_show_clear_reason' => $reason,
+            ])->save();
+
+            $this->auditLogger->log($admin, 'no_show_cleared', $locked, $reason);
+
+            return $locked;
+        });
+    }
+
     /** BR04, FR69: reuse the assigned-but-unopened visits; open them and occupy all linked tables. */
     public function seatOnHolderScan(RestaurantTable $table, Reservation $reservation): Visit
     {

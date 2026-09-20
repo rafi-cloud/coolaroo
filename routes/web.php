@@ -4,9 +4,11 @@ use App\Http\Controllers\Admin\AddOnGroupController;
 use App\Http\Controllers\Admin\AddOnOptionController;
 use App\Http\Controllers\Admin\AllergenController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DietaryTagController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MenuItemSizeController;
+use App\Http\Controllers\Admin\NoShowController as AdminNoShowController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\SlotCapacityController;
@@ -218,6 +220,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::patch('tables/{table}/qr/regenerate', [TableController::class, 'regenerateQr'])->name('tables.qr.regenerate');
     Route::get('tables/{table}/qr.png', [TableController::class, 'qr'])->name('tables.qr');
     Route::get('tables/{table}/qr.pdf', [TableController::class, 'qrPdf'])->name('tables.qr.pdf');
+
+    Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
+    Route::get('/customers/{customer}', [AdminCustomerController::class, 'show'])->name('customers.show');
+    Route::post('/customers/{customer}/no-shows/{reservation}/clear', [AdminNoShowController::class, 'clear'])->name('customers.no-shows.clear');
 });
 
 //have to delete this block when the real pages done.
