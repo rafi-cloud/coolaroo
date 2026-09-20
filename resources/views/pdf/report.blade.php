@@ -390,7 +390,7 @@
         @forelse ($data['recent_reviews'] as $rev)
           <tr>
             <td>{{ $rev->submitted_at?->format('d/m/Y') }}</td>
-            <td>{{ $rev->customer ? $rev->customer->first_name . ' ' . substr($rev->customer->last_name, 0, 1) . '.' : 'Guest Diner' }}</td>
+            <td>{{ $rev->customer ? $rev->customer->full_name : 'Guest Diner' }}</td>
             <td class="num">{{ $rev->food_rating }} ★</td>
             <td class="num">{{ $rev->service_rating }} ★</td>
             <td>{{ $rev->comment ?? 'No comment provided' }}</td>
@@ -434,6 +434,99 @@
           </tr>
         @empty
           <tr><td colspan="10" style="text-align:center; color:#94a3b8;">No staff records found</td></tr>
+        @endforelse
+      </tbody>
+    </table>
+
+  @elseif ($type === 'ai')
+    <table class="summary-grid">
+      <tr>
+        <td class="summary-box" style="width:25%;">
+          <p class="val">{{ $data['total_requests'] }}</p>
+          <p class="lbl">Total AI Invocations</p>
+        </td>
+        <td class="summary-box" style="width:25%;">
+          <p class="val">{{ number_format($data['total_tokens']) }}</p>
+          <p class="lbl">Total Tokens Billed</p>
+        </td>
+        <td class="summary-box" style="width:25%;">
+          <p class="val">{{ number_format($data['avg_tokens_per_request']) }}</p>
+          <p class="lbl">Average Tokens / Request</p>
+        </td>
+        <td class="summary-box" style="width:25%;">
+          <p class="val">{{ $data['success_rate'] }}%</p>
+          <p class="lbl">Success Rate</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="summary-box">
+          <p class="val">{{ number_format($data['total_tokens_in']) }}</p>
+          <p class="lbl">Prompt Tokens (In)</p>
+        </td>
+        <td class="summary-box">
+          <p class="val">{{ number_format($data['total_tokens_out']) }}</p>
+          <p class="lbl">Completion Tokens (Out)</p>
+        </td>
+        <td class="summary-box" colspan="2">
+          <p class="val">{{ $data['busy_count'] }}</p>
+          <p class="lbl">Busy / Throttled Requests</p>
+        </td>
+      </tr>
+    </table>
+
+    <h2 class="section-h">Feature Usage Distribution</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Feature Module</th>
+          <th class="num">Invocations</th>
+          <th class="num">Tokens In</th>
+          <th class="num">Tokens Out</th>
+          <th class="num">Total Tokens</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Chat Assistant (S17, FR43)</strong></td>
+          <td class="num">{{ $data['by_feature']['chat']['requests'] }}</td>
+          <td class="num">{{ number_format($data['by_feature']['chat']['tokens_in']) }}</td>
+          <td class="num">{{ number_format($data['by_feature']['chat']['tokens_out']) }}</td>
+          <td class="num"><strong>{{ number_format($data['by_feature']['chat']['total_tokens']) }}</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Meal Builder (S16, FR44)</strong></td>
+          <td class="num">{{ $data['by_feature']['meal_builder']['requests'] }}</td>
+          <td class="num">{{ number_format($data['by_feature']['meal_builder']['tokens_in']) }}</td>
+          <td class="num">{{ number_format($data['by_feature']['meal_builder']['tokens_out']) }}</td>
+          <td class="num"><strong>{{ number_format($data['by_feature']['meal_builder']['total_tokens']) }}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="section-h">Recent AI Request Audit Logs</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date &amp; Time</th>
+          <th>Feature</th>
+          <th>Actor / Customer</th>
+          <th class="num">Tokens In</th>
+          <th class="num">Tokens Out</th>
+          <th>Client IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse ($data['recent_requests'] as $req)
+          <tr>
+            <td>{{ $req->logged_at?->format('d/m/Y h:i A') }}</td>
+            <td>{{ ucwords(str_replace('_', ' ', (string) ($req->details['feature'] ?? 'chat'))) }}</td>
+            <td>{{ $req->customer ? $req->customer->full_name : ($req->staff ? $req->staff->first_name . ' ' . $req->staff->last_name : 'Guest Visitor') }}</td>
+            <td class="num">{{ number_format($req->details['tokens_in'] ?? 0) }}</td>
+            <td class="num">{{ number_format($req->details['tokens_out'] ?? 0) }}</td>
+            <td>{{ $req->ip_address ?? '—' }}</td>
+          </tr>
+        @empty
+          <tr><td colspan="6" style="text-align:center; color:#94a3b8;">No AI request logs recorded in this period</td></tr>
         @endforelse
       </tbody>
     </table>

@@ -246,6 +246,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::post('/customers/{customer}/no-shows/{reservation}/clear', [AdminNoShowController::class, 'clear'])->name('customers.no-shows.clear');
 
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::patch('reports/ai/toggle', [ReportController::class, 'toggleAi'])->name('reports.ai.toggle');
     Route::get('reports/{type}/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('reports/{type}', [ReportController::class, 'show'])->name('reports.show');
 });

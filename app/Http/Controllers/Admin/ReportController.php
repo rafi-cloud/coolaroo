@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\SettingSwitched;
 use App\Http\Controllers\Controller;
+use App\Services\AuditLogger;
 use App\Services\ReportService;
+use App\Services\SettingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,7 +14,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 /**
- * FR82–FR87, UC35, S41. Admin report pages for sales, items, operations, reservations, feedback, and staff.
+ * FR45, FR82–FR88, FR98, UC35, S41. Admin report pages for sales, items, operations, reservations, feedback, staff, and AI usage.
  */
 class ReportController extends Controller
 {
@@ -22,6 +25,7 @@ class ReportController extends Controller
         'reservations' => 'Reservation Report',
         'feedback' => 'Feedback Report',
         'staff' => 'Staff Activity Report',
+        'ai' => 'AI Usage Report',
     ];
 
     public function index(): RedirectResponse
@@ -29,7 +33,7 @@ class ReportController extends Controller
         return redirect()->route('admin.reports.show', ['type' => 'sales']);
     }
 
-    public function show(string $type, Request $request, ReportService $reportService): View
+    public function show(string $type, Request $request, ReportService $reportService, SettingService $settings): View
     {
         if (! array_key_exists($type, self::VALID_TYPES)) {
             abort(404, 'Unknown report type');
@@ -54,6 +58,7 @@ class ReportController extends Controller
             'reservations' => $reportService->reservationsReport($from, $to),
             'feedback' => $reportService->feedbackReport($from, $to),
             'staff' => $reportService->staffActivityReport($from, $to),
+            'ai' => $reportService->aiReport($from, $to),
         };
 
         return view('admin.reports.show', [
@@ -63,7 +68,29 @@ class ReportController extends Controller
             'data' => $data,
             'from' => $from->toDateString(),
             'to' => $to->toDateString(),
+            'aiEnabled' => $settings->getBool('ai_enabled', true),
         ]);
+    }
+
+    /**
+     * FR98, BR49. Toggle AI Assistant on/off switch.
+     */
+    public function toggleAi(Request $request, SettingService $settings, AuditLogger $audit): RedirectResponse
+    {
+        $current = $settings->getBool('ai_enabled', true);
+        $new = ! $current;
+        $setting = $settings->set('ai_enabled', $new ? '1' : '0', $request->user('staff'));
+
+        $audit->log(
+            $request->user('staff'),
+            'setting_update',
+            $setting,
+            sprintf('AI Assistant %s by administrator', $new ? 'enabled' : 'disabled')
+        );
+
+        event(new SettingSwitched('ai_enabled', $new ? '1' : '0'));
+
+        return back()->with('status', sprintf('AI Assistant successfully %s.', $new ? 'enabled' : 'disabled'));
     }
 
     /**

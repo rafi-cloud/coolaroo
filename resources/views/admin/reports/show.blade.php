@@ -731,6 +731,152 @@
           </div>
         </article>
       </div>
+
+    {{-- REPORT 7: AI USAGE REPORT (FR45, FR98) --}}
+    @elseif ($type === 'ai')
+      {{-- Master On/Off Switch Card (FR98) --}}
+      <article class="card wide" style="margin-bottom: 1.5rem;" data-testid="admin-ai-switch-card">
+        <header class="card-head" style="align-items:center;">
+          <div>
+            <h3>AI Assistant Operational Control (FR98)</h3>
+            <p class="card-sub">Toggling controls customer accessibility to the AI chat widget and meal builder assistant (BR49).</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            @if ($aiEnabled)
+              <span class="badge b-ready" style="font-size:0.85rem; padding:0.4rem 0.8rem;">● AI Assistant Active</span>
+            @else
+              <span class="badge b-expired" style="font-size:0.85rem; padding:0.4rem 0.8rem;">○ AI Assistant Disabled</span>
+            @endif
+
+            <form method="POST" action="{{ route('admin.reports.ai.toggle') }}" style="margin:0;">
+              @csrf
+              @method('PATCH')
+              <button class="btn {{ $aiEnabled ? 'btn-danger' : 'btn-solid' }}" type="submit" data-testid="admin-ai-toggle">
+                {{ $aiEnabled ? 'Turn AI Off' : 'Turn AI On' }}
+              </button>
+            </form>
+          </div>
+        </header>
+      </article>
+
+      <div class="dashboard-grid" data-testid="admin-report-ai">
+        <article class="card tile">
+          <p class="tile-value">{{ $data['total_requests'] }}</p>
+          <p class="tile-name">Total AI Requests</p>
+          <p class="tile-change"><span>{{ number_format($data['total_tokens']) }} total tokens billed</span></p>
+        </article>
+
+        <article class="card tile">
+          <p class="tile-value">{{ number_format($data['total_tokens_in']) }}</p>
+          <p class="tile-name">Prompt Tokens (In)</p>
+          <p class="tile-change"><span>Completion: {{ number_format($data['total_tokens_out']) }}</span></p>
+        </article>
+
+        <article class="card tile">
+          <p class="tile-value">{{ number_format($data['avg_tokens_per_request']) }}</p>
+          <p class="tile-name">Average Tokens / Request</p>
+          <p class="tile-change"><span>Combined prompt &amp; completion</span></p>
+        </article>
+
+        <article class="card tile">
+          <p class="tile-value" style="color:var(--ready)">{{ $data['success_rate'] }}%</p>
+          <p class="tile-name">Success Rate</p>
+          <p class="tile-change"><span>Busy / Throttled: {{ $data['busy_count'] }}</span></p>
+        </article>
+      </div>
+
+      <div class="dashboard-grid">
+        {{-- Feature Breakdown --}}
+        <article class="card wide" data-testid="admin-report-ai-features">
+          <header class="card-head">
+            <div>
+              <h3>AI Usage by Feature</h3>
+              <p class="card-sub">Distribution between Chat Assistant and Meal Builder</p>
+            </div>
+          </header>
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Feature Module</th>
+                  <th scope="col" class="num">Invocations</th>
+                  <th scope="col" class="num">Tokens In</th>
+                  <th scope="col" class="num">Tokens Out</th>
+                  <th scope="col" class="num">Total Tokens</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Chat Assistant (S17, FR43)</strong></td>
+                  <td class="num">{{ $data['by_feature']['chat']['requests'] }}</td>
+                  <td class="num">{{ number_format($data['by_feature']['chat']['tokens_in']) }}</td>
+                  <td class="num">{{ number_format($data['by_feature']['chat']['tokens_out']) }}</td>
+                  <td class="num"><strong>{{ number_format($data['by_feature']['chat']['total_tokens']) }}</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Meal Builder (S16, FR44)</strong></td>
+                  <td class="num">{{ $data['by_feature']['meal_builder']['requests'] }}</td>
+                  <td class="num">{{ number_format($data['by_feature']['meal_builder']['tokens_in']) }}</td>
+                  <td class="num">{{ number_format($data['by_feature']['meal_builder']['tokens_out']) }}</td>
+                  <td class="num"><strong>{{ number_format($data['by_feature']['meal_builder']['total_tokens']) }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+
+      <div class="dashboard-grid">
+        {{-- Recent AI Requests --}}
+        <article class="card wide" data-testid="admin-report-ai-requests">
+          <header class="card-head">
+            <div>
+              <h3>Recent AI Invocations Log (Audit Trail)</h3>
+              <p class="card-sub">Recorded ai_request rows from audit log with token telemetry</p>
+            </div>
+          </header>
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Logged At</th>
+                  <th scope="col">Feature</th>
+                  <th scope="col">Actor / Customer</th>
+                  <th scope="col" class="num">Tokens In</th>
+                  <th scope="col" class="num">Tokens Out</th>
+                  <th scope="col">Client IP</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse ($data['recent_requests'] as $req)
+                  <tr>
+                    <td>@auDateTime($req->logged_at)</td>
+                    <td>
+                      <span class="tag {{ ($req->details['feature'] ?? '') === 'meal_builder' ? 'tag-purple' : 'tag-quiet' }}">
+                        {{ ucwords(str_replace('_', ' ', (string) ($req->details['feature'] ?? 'chat'))) }}
+                      </span>
+                    </td>
+                    <td>
+                      @if ($req->customer)
+                        <strong>{{ $req->customer->full_name }}</strong>
+                      @else
+                        <span class="muted">Guest Visitor</span>
+                      @endif
+                    </td>
+                    <td class="num">{{ number_format($req->details['tokens_in'] ?? 0) }}</td>
+                    <td class="num">{{ number_format($req->details['tokens_out'] ?? 0) }}</td>
+                    <td class="muted">{{ $req->ip_address ?? '—' }}</td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="6" class="muted" style="text-align:center">No AI request logs recorded in this period.</td>
+                  </tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
     @endif
   </div>
 </x-layouts.admin>

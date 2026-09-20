@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use App\Models\Staff;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -49,6 +50,25 @@ class SettingService
     public function clearCache(): void
     {
         Cache::forget(self::CACHE_KEY);
+    }
+
+    /**
+     * Set a setting value, invalidating the settings cache.
+     */
+    public function set(string $key, string $value, ?Staff $actor = null): Setting
+    {
+        $setting = Setting::updateOrCreate(
+            ['setting_key' => $key],
+            [
+                'setting_value' => $value,
+                'updated_by_staff_id' => $actor?->staff_id,
+                'updated_at' => now(),
+            ]
+        );
+
+        $this->clearCache();
+
+        return $setting;
     }
 
     /**

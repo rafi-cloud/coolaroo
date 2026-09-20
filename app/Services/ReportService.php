@@ -877,6 +877,7 @@ class ReportService
             'reservations' => $this->reservationsReport($from, $to),
             'feedback' => $this->feedbackReport($from, $to),
             'staff' => $this->staffActivityReport($from, $to),
+            'ai' => $this->aiReport($from, $to),
             default => throw new \InvalidArgumentException("Unknown report type: {$type}"),
         };
 
@@ -887,6 +888,7 @@ class ReportService
             'reservations' => 'Reservation Report',
             'feedback' => 'Feedback Report',
             'staff' => 'Staff Activity Report',
+            'ai' => 'AI Usage Report',
         ];
 
         fputcsv($handle, ['Report Type', $typeNames[$type] ?? ucfirst($type).' Report']);
@@ -901,6 +903,7 @@ class ReportService
             'reservations' => $this->writeReservationsCsv($handle, $data),
             'feedback' => $this->writeFeedbackCsv($handle, $data),
             'staff' => $this->writeStaffCsv($handle, $data),
+            'ai' => $this->writeAiCsv($handle, $data),
         };
 
         rewind($handle);
@@ -922,6 +925,7 @@ class ReportService
             'reservations' => $this->reservationsReport($from, $to),
             'feedback' => $this->feedbackReport($from, $to),
             'staff' => $this->staffActivityReport($from, $to),
+            'ai' => $this->aiReport($from, $to),
             default => throw new \InvalidArgumentException("Unknown report type: {$type}"),
         };
 
@@ -932,6 +936,7 @@ class ReportService
             'reservations' => 'Reservation Report',
             'feedback' => 'Feedback Report',
             'staff' => 'Staff Activity Report',
+            'ai' => 'AI Usage Report',
         ];
 
         $venue = app(SettingService::class)->venue();
@@ -1103,6 +1108,114 @@ class ReportService
                 $row['toggles_count'],
                 $row['overrides_count'],
                 $row['total_actions'],
+            ]);
+        }
+    }
+
+    /**
+     * FR45. AI Usage Report: requests, tokens, and success/busy rate from audit_log ai_request entries.
+     *
+     * @return array<string, mixed>
+     */
+    public function aiReport(Carbon $from, Carbon $to): array
+    {
+        $logs = AuditLog::where('action_type', 'ai_request')
+            ->whereBetween('logged_at', [$from, $to])
+            ->with('customer')
+            ->orderByDesc('logged_at')
+            ->get();
+
+        $totalRequests = $logs->count();
+        $totalTokensIn = (int) $logs->sum(fn (AuditLog $l) => (int) ($l->details['tokens_in'] ?? 0));
+        $totalTokensOut = (int) $logs->sum(fn (AuditLog $l) => (int) ($l->details['tokens_out'] ?? 0));
+        $totalTokens = $totalTokensIn + $totalTokensOut;
+
+        $avgTokens = $totalRequests > 0 ? (int) round($totalTokens / $totalRequests) : 0;
+
+        $busyCount = $logs->filter(fn (AuditLog $l) => ($l->details['status'] ?? 'success') === 'busy')->count();
+        $successCount = $totalRequests - $busyCount;
+        $successRate = $totalRequests > 0 ? round(($successCount / $totalRequests) * 100, 1) : 100.0;
+
+        // By feature (chat vs meal_builder)
+        $chatLogs = $logs->filter(fn (AuditLog $l) => ($l->details['feature'] ?? 'chat') === 'chat');
+        $mealLogs = $logs->filter(fn (AuditLog $l) => ($l->details['feature'] ?? '') === 'meal_builder');
+
+        $byFeature = [
+            'chat' => [
+                'requests' => $chatLogs->count(),
+                'tokens_in' => (int) $chatLogs->sum(fn (AuditLog $l) => (int) ($l->details['tokens_in'] ?? 0)),
+                'tokens_out' => (int) $chatLogs->sum(fn (AuditLog $l) => (int) ($l->details['tokens_out'] ?? 0)),
+                'total_tokens' => (int) $chatLogs->sum(fn (AuditLog $l) => (int) (($l->details['tokens_in'] ?? 0) + ($l->details['tokens_out'] ?? 0))),
+            ],
+            'meal_builder' => [
+                'requests' => $mealLogs->count(),
+                'tokens_in' => (int) $mealLogs->sum(fn (AuditLog $l) => (int) ($l->details['tokens_in'] ?? 0)),
+                'tokens_out' => (int) $mealLogs->sum(fn (AuditLog $l) => (int) ($l->details['tokens_out'] ?? 0)),
+                'total_tokens' => (int) $mealLogs->sum(fn (AuditLog $l) => (int) (($l->details['tokens_in'] ?? 0) + ($l->details['tokens_out'] ?? 0))),
+            ],
+        ];
+
+        return [
+            'total_requests' => $totalRequests,
+            'total_tokens_in' => $totalTokensIn,
+            'total_tokens_out' => $totalTokensOut,
+            'total_tokens' => $totalTokens,
+            'avg_tokens_per_request' => $avgTokens,
+            'success_rate' => $successRate,
+            'success_count' => $successCount,
+            'busy_count' => $busyCount,
+            'by_feature' => $byFeature,
+            'recent_requests' => $logs->take(50)->values(),
+            'from' => $from,
+            'to' => $to,
+        ];
+    }
+
+    /**
+     * @param resource $handle
+     * @param array<string, mixed> $data
+     */
+    private function writeAiCsv($handle, array $data): void
+    {
+        fputcsv($handle, ['Metric', 'Value']);
+        fputcsv($handle, ['Total AI Requests', (string) $data['total_requests']]);
+        fputcsv($handle, ['Total Tokens Used', (string) $data['total_tokens']]);
+        fputcsv($handle, ['Prompt Tokens (In)', (string) $data['total_tokens_in']]);
+        fputcsv($handle, ['Completion Tokens (Out)', (string) $data['total_tokens_out']]);
+        fputcsv($handle, ['Average Tokens / Request', (string) $data['avg_tokens_per_request']]);
+        fputcsv($handle, ['Success Rate', $data['success_rate'].'%']);
+        fputcsv($handle, ['Busy / Throttled Rate', ($data['total_requests'] > 0 ? round(($data['busy_count'] / $data['total_requests']) * 100, 1) : 0).'%']);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Feature Breakdown']);
+        fputcsv($handle, ['Feature', 'Requests', 'Tokens In', 'Tokens Out', 'Total Tokens']);
+        fputcsv($handle, [
+            'Chat Assistant',
+            $data['by_feature']['chat']['requests'],
+            $data['by_feature']['chat']['tokens_in'],
+            $data['by_feature']['chat']['tokens_out'],
+            $data['by_feature']['chat']['total_tokens'],
+        ]);
+        fputcsv($handle, [
+            'Meal Builder',
+            $data['by_feature']['meal_builder']['requests'],
+            $data['by_feature']['meal_builder']['tokens_in'],
+            $data['by_feature']['meal_builder']['tokens_out'],
+            $data['by_feature']['meal_builder']['total_tokens'],
+        ]);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Recent AI Requests']);
+        fputcsv($handle, ['Date & Time', 'Feature', 'Customer / Actor', 'Tokens In', 'Tokens Out', 'IP Address']);
+        foreach ($data['recent_requests'] as $req) {
+            $customerName = $req->customer ? $req->customer->first_name.' '.$req->customer->last_name : 'Guest Visitor';
+            fputcsv($handle, [
+                $req->logged_at?->format('Y-m-d H:i:s'),
+                ucwords(str_replace('_', ' ', (string) ($req->details['feature'] ?? 'chat'))),
+                $customerName,
+                $req->details['tokens_in'] ?? 0,
+                $req->details['tokens_out'] ?? 0,
+                $req->ip_address ?? '—',
             ]);
         }
     }
