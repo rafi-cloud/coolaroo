@@ -436,7 +436,7 @@ input{font:inherit}
   content:"";width:6px;height:6px;flex:none;
   border-radius:50%;background:currentColor;
 }
-.b-pending{background:#F7E2DD;color:var(--pending)}
+.b-pending,.b-pending_payment,.b-paid{background:#F7E2DD;color:var(--pending)}
 .b-preparing{background:#FCEED8;color:#9A6612}
 .b-ready{background:#DDF2E5;color:#1F7844}
 .b-served{background:#EFE7E0;color:var(--served)}
