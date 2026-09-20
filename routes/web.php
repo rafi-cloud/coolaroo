@@ -34,8 +34,10 @@ use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\Floor\FloorController;
 use App\Http\Controllers\Staff\Floor\ServeController;
-use App\Http\Controllers\Staff\Floor\TableController as StaffTableController;
+use App\Http\Controllers\Staff\Floor\ReservationController as StaffReservationController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
+use App\Http\Controllers\Staff\Floor\TableController as StaffTableController;
+use App\Http\Controllers\Staff\Floor\TrustController;
 use App\Http\Controllers\Staff\Kds\AvailabilityController;
 use App\Http\Controllers\Staff\Kds\StationController;
 use App\Http\Controllers\Staff\OrderController as StaffOrderActionsController;
@@ -137,6 +139,11 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
     Route::get('/orders/{order}/stripe-qr', [StaffOrderController::class, 'stripeQr'])->name('staff.orders.stripe-qr');
     Route::post('/orders/{order}/payment-check', [StaffOrderController::class, 'check'])->name('staff.orders.payment-check');
     Route::post('/orders/{order}/cancel', [StaffOrderActionsController::class, 'cancel'])->name('staff.orders.cancel');
+
+    Route::get('/reservations', [StaffReservationController::class, 'index'])->name('staff.reservations.index');
+    Route::post('/reservations/{reservation}/approve', [StaffReservationController::class, 'approve'])->name('staff.reservations.approve');
+    Route::post('/reservations/{reservation}/decline', [StaffReservationController::class, 'decline'])->name('staff.reservations.decline');
+    Route::get('/customers/{customer}/trust', [TrustController::class, 'show'])->name('staff.customers.trust');
 });
 
 Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:kitchen,bar'])->group(function () {

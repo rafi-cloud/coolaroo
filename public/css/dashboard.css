@@ -966,3 +966,104 @@ input{font:inherit}
 
 .staff-order-line{display:flex;flex-wrap:wrap;gap:.6rem;align-items:flex-end;margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid var(--line)}
 .staff-order-line label{display:block;font-size:.78rem;color:var(--body);margin-bottom:.2rem}
+
+/* ---------- reservations board (S27) & review panel (S28) ---------- */
+.date-navigator{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.date-picker-form input[type="date"]{
+  padding:.35rem .6rem;border:1px solid var(--line);border-radius:6px;
+  font-family:inherit;font-size:.85rem;color:var(--ink);background:var(--white);
+}
+
+.filter-tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.2rem 0}
+.filter-pill{
+  display:inline-block;padding:.35rem .75rem;border-radius:100px;
+  background:var(--sand);color:var(--body);font-size:.82rem;font-weight:500;
+  text-decoration:none;transition:background .15s ease, color .15s ease;
+}
+.filter-pill:hover{background:var(--line);color:var(--ink)}
+.filter-pill.active{background:var(--orange);color:var(--white);font-weight:600}
+
+.reservations-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:clamp(.9rem,1.5vw,1.3rem);margin-bottom:1.5rem;
+}
+
+.reservation-card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.75rem;
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+.reservation-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+
+.card-unassigned-t30{
+  border:2px solid #E67E22;background:#FEF9E7;
+}
+
+.unassigned-t30-banner{
+  background:#F39C12;color:#FFFFFF;font-weight:700;font-size:.78rem;
+  padding:.3rem .6rem;border-radius:4px;letter-spacing:.02em;text-align:center;
+}
+
+.card-top{display:flex;justify-content:space-between;align-items:flex-start}
+.time-block{display:flex;flex-direction:column}
+.booking-time{font-size:1.15rem;font-weight:700;color:var(--ink)}
+.ref-code{font-size:.75rem;font-family:monospace;color:var(--cancelled);letter-spacing:.05em}
+
+.card-guest-info{display:flex;flex-direction:column;gap:.25rem}
+.guest-identity{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.guest-name{font-size:.95rem;color:var(--ink)}
+
+.trust-badge{
+  font-size:.7rem;font-weight:700;padding:.15rem .5rem;border-radius:100px;
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.badge-flagged{background:#FADBD8;color:#922B21}
+.badge-regular{background:#E8DAEF;color:#6C3483}
+.badge-new{background:#EAECEE;color:#5D6D7E}
+
+.card-table-info{font-size:.85rem;color:var(--ink);display:flex;align-items:center;gap:.4rem}
+.unassigned-tag{
+  background:#F2F4F4;color:#7F8C8D;font-size:.75rem;font-weight:600;
+  padding:.15rem .45rem;border-radius:4px;
+}
+.unassigned-urgent{background:#FADBD8;color:#922B21;font-weight:700}
+
+.card-requests{
+  font-size:.82rem;font-style:italic;color:var(--body);
+  background:var(--cream);padding:.4rem .6rem;border-radius:6px;border-left:3px solid var(--sand);
+}
+
+.card-review-wrapper{margin-top:auto;padding-top:.4rem;border-top:1px solid var(--line)}
+
+/* review panel (S28) */
+.reservation-review-panel{margin-top:.4rem}
+.reservation-review-panel summary{
+  cursor:pointer;font-size:.82rem;font-weight:600;display:inline-block;padding:.3rem .7rem;
+}
+.review-panel-content{
+  margin-top:.8rem;padding:.8rem;background:var(--cream);border-radius:8px;
+  border:1px solid var(--line);display:flex;flex-direction:column;gap:.7rem;
+}
+.trust-profile-card{
+  background:var(--white);padding:.6rem .8rem;border-radius:6px;
+  border:1px solid var(--line);
+}
+.trust-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.trust-header h4{margin:0;font-size:.82rem;font-weight:700;color:var(--ink)}
+.trust-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;text-align:center}
+.stat-box{padding:.3rem .2rem;background:var(--sand);border-radius:4px}
+.stat-box-danger{background:#FADBD8;color:#922B21}
+.stat-num{display:block;font-size:.95rem;font-weight:700;color:var(--ink)}
+.stat-box-danger .stat-num{color:#922B21}
+.stat-lbl{display:block;font-size:.65rem;text-transform:uppercase;color:var(--body)}
+.trust-warning{margin:.5rem 0 0;font-size:.75rem;font-weight:600;color:#922B21}
+
+.review-booking-summary{font-size:.82rem;color:var(--ink)}
+.review-special-requests{margin-top:.3rem;color:var(--body)}
+
+.review-actions{display:flex;flex-direction:column;gap:.6rem;padding-top:.4rem}
+.review-actions .inline-form{margin:0}
+.decline-form .auth-field{margin-bottom:.4rem}
+.decline-form label{font-size:.75rem;display:block;margin-bottom:.2rem;color:var(--body)}
+.decline-form input{width:100%;font-size:.82rem;padding:.3rem .5rem;border:1px solid var(--line);border-radius:4px}
+
