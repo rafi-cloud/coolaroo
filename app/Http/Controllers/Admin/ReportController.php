@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\ReportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
@@ -62,6 +63,47 @@ class ReportController extends Controller
             'data' => $data,
             'from' => $from->toDateString(),
             'to' => $to->toDateString(),
+        ]);
+    }
+
+    /**
+     * FR88, UC35. Export report as PDF or CSV.
+     */
+    public function export(string $type, Request $request, ReportService $reportService): Response
+    {
+        if (! array_key_exists($type, self::VALID_TYPES)) {
+            abort(404, 'Unknown report type');
+        }
+
+        $from = $request->filled('from')
+            ? Carbon::parse($request->query('from'))->startOfDay()
+            : today()->subDays(29)->startOfDay();
+
+        $to = $request->filled('to')
+            ? Carbon::parse($request->query('to'))->endOfDay()
+            : today()->endOfDay();
+
+        if ($from->isAfter($to)) {
+            $from = (clone $to)->subDays(29)->startOfDay();
+        }
+
+        $format = strtolower((string) $request->query('format', 'csv'));
+        $filename = sprintf('report-%s-%s-to-%s', $type, $from->toDateString(), $to->toDateString());
+
+        if ($format === 'pdf') {
+            $pdfBytes = $reportService->exportPdf($type, $from, $to);
+
+            return response($pdfBytes, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => sprintf('attachment; filename="%s.pdf"', $filename),
+            ]);
+        }
+
+        $csvString = $reportService->exportCsv($type, $from, $to);
+
+        return response($csvString, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => sprintf('attachment; filename="%s.csv"', $filename),
         ]);
     }
 }

@@ -18,6 +18,7 @@ use App\Models\Refund;
 use App\Models\Reservation;
 use App\Models\Staff;
 use App\Models\Visit;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -860,6 +861,250 @@ class ReportService
             'from' => $from,
             'to' => $to,
         ];
+    }
+
+    /**
+     * FR88. Export report as formatted CSV string.
+     */
+    public function exportCsv(string $type, Carbon $from, Carbon $to): string
+    {
+        $handle = fopen('php://temp', 'r+');
+
+        $data = match ($type) {
+            'sales' => $this->salesReport($from, $to),
+            'items' => $this->itemsReport($from, $to),
+            'operations' => $this->operationsReport($from, $to),
+            'reservations' => $this->reservationsReport($from, $to),
+            'feedback' => $this->feedbackReport($from, $to),
+            'staff' => $this->staffActivityReport($from, $to),
+            default => throw new \InvalidArgumentException("Unknown report type: {$type}"),
+        };
+
+        $typeNames = [
+            'sales' => 'Sales Report',
+            'items' => 'Item & Category Report',
+            'operations' => 'Operations Report',
+            'reservations' => 'Reservation Report',
+            'feedback' => 'Feedback Report',
+            'staff' => 'Staff Activity Report',
+        ];
+
+        fputcsv($handle, ['Report Type', $typeNames[$type] ?? ucfirst($type).' Report']);
+        fputcsv($handle, ['Date Range', $from->format('Y-m-d').' to '.$to->format('Y-m-d')]);
+        fputcsv($handle, ['Generated At', now()->toDateTimeString()]);
+        fputcsv($handle, []);
+
+        match ($type) {
+            'sales' => $this->writeSalesCsv($handle, $data),
+            'items' => $this->writeItemsCsv($handle, $data),
+            'operations' => $this->writeOperationsCsv($handle, $data),
+            'reservations' => $this->writeReservationsCsv($handle, $data),
+            'feedback' => $this->writeFeedbackCsv($handle, $data),
+            'staff' => $this->writeStaffCsv($handle, $data),
+        };
+
+        rewind($handle);
+        $content = stream_get_contents($handle);
+        fclose($handle);
+
+        return (string) $content;
+    }
+
+    /**
+     * FR88. Export report as PDF binary string.
+     */
+    public function exportPdf(string $type, Carbon $from, Carbon $to): string
+    {
+        $data = match ($type) {
+            'sales' => $this->salesReport($from, $to),
+            'items' => $this->itemsReport($from, $to),
+            'operations' => $this->operationsReport($from, $to),
+            'reservations' => $this->reservationsReport($from, $to),
+            'feedback' => $this->feedbackReport($from, $to),
+            'staff' => $this->staffActivityReport($from, $to),
+            default => throw new \InvalidArgumentException("Unknown report type: {$type}"),
+        };
+
+        $typeNames = [
+            'sales' => 'Sales Report',
+            'items' => 'Item & Category Report',
+            'operations' => 'Operations Report',
+            'reservations' => 'Reservation Report',
+            'feedback' => 'Feedback Report',
+            'staff' => 'Staff Activity Report',
+        ];
+
+        $venue = app(SettingService::class)->venue();
+
+        return Pdf::loadView('pdf.report', [
+            'type' => $type,
+            'typeName' => $typeNames[$type] ?? ucfirst($type).' Report',
+            'data' => $data,
+            'from' => $from,
+            'to' => $to,
+            'venue' => $venue,
+            'generatedAt' => now(),
+        ])->output();
+    }
+
+    /**
+     * @param resource $handle
+     * @param array<string, mixed> $data
+     */
+    private function writeSalesCsv($handle, array $data): void
+    {
+        fputcsv($handle, ['Metric', 'Value (AUD)']);
+        fputcsv($handle, ['Gross Sales', sprintf('$%.2f', $data['gross_sales'])]);
+        fputcsv($handle, ['Net Takings', sprintf('$%.2f', $data['net_sales'])]);
+        fputcsv($handle, ['GST Liability (1/11th)', sprintf('$%.2f', $data['gst_amount'])]);
+        fputcsv($handle, ['Total Paid Orders', (string) $data['total_orders']]);
+        fputcsv($handle, ['Cash Takings', sprintf('$%.2f', $data['method_split']['cash_amount'])]);
+        fputcsv($handle, ['Stripe Takings', sprintf('$%.2f', $data['method_split']['stripe_amount'])]);
+        fputcsv($handle, ['Total Refunds', sprintf('$%.2f', $data['refunds'])]);
+        fputcsv($handle, ['Discounts & Adjustments', sprintf('$%.2f', $data['sale_discounts'] + $data['cash_adjustments'])]);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Daily Sales Breakdown']);
+        fputcsv($handle, ['Date', 'Orders', 'Gross Sales', 'GST Liability']);
+        foreach ($data['daily'] as $day) {
+            fputcsv($handle, [
+                $day['date'],
+                $day['count'],
+                sprintf('$%.2f', $day['gross']),
+                sprintf('$%.2f', $day['gst']),
+            ]);
+        }
+    }
+
+    /**
+     * @param resource $handle
+     * @param array<string, mixed> $data
+     */
+    private function writeItemsCsv($handle, array $data): void
+    {
+        fputcsv($handle, ['Top Selling Items']);
+        fputcsv($handle, ['Rank', 'Item Name', 'Category', 'Quantity Sold', 'Gross Revenue']);
+        foreach ($data['top_sellers'] as $idx => $item) {
+            fputcsv($handle, [
+                $idx + 1,
+                $item['item_name'],
+                $item['category_name'],
+                $item['quantity'],
+                sprintf('$%.2f', $item['revenue']),
+            ]);
+        }
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Category Breakdown']);
+        fputcsv($handle, ['Category Name', 'Items Sold', 'Gross Revenue']);
+        foreach ($data['category_sales'] as $cat) {
+            fputcsv($handle, [
+                $cat['category_name'],
+                $cat['quantity'],
+                sprintf('$%.2f', $cat['revenue']),
+            ]);
+        }
+    }
+
+    /**
+     * @param resource $handle
+     * @param array<string, mixed> $data
+     */
+    private function writeOperationsCsv($handle, array $data): void
+    {
+        fputcsv($handle, ['Metric', 'Value']);
+        fputcsv($handle, ['Kitchen On-Time Rate', $data['kitchen_on_time_pct'] !== null ? $data['kitchen_on_time_pct'].'%' : '—']);
+        fputcsv($handle, ['Bar On-Time Rate', $data['bar_on_time_pct'] !== null ? $data['bar_on_time_pct'].'%' : '—']);
+        fputcsv($handle, ['Completed Dining Visits', (string) $data['completed_visits_count']]);
+        fputcsv($handle, ['Average Turnover (All Visits)', $data['avg_turnover_minutes'] !== null ? $data['avg_turnover_minutes'].' min' : '—']);
+        fputcsv($handle, ['Average Turnover (1–2 covers)', $data['turnover_by_size']['1_2'] !== null ? $data['turnover_by_size']['1_2'].' min' : '—']);
+        fputcsv($handle, ['Average Turnover (3–6 covers)', $data['turnover_by_size']['3_6'] !== null ? $data['turnover_by_size']['3_6'].' min' : '—']);
+        fputcsv($handle, ['Average Turnover (7+ covers)', $data['turnover_by_size']['7_plus'] !== null ? $data['turnover_by_size']['7_plus'].' min' : '—']);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Orders by Hour (Peak Times)']);
+        fputcsv($handle, ['Hour', 'Orders Placed', 'Gross Sales']);
+        foreach ($data['peak_hours'] as $hourData) {
+            fputcsv($handle, [
+                sprintf('%02d:00 – %02d:59', $hourData['hour'], $hourData['hour']),
+                $hourData['orders_count'],
+                sprintf('$%.2f', $hourData['gross_sales']),
+            ]);
+        }
+    }
+
+    /**
+     * @param resource $handle
+     * @param array<string, mixed> $data
+     */
+    private function writeReservationsCsv($handle, array $data): void
+    {
+        fputcsv($handle, ['Metric', 'Value']);
+        fputcsv($handle, ['Total Bookings', (string) $data['total_bookings']]);
+        fputcsv($handle, ['Total Covers', (string) $data['total_covers']]);
+        fputcsv($handle, ['Approval Rate', $data['approval_rate'] !== null ? $data['approval_rate'].'%' : '—']);
+        fputcsv($handle, ['No-Show Rate', $data['no_show_rate'] !== null ? $data['no_show_rate'].'%' : '0%']);
+        fputcsv($handle, ['No-Show Count', (string) $data['no_show_count']]);
+        fputcsv($handle, ['Late Cancellations (< 2h)', (string) $data['late_cancellations']]);
+        fputcsv($handle, ['Walk-in Visits', (string) $data['walk_in_visits']]);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Booking Status Distribution']);
+        fputcsv($handle, ['Status', 'Count']);
+        foreach ($data['status_counts'] as $status => $count) {
+            fputcsv($handle, [ucfirst($status), $count]);
+        }
+    }
+
+    /**
+     * @param resource $handle
+     * @param array<string, mixed> $data
+     */
+    private function writeFeedbackCsv($handle, array $data): void
+    {
+        fputcsv($handle, ['Metric', 'Value']);
+        fputcsv($handle, ['Overall Average Rating', $data['overall_avg'] !== null ? $data['overall_avg'].' / 5' : '—']);
+        fputcsv($handle, ['Food Rating Average', $data['food_avg'] !== null ? $data['food_avg'].' / 5' : '—']);
+        fputcsv($handle, ['Service Rating Average', $data['service_avg'] !== null ? $data['service_avg'].' / 5' : '—']);
+        fputcsv($handle, ['Public Reviews Count', (string) $data['total_reviews']]);
+        fputcsv($handle, ['Hidden Reviews Count', (string) $data['hidden_count']]);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Recent Feedback Reviews']);
+        fputcsv($handle, ['Date', 'Customer', 'Food Rating', 'Service Rating', 'Comment']);
+        foreach ($data['recent_reviews'] as $rev) {
+            $customerName = $rev->customer ? $rev->customer->first_name.' '.substr($rev->customer->last_name, 0, 1).'.' : 'Guest Diner';
+            fputcsv($handle, [
+                $rev->submitted_at?->format('Y-m-d'),
+                $customerName,
+                $rev->food_rating,
+                $rev->service_rating,
+                $rev->comment ?? '',
+            ]);
+        }
+    }
+
+    /**
+     * @param resource $handle
+     * @param array<string, mixed> $data
+     */
+    private function writeStaffCsv($handle, array $data): void
+    {
+        fputcsv($handle, ['Staff Member', 'Role', 'Cash Count', 'Cash Total', 'Adjustments Count', 'Adjustments Total', 'Refund Requests', 'Menu Toggles', 'Overrides', 'Total Actions']);
+        foreach ($data['staff_activity'] as $row) {
+            fputcsv($handle, [
+                $row['staff']->name,
+                ucfirst($row['staff']->role?->role_name ?? 'staff'),
+                $row['cash_count'],
+                sprintf('$%.2f', $row['cash_total']),
+                $row['adjustments_count'],
+                sprintf('$%.2f', $row['adjustments_total']),
+                $row['refund_requests_count'],
+                $row['toggles_count'],
+                $row['overrides_count'],
+                $row['total_actions'],
+            ]);
+        }
     }
 }
 
