@@ -7,6 +7,16 @@
  */
 
 import './echo';
+import { initDashboard } from './dashboard';
+import { initFloor } from './floor';
+import { initKds } from './kds';
+import { initMenuLive } from './menu';
 import { initOrderStatus } from './order-status';
 
-document.addEventListener('DOMContentLoaded', initOrderStatus);
+document.addEventListener('DOMContentLoaded', () => {
+    initOrderStatus();
+    initFloor();
+    initKds();
+    initDashboard();
+    initMenuLive();
+});

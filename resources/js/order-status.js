@@ -1,3 +1,5 @@
+import { listenOn, onReconnect, privateChannel, refreshFrom } from './realtime';
+
 const TIMELINE_STEPS = ['paid', 'preparing', 'ready', 'served'];
 
 function applyStatus(page, status, lastStatus) {
@@ -25,24 +27,27 @@ export function initOrderStatus() {
         return;
     }
 
-    const stateUrl = page.dataset.stateUrl;
     let lastStatus = page.dataset.status;
+    let timer = null;
 
-    const timer = setInterval(() => {
-        fetch(stateUrl, { headers: { Accept: 'application/json' } })
-            .then((response) => (response.ok ? response.json() : null))
-            .then((state) => {
-                if (!state) {
-                    return;
-                }
+    const refresh = () => refreshFrom(page.dataset.stateUrl, (state) => {
+        applyStatus(page, state.status, lastStatus);
+        lastStatus = state.status;
 
-                applyStatus(page, state.status, lastStatus);
-                lastStatus = state.status;
+        if (state.status === 'served' || state.status === 'cancelled') {
+            clearInterval(timer);
+        }
+    });
 
-                if (state.status === 'served' || state.status === 'cancelled') {
-                    clearInterval(timer);
-                }
-            })
-            .catch(() => {});
-    }, 8000);
+    // The poll stays as the floor under Echo: Reverb is a separate process and
+    // may not be running, and NFR09's reconnect rule assumes the socket can
+    // drop entirely.
+    timer = setInterval(refresh, 8000);
+
+    listenOn(privateChannel(`order.${page.dataset.orderId}`), [
+        'OrderStatusChanged',
+        'OrderLinesUpdated',
+    ], refresh);
+
+    onReconnect(refresh);
 }

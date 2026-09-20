@@ -60,7 +60,7 @@ app/
 resources/views/  public/ customer/ staff/ admin/ pdf/  (pages)
   components/     document · layouts/ (public, customer, staff, admin) · site/ · dashboard/ ·
                   menu/ floor/ reservations/ kds/ staff/ (screen fragments, see 8.1) · shared UI (status-badge, stat-tile…)
-resources/js/     echo.js cart.js order-status.js floor.js kds.js dashboard.js chat.js meal-builder.js
+resources/js/     echo.js realtime.js cart.js order-status.js floor.js kds.js dashboard.js menu.js chat.js meal-builder.js
 public/css/       style.css (public, W3C validated)  dashboard.css (staff/admin)
 tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 ```

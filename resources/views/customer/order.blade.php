@@ -1,5 +1,5 @@
 <x-layouts.customer title="Order #{{ $order->order_number }}">
-<div class="panel" data-order-page data-state-url="{{ route('orders.state', $order) }}" data-status="{{ $order->status->value }}" data-testid="order-status-page">
+<div class="panel" data-order-page data-order-id="{{ $order->order_id }}" data-state-url="{{ route('orders.state', $order) }}" data-status="{{ $order->status->value }}" data-testid="order-status-page">
   @if (session('status') === 'order-cancelled')
     <div class="auth-error auth-success" role="status" data-testid="order-cancelled-notice">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
