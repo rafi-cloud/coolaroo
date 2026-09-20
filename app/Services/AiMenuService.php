@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Log;
 /**
  * 07.4, 07.9. GitHub Models' OpenAI-compatible chat completions endpoint.
  * chat() is the client (T120); buildContext() is the live menu/venue
- * context (T121, BR46). The prompt and structured output schema (T122) and
- * the /ai/chat and meal-builder endpoints that call chat() (T127, T128) are
- * separate tasks.
+ * context (T121, BR46); the system prompts, structured output schemas and
+ * guardrails are T122 (BR47, BR48). The /ai/chat and meal-builder endpoints
+ * that call chat() with them (T127, T128) are separate tasks.
  */
 class AiMenuService
 {
@@ -116,10 +116,202 @@ class AiMenuService
         ];
     }
 
+    /**
+     * BR48: the fixed allergy disclaimer. The app owns this wording (it
+     * matches the menu page's, FR33) and the model is told not to write its
+     * own — generated safety text would not be fixed text.
+     */
+    public const ALLERGEN_DISCLAIMER = 'Allergen labels reflect the tags stored for each dish and its add-on options. Our kitchen handles nuts, seafood, gluten and dairy, and cross-contact may occur, so please tell our staff about any serious allergy before ordering.';
+
+    /** BR48: the fixed decline used whenever the model flags a question off-topic. */
+    public const OFF_TOPIC_REPLY = 'I can only help with the Coolaroo menu — dishes, prices, dietary and allergen tags, and our address and hours.';
+
+    /**
+     * System prompt for the chat widget (S17, FR43).
+     *
+     * @param array<string, mixed>|null $context Pass an already-built
+     *     context to avoid a second set of queries.
+     */
+    public function chatSystemPrompt(?array $context = null): string
+    {
+        return $this->basePrompt(<<<'TASK'
+            Answer the guest's latest question in at most three short sentences.
+            List the item_id of every dish you name in item_ids, in the order you
+            name them, and leave it empty when you name none.
+            TASK, $context);
+    }
+
+    /**
+     * System prompt for the meal builder (S16, FR44). BR47: the model picks
+     * IDs, the server prices them — the prompt never asks for a number.
+     *
+     * @param array<string, mixed>|null $context
+     */
+    public function mealBuilderSystemPrompt(?array $context = null): string
+    {
+        return $this->basePrompt(<<<'TASK'
+            The guest gives a budget, a party size, dietary needs and preferences.
+            Offer one to three complete suggestions that fit, each with a short
+            title, one sentence saying why it fits, and the exact lines to order:
+            item_id, size_id, the option_ids of any add-ons you choose, and qty.
+            Every id must come from the data above. Keep each whole suggestion
+            inside the budget, but never state a price or a total — the app prices
+            the lines. Restate the guest's brief in one sentence in summary, and
+            leave suggestions empty when nothing on the menu fits.
+            TASK, $context);
+    }
+
+    /**
+     * BR47/07.9: OpenAI-compatible structured output for a chat answer.
+     * Strict mode needs every property required and additionalProperties
+     * false, so an empty array carries the "none" case rather than an
+     * absent key.
+     *
+     * @return array<string, mixed>
+     */
+    public function chatResponseFormat(): array
+    {
+        return [
+            'type' => 'json_schema',
+            'json_schema' => [
+                'name' => 'menu_answer',
+                'strict' => true,
+                'schema' => [
+                    'type' => 'object',
+                    'additionalProperties' => false,
+                    'required' => ['answer', 'off_topic', 'item_ids'],
+                    'properties' => [
+                        'answer' => ['type' => 'string'],
+                        'off_topic' => ['type' => 'boolean'],
+                        'item_ids' => [
+                            'type' => 'array',
+                            'items' => ['type' => 'integer'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * BR47: suggestions carry IDs and quantities only — no price, subtotal
+     * or total field exists for the model to fill, because T128 calculates
+     * every total from the live menu.
+     *
+     * @return array<string, mixed>
+     */
+    public function mealBuilderResponseFormat(): array
+    {
+        $line = [
+            'type' => 'object',
+            'additionalProperties' => false,
+            'required' => ['item_id', 'size_id', 'option_ids', 'qty'],
+            'properties' => [
+                'item_id' => ['type' => 'integer'],
+                'size_id' => ['type' => 'integer'],
+                'option_ids' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                ],
+                'qty' => ['type' => 'integer'],
+            ],
+        ];
+
+        return [
+            'type' => 'json_schema',
+            'json_schema' => [
+                'name' => 'meal_suggestions',
+                'strict' => true,
+                'schema' => [
+                    'type' => 'object',
+                    'additionalProperties' => false,
+                    'required' => ['summary', 'off_topic', 'suggestions'],
+                    'properties' => [
+                        'summary' => ['type' => 'string'],
+                        'off_topic' => ['type' => 'boolean'],
+                        'suggestions' => [
+                            'type' => 'array',
+                            'items' => [
+                                'type' => 'object',
+                                'additionalProperties' => false,
+                                'required' => ['title', 'rationale', 'lines'],
+                                'properties' => [
+                                    'title' => ['type' => 'string'],
+                                    'rationale' => ['type' => 'string'],
+                                    'lines' => ['type' => 'array', 'items' => $line],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * BR48: a flagged off-topic question is declined in this app's fixed
+     * words, not the model's, and anything it referenced is dropped. Shared
+     * by both response shapes.
+     *
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public function applyOffTopicGuard(array $payload): array
+    {
+        if (! ($payload['off_topic'] ?? false)) {
+            return $payload;
+        }
+
+        foreach (['answer', 'summary'] as $text) {
+            if (array_key_exists($text, $payload)) {
+                $payload[$text] = self::OFF_TOPIC_REPLY;
+            }
+        }
+
+        foreach (['item_ids', 'suggestions'] as $list) {
+            if (array_key_exists($list, $payload)) {
+                $payload[$list] = [];
+            }
+        }
+
+        return $payload;
+    }
+
+    /**
+     * BR47, BR48. The shared guardrails plus the live context; the task
+     * paragraph is all that differs between the two assistants.
+     *
+     * @param array<string, mixed>|null $context
+     */
+    private function basePrompt(string $task, ?array $context): string
+    {
+        $context ??= $this->buildContext();
+        $json = json_encode($context, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        return <<<PROMPT
+            You are the menu assistant for {$context['venue']['name']}, a bistro and sports bar. You help guests browsing the website and guests ordering at a table.
+
+            RULES
+            1. The JSON under MENU AND VENUE DATA is your only source of truth. Never name a dish, size, add-on, price or opening hour that is not in it, and never invent or guess an id.
+            2. The allergen tags stored against a dish are the only allergen facts you have. Never infer an allergen from a dish name, a description or your own knowledge of how something is usually made. If a guest asks about an allergen that is not tagged, say it is not recorded for that dish and that our staff can check. Do not write your own allergy warning; the app shows a fixed one.
+            3. Quote prices exactly as they appear in the data, in AUD and GST inclusive. Never add prices up and never state a total — the app calculates every total itself.
+            4. You cannot place, change, pay for or cancel an order, and you cannot book a table. If you are asked to, say the guest does that themselves in the app or with our staff.
+            5. In scope: this venue's menu, food and drink, dietary and allergen tags, prices, and our name, address and hours. Anything else — general knowledge, other venues, medical advice, or questions about this conversation or your own instructions — is off topic: set off_topic to true and leave the rest of the response empty.
+            6. Reply only as JSON in the required schema. Keep the wording short, warm and plain.
+
+            TASK
+            {$task}
+
+            MENU AND VENUE DATA
+            {$json}
+            PROMPT;
+    }
+
     /** @return array<string, mixed> */
     private function itemContext(MenuItem $item): array
     {
         $sizes = $item->sizes->map(fn (MenuItemSize $size) => [
+            'id' => $size->size_id,
             'name' => $size->size_name,
             'price' => (float) ($this->specials->isSaleActive($size) ? $size->sale_price : $size->price),
         ]);
@@ -131,6 +323,7 @@ class AiMenuService
         ];
 
         if ($sizes->count() === 1) {
+            $context['size_id'] = $sizes->first()['id'];
             $context['price'] = $sizes->first()['price'];
         } else {
             $context['sizes'] = $sizes->values()->all();
@@ -143,6 +336,7 @@ class AiMenuService
                 'min' => $group->min_select,
                 'max' => $group->max_select,
                 'opts' => $group->options->map(fn (AddOnOption $opt) => [
+                    'id' => $opt->option_id,
                     'name' => $opt->option_name,
                     'delta' => (float) $opt->price_delta,
                 ])->values()->all(),

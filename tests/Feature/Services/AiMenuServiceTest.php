@@ -134,6 +134,100 @@ class AiMenuServiceTest extends TestCase
         $this->assertSame(15.0, $context['items'][0]['price']);
     }
 
+    /** BR47: the model can only return ids it was given. */
+    public function test_build_context_exposes_size_and_option_ids(): void
+    {
+        $this->seed(\Database\Seeders\SettingSeeder::class);
+
+        $item = MenuItem::factory()->create();
+        $regular = $item->sizes()->create(['size_name' => 'Regular', 'price' => 18]);
+        $group = $item->addOnGroups()->create(['group_name' => 'Extras', 'min_select' => 0, 'max_select' => 2]);
+        $option = $group->options()->create(['option_name' => 'Bacon', 'price_delta' => 3]);
+
+        $twoSizes = MenuItem::factory()->create();
+        $small = $twoSizes->sizes()->create(['size_name' => 'Small', 'price' => 8]);
+        $large = $twoSizes->sizes()->create(['size_name' => 'Large', 'price' => 12]);
+
+        $items = collect(app(AiMenuService::class)->buildContext()['items'])->keyBy('id');
+
+        $this->assertSame($regular->size_id, $items[$item->item_id]['size_id']);
+        $this->assertSame($option->option_id, $items[$item->item_id]['addons'][0]['opts'][0]['id']);
+        $this->assertSame(
+            [$small->size_id, $large->size_id],
+            array_column($items[$twoSizes->item_id]['sizes'], 'id')
+        );
+    }
+
+    public function test_chat_system_prompt_carries_the_guardrails_and_the_live_menu(): void
+    {
+        $this->seed(\Database\Seeders\SettingSeeder::class);
+
+        $item = MenuItem::factory()->create(['item_name' => 'Chicken Parma']);
+        $item->sizes()->create(['size_name' => 'Regular', 'price' => 22.75]);
+
+        $prompt = app(AiMenuService::class)->chatSystemPrompt();
+
+        $this->assertStringContainsString('Chicken Parma', $prompt);
+        $this->assertStringContainsString('"id":'.$item->item_id, $prompt);
+        $this->assertStringContainsString('22.75', $prompt);
+        $this->assertStringContainsString('allergen tags', $prompt);
+        $this->assertStringContainsString('off_topic', $prompt);
+        $this->assertStringContainsString('never state a total', $prompt);
+        $this->assertStringContainsString('cannot place, change, pay for or cancel an order', $prompt);
+    }
+
+    /** BR47: the schemas are strict, and no line carries a price the server should own. */
+    public function test_response_formats_are_strict_json_schemas_without_price_fields(): void
+    {
+        $service = app(AiMenuService::class);
+
+        $chat = $service->chatResponseFormat();
+        $this->assertSame('json_schema', $chat['type']);
+        $this->assertTrue($chat['json_schema']['strict']);
+        $this->assertFalse($chat['json_schema']['schema']['additionalProperties']);
+        $this->assertSame(
+            ['answer', 'off_topic', 'item_ids'],
+            $chat['json_schema']['schema']['required']
+        );
+
+        $builder = $service->mealBuilderResponseFormat();
+        $line = $builder['json_schema']['schema']['properties']['suggestions']['items']['properties']['lines']['items'];
+
+        $this->assertTrue($builder['json_schema']['strict']);
+        $this->assertSame(['item_id', 'size_id', 'option_ids', 'qty'], $line['required']);
+        $this->assertSame(array_keys($line['properties']), $line['required']);
+        $this->assertStringNotContainsString('price', json_encode($builder));
+        $this->assertStringNotContainsString('total', json_encode($builder));
+    }
+
+    /** BR48: the decline is this app's fixed wording, not the model's. */
+    public function test_off_topic_guard_replaces_the_answer_and_drops_referenced_items(): void
+    {
+        $service = app(AiMenuService::class);
+
+        $chat = $service->applyOffTopicGuard([
+            'answer' => 'The capital of France is Paris.',
+            'off_topic' => true,
+            'item_ids' => [7],
+        ]);
+
+        $this->assertSame(AiMenuService::OFF_TOPIC_REPLY, $chat['answer']);
+        $this->assertSame([], $chat['item_ids']);
+
+        $builder = $service->applyOffTopicGuard([
+            'summary' => 'Here is some medical advice.',
+            'off_topic' => true,
+            'suggestions' => [['title' => 'x', 'rationale' => 'y', 'lines' => []]],
+        ]);
+
+        $this->assertSame(AiMenuService::OFF_TOPIC_REPLY, $builder['summary']);
+        $this->assertSame([], $builder['suggestions']);
+
+        $onTopic = ['answer' => 'We have four vegetarian mains.', 'off_topic' => false, 'item_ids' => [3, 9]];
+
+        $this->assertSame($onTopic, $service->applyOffTopicGuard($onTopic));
+    }
+
     /**
      * 07.9's "under 8K tokens" budget, checked with the commonly-cited
      * ~4 characters/token approximation — no real tokenizer is installed,
