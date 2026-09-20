@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\Auth\LoginCustomerRequest;
+use App\Models\RestaurantTable;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,9 +17,13 @@ class AuthenticatedCustomerController extends Controller
     {
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('customer.auth.login');
+        $tableId = $request->session()->get('qr.table_id');
+
+        return view('customer.auth.login', [
+            'qrTable' => $tableId !== null ? RestaurantTable::find($tableId) : null,
+        ]);
     }
 
     public function store(LoginCustomerRequest $request): RedirectResponse

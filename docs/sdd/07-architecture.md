@@ -112,6 +112,7 @@ tests/            Feature/ Unit/ (Laravel)   selenium/ (end-to-end, see 09)
 | POST | /ai/chat | Public\AiController@chat | FR43 |
 | POST | /ai/meal-builder | Public\AiController@mealBuilder | FR44 |
 | GET | /t/{table}/{token} (signed) | Public\TableScanController@show | FR31 |
+| POST | /t/{table}/switch | Public\TableScanController@switchTable | BR57 |
 | POST | /t/{table}/call-waiter | Public\WaiterCallController@store | FR40 |
 | GET | /reservations/availability | Public\AvailabilityController@index | FR61 |
 | GET/POST | /register, /login, /logout, /forgot-password, /reset-password/{token} | Customer\Auth\* | FR01, FR03, FR05 |

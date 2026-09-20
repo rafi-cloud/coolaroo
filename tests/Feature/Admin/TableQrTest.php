@@ -69,6 +69,6 @@ class TableQrTest extends TestCase
 
         $url = URL::signedRoute('table.scan', ['table' => $table->table_id, 'token' => $table->qr_token]);
 
-        $this->get($url)->assertStatus(501);
+        $this->get($url)->assertRedirect(route('customer.login'));
     }
 }

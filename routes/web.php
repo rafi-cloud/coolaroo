@@ -20,17 +20,20 @@ use App\Http\Controllers\Customer\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Public\TableScanController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
 use Illuminate\Support\Facades\Route;
 
 // No '/' route yet — the real homepage lands in T030. Hitting '/' 404s until then.
 
-// Stub for T052's real Public\TableScanController — exists now only so
-// URL::signedRoute('table.scan', ...) (07.5) has a real route to sign against.
-Route::get('/t/{table}/{token}', function () {
-    abort(501, "Table ordering isn't built yet — see T052.");
-})->middleware('signed')->name('table.scan');
+Route::get('/t/{table}/{token}', [TableScanController::class, 'show'])
+    ->middleware('signed')
+    ->name('table.scan');
+
+Route::post('/t/{table}/switch', [TableScanController::class, 'switchTable'])
+    ->middleware('auth:customer')
+    ->name('table.scan.switch');
 
 Route::middleware('guest:customer')->group(function () {
     Route::get('/register', [RegisteredCustomerController::class, 'create'])->name('register');
