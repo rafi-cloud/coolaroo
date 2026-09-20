@@ -938,3 +938,22 @@ input{font:inherit}
 .kds-availability-list li{display:flex;justify-content:space-between;align-items:center;gap:.8rem}
 .kds-availability-suboption{padding-left:1.2rem;font-size:.86rem;color:var(--body)}
 .kds-availability-list .btn{min-height:36px;padding:0 .8rem;font-size:.8rem}
+
+/* ---------- floor view (S22) ---------- */
+.b-available{background:#DFF3E6;color:#1E6B3A}
+.b-occupied{background:#F7E2DD;color:#B8402C}
+.b-reserved{background:#FCEED8;color:#9A6612}
+
+.floor-paused-banner{
+  margin-bottom:1rem;padding:.7rem 1rem;border-radius:8px;
+  background:#FCEED8;color:#9A6612;font-weight:600;font-size:.88rem;
+}
+
+.floor-alerts-panel,.floor-list-panel{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:.9rem 1.1rem;margin-bottom:1.1rem;
+}
+.floor-alerts-panel h2,.floor-list-panel h2{font-size:.95rem;margin-bottom:.5rem}
+.floor-alerts-list,.floor-list-panel ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4rem;font-size:.86rem}
+.floor-alert-item{color:var(--pending);font-weight:600}

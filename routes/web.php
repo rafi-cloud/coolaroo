@@ -28,6 +28,7 @@ use App\Http\Controllers\Public\TableScanController;
 use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
+use App\Http\Controllers\Staff\Floor\FloorController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
 use App\Http\Controllers\Staff\Kds\AvailabilityController;
 use App\Http\Controllers\Staff\Kds\StationController;
@@ -117,6 +118,8 @@ Route::middleware(['auth:staff', 'staff.session'])->group(function () {
 });
 
 Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitstaff'])->group(function () {
+    Route::get('/floor', [FloorController::class, 'index'])->name('staff.floor.index');
+    Route::get('/floor/state', [FloorController::class, 'state'])->name('staff.floor.state');
     Route::post('/orders/{order}/cash', [CashPaymentController::class, 'store'])->name('staff.orders.cash.store');
     Route::get('/orders/{order}/stripe-qr', [StaffOrderController::class, 'stripeQr'])->name('staff.orders.stripe-qr');
     Route::post('/orders/{order}/payment-check', [StaffOrderController::class, 'check'])->name('staff.orders.payment-check');
