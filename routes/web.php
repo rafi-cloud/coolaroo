@@ -25,6 +25,7 @@ use App\Http\Controllers\Customer\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Public\AvailabilityController as PublicAvailabilityController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\MenuController;
 use App\Http\Controllers\Public\TableScanController;
@@ -44,6 +45,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
+Route::get('/reservations/availability', [PublicAvailabilityController::class, 'index'])->name('reservations.availability');
 
 Route::get('/t/{table}/{token}', [TableScanController::class, 'show'])
     ->middleware('signed')
