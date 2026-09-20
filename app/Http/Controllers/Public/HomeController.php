@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Feedback;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use App\Services\SettingService;
@@ -10,7 +11,7 @@ use App\Services\SpecialsService;
 use Illuminate\View\View;
 
 /**
- * S01, FR32, FR80, FR91, BR59: Public homepage.
+ * S01, FR32, FR80, FR91, BR45, BR59: Public homepage.
  */
 class HomeController extends Controller
 {
@@ -38,12 +39,45 @@ class HomeController extends Controller
             ->orderBy('display_order')
             ->get();
 
+        // FR80, BR45: Public ratings section
+        $minReviews = $this->settingService->getInt('public_rating_min_count', 10);
+        $nonHidden = Feedback::where('is_hidden', false);
+        $reviewCount = (clone $nonHidden)->count();
+
+        $showRatingCard = $reviewCount >= $minReviews;
+        $ratingStats = null;
+
+        if ($showRatingCard) {
+            $foodAvg = round((float) (clone $nonHidden)->avg('food_rating'), 1);
+            $serviceAvg = round((float) (clone $nonHidden)->avg('service_rating'), 1);
+            $overallAvg = round(($foodAvg + $serviceAvg) / 2, 1);
+
+            $ratingStats = [
+                'count' => $reviewCount,
+                'food_avg' => number_format($foodAvg, 1),
+                'food_pct' => round(($foodAvg / 5) * 100),
+                'service_avg' => number_format($serviceAvg, 1),
+                'service_pct' => round(($serviceAvg / 5) * 100),
+                'overall_avg' => number_format($overallAvg, 1),
+            ];
+        }
+
+        $featuredReviews = (clone $nonHidden)
+            ->where('is_featured', true)
+            ->with('customer')
+            ->latest('submitted_at')
+            ->take(3)
+            ->get();
+
         return view('public.home', [
             'venue' => $this->settingService->venue(),
             'featuredItems' => $featuredItems,
             'topSpecial' => $topSpecial,
             'hasSpecials' => $hasSpecials,
             'categories' => $categories,
+            'ratingStats' => $ratingStats,
+            'featuredReviews' => $featuredReviews,
+            'showRatingCard' => $showRatingCard,
         ]);
     }
 }

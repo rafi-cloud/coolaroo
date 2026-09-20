@@ -155,8 +155,68 @@
     </div>
   </section>
 
+  {{-- S01: Reviews Section (T032, FR80, BR45) --}}
+  <section class="section wrap" id="reviews" data-testid="home-reviews-section">
+    <div class="center">
+      <div class="rule center"></div>
+      <h2 class="section-title">What our diners say</h2>
+    </div>
+
+    <div class="reviews @if(! $showRatingCard) no-rating-card @endif" data-testid="home-reviews-container">
+      {{-- Rating summary card: shown when count >= public_rating_min_count (BR45) --}}
+      @if($showRatingCard && $ratingStats)
+        <div class="rating-card" data-testid="home-rating-card">
+          <p class="rating-big">{{ $ratingStats['overall_avg'] }}<span>/5</span></p>
+          <div class="rating-row">
+            <span class="rating-label">Food</span>
+            <span class="stars" role="img" aria-label="Food rated {{ $ratingStats['food_avg'] }} out of 5">
+              <span class="stars-fill" style="width:{{ $ratingStats['food_pct'] }}%"></span>
+            </span>
+            <strong>{{ $ratingStats['food_avg'] }}</strong>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">Service</span>
+            <span class="stars" role="img" aria-label="Service rated {{ $ratingStats['service_avg'] }} out of 5">
+              <span class="stars-fill" style="width:{{ $ratingStats['service_pct'] }}%"></span>
+            </span>
+            <strong>{{ $ratingStats['service_avg'] }}</strong>
+          </div>
+          <p class="rating-count">Based on {{ $ratingStats['count'] }} {{ \Illuminate\Support\Str::plural('review', $ratingStats['count']) }} from diners</p>
+        </div>
+      @endif
+
+      <div>
+        <p class="featured-label">Featured reviews</p>
+        <div class="review-grid" data-testid="home-featured-reviews-grid">
+          @forelse($featuredReviews as $feedback)
+            @php
+              $parts = explode(' ', trim($feedback->customer?->full_name ?? 'Diner'));
+              $firstName = $parts[0] ?? 'Diner';
+              $lastInitial = isset($parts[1]) && strlen($parts[1]) > 0 ? strtoupper($parts[1][0]) . '.' : '';
+              $author = trim("{$firstName} {$lastInitial}");
+              $avgRating = round(($feedback->food_rating + $feedback->service_rating) / 2);
+              $starPct = round(($avgRating / 5) * 100);
+            @endphp
+            <article class="review" data-testid="home-review-{{ $feedback->order_id }}">
+              <span class="stars stars-sm" role="img" aria-label="Rated {{ $avgRating }} out of 5">
+                <span class="stars-fill" style="width:{{ $starPct }}%"></span>
+              </span>
+              <blockquote>
+                <p>{{ $feedback->comment }}</p>
+              </blockquote>
+              <p class="review-by" data-testid="home-review-by-{{ $feedback->order_id }}">
+                {{ $author }} &middot; {{ $feedback->submitted_at?->format('F Y') }}
+              </p>
+            </article>
+          @empty
+            <p data-testid="home-reviews-empty">Reviews will appear here as diners share their experiences.</p>
+          @endforelse
+        </div>
+      </div>
+    </div>
+  </section>
+
   {{-- Section Anchor Hooks for subsequent Phase 6 tasks --}}
   <div id="table-order-info" class="visually-hidden" aria-hidden="true"></div>
-  <div id="reviews" class="visually-hidden" aria-hidden="true"></div>
   <div id="reserve" class="visually-hidden" aria-hidden="true"></div>
 </x-layouts.public>
