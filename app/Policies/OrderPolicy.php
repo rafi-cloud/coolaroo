@@ -32,6 +32,11 @@ class OrderPolicy
         return in_array($staff->role->role_name, ['waitstaff', 'kitchen', 'bar'], true);
     }
 
+    public function resolveStockConflict(Staff $staff): bool
+    {
+        return in_array($staff->role->role_name, ['kitchen', 'bar'], true);
+    }
+
     public function issueRefund(Staff $staff): bool
     {
         return false;

@@ -28,6 +28,7 @@ use App\Http\Controllers\Public\TableScanController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
+use App\Http\Controllers\Staff\OrderController as StaffOrderActionsController;
 use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
 use App\Http\Controllers\Staff\RefundRequestController;
 use Illuminate\Support\Facades\Route;
@@ -113,6 +114,11 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
     Route::post('/orders/{order}/cash', [CashPaymentController::class, 'store'])->name('staff.orders.cash.store');
     Route::get('/orders/{order}/stripe-qr', [StaffOrderController::class, 'stripeQr'])->name('staff.orders.stripe-qr');
     Route::post('/orders/{order}/payment-check', [StaffOrderController::class, 'check'])->name('staff.orders.payment-check');
+    Route::post('/orders/{order}/cancel', [StaffOrderActionsController::class, 'cancel'])->name('staff.orders.cancel');
+});
+
+Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:kitchen,bar'])->group(function () {
+    Route::post('/orders/{order}/stock-conflict/resolve', [StaffOrderActionsController::class, 'resolveConflict'])->name('staff.orders.stock-conflict.resolve');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {
