@@ -104,11 +104,11 @@ class PaymentController extends Controller
         return $this->verify($payment, $order);
     }
 
-    /** BR25: the one place a retrieved session is turned into "paid" or not. */
+    /** BR25: delegates to PaymentService::verifyStripePayment() (T073) — the one shared implementation. */
     private function verify(Payment $payment, Order $order): RedirectResponse
     {
         try {
-            $session = $this->stripe->retrieveSession($payment->stripe_session_id);
+            $paid = $this->payments->verifyStripePayment($payment, $order->customer);
         } catch (ApiErrorException $e) {
             Log::channel('integrations')->error('Stripe session retrieval failed', [
                 'payment_id' => $payment->payment_id,
@@ -119,9 +119,7 @@ class PaymentController extends Controller
                 ->with('error', 'Could not check payment status just now — try again shortly.');
         }
 
-        if ($session->payment_status === 'paid') {
-            $this->payments->markPaid($payment, $order->customer);
-
+        if ($paid) {
             return redirect()->route('orders.show', $order)->with('status', 'order-paid');
         }
 

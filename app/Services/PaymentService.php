@@ -26,8 +26,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * FR55, 07.7, BR01, BR10, BR25, BR30, BR54. Shared by Stripe (T070) and cash
- * (T072) once either exists — both will create a Payment row and hand it
- * here; this task builds the transaction itself.
+ * (T072) — both create a Payment row and hand it here; this class builds
+ * the transaction itself.
  */
 class PaymentService
 {
@@ -35,7 +35,22 @@ class PaymentService
         private StockService $stock,
         private TableStatusService $tableStatus,
         private AuditLogger $auditLogger,
+        private StripeService $stripe,
     ) {
+    }
+
+    /** BR25: the one place any caller (customer or staff, T073) turns a retrieved session into "paid" or not. */
+    public function verifyStripePayment(Payment $payment, Staff|Customer|null $actor = null): bool
+    {
+        $session = $this->stripe->retrieveSession($payment->stripe_session_id);
+
+        if ($session->payment_status === 'paid') {
+            $this->markPaid($payment, $actor);
+
+            return true;
+        }
+
+        return false;
     }
 
     public function markPaid(Payment $payment, Staff|Customer|null $actor = null): Order

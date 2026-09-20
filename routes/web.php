@@ -26,6 +26,7 @@ use App\Http\Controllers\Customer\ProfileController as CustomerProfileController
 use App\Http\Controllers\Public\TableScanController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
+use App\Http\Controllers\Staff\Floor\StaffOrderController;
 use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -104,6 +105,8 @@ Route::middleware(['auth:staff', 'staff.session'])->group(function () {
 
 Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitstaff'])->group(function () {
     Route::post('/orders/{order}/cash', [CashPaymentController::class, 'store'])->name('staff.orders.cash.store');
+    Route::get('/orders/{order}/stripe-qr', [StaffOrderController::class, 'stripeQr'])->name('staff.orders.stripe-qr');
+    Route::post('/orders/{order}/payment-check', [StaffOrderController::class, 'check'])->name('staff.orders.payment-check');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {
