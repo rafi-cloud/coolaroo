@@ -28,6 +28,7 @@ use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
 use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\Floor\StaffOrderController;
 use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
+use App\Http\Controllers\Staff\RefundRequestController;
 use Illuminate\Support\Facades\Route;
 
 // No '/' route yet — the real homepage lands in T030. Hitting '/' 404s until then.
@@ -101,6 +102,10 @@ Route::middleware(['auth:staff', 'staff.session'])->group(function () {
 
     Route::get('/staff/profile', [StaffProfileController::class, 'edit'])->name('staff.profile.edit');
     Route::patch('/staff/profile', [StaffProfileController::class, 'update'])->name('staff.profile.update');
+
+    // No role: restriction — FR51's actor list (Waitstaff, Kitchen, Bar, Admin)
+    // is enforced by OrderPolicy::requestRefund() itself, not route middleware.
+    Route::post('/staff/orders/{order}/refund-requests', [RefundRequestController::class, 'store'])->name('staff.orders.refund-requests.store');
 });
 
 Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitstaff'])->group(function () {
