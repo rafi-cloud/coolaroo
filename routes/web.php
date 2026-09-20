@@ -25,6 +25,7 @@ use App\Http\Controllers\Customer\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Customer\Auth\RegisteredCustomerController;
 use App\Http\Controllers\Customer\Auth\VerifyEmailController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\TableScanController;
 use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
@@ -40,7 +41,7 @@ use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
 use App\Http\Controllers\Staff\RefundRequestController;
 use Illuminate\Support\Facades\Route;
 
-// No '/' route yet — the real homepage lands in T030. Hitting '/' 404s until then.
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/t/{table}/{token}', [TableScanController::class, 'show'])
     ->middleware('signed')
