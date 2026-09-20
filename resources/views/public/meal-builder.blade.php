@@ -57,6 +57,8 @@
     </div>
   </section>
 
+  <x-chat />
+
   @push('scripts')
   <script>
   document.addEventListener('DOMContentLoaded', function () {

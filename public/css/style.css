@@ -1151,3 +1151,52 @@ svg{display:block}
 }
 .mb-scan{font-size:.9rem;color:var(--body)}
 .mb-note{margin-top:2rem;font-size:.85rem;color:var(--body);max-width:760px}
+
+/* Chat widget (S17) */
+.chat{position:fixed;right:1rem;bottom:1rem;z-index:60}
+.chat-launcher{
+  display:inline-flex;align-items:center;gap:.55rem;
+  background:var(--orange);color:#fff;border:0;border-radius:999px;
+  padding:.8rem 1.2rem;font:inherit;font-weight:600;cursor:pointer;
+  box-shadow:var(--shadow);
+}
+.chat-launcher:hover{background:var(--orange-dark)}
+.chat-launcher svg{width:20px;height:20px}
+.chat-panel{
+  position:absolute;right:0;bottom:0;width:min(23rem,calc(100vw - 2rem));
+  display:flex;flex-direction:column;
+  background:#fff;border-radius:12px;box-shadow:var(--shadow);overflow:hidden;
+}
+.chat-head{
+  display:flex;align-items:center;gap:.8rem;
+  background:var(--dark);color:#fff;padding:.9rem 1rem;
+}
+.chat-head h2{font-size:1rem;color:#fff;margin-right:auto}
+.chat-build{font-size:.85rem;text-decoration:underline;color:var(--amber)}
+.chat-close{background:none;border:0;color:#fff;cursor:pointer;padding:.2rem;line-height:0}
+.chat-close svg{width:18px;height:18px}
+.chat-log{
+  display:flex;flex-direction:column;gap:.6rem;
+  padding:1rem;max-height:min(24rem,50vh);overflow-y:auto;
+}
+.chat-msg{
+  max-width:85%;padding:.6rem .85rem;border-radius:12px;
+  font-size:.92rem;line-height:1.5;
+}
+.chat-msg-bot{background:var(--sand);color:var(--ink);align-self:flex-start}
+.chat-msg-you{background:var(--orange);color:#fff;align-self:flex-end}
+.chat-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chat-chip{
+  display:inline-block;background:#fff;border:1.5px solid var(--orange);
+  color:var(--ink);border-radius:999px;padding:.3rem .75rem;font-size:.82rem;
+}
+.chat-chip:hover{background:var(--cream)}
+.chat-form{display:flex;gap:.5rem;padding:0 1rem}
+.chat-form input{
+  flex:1;min-width:0;font:inherit;color:var(--body);
+  border:1.5px solid #EAE0D4;border-radius:10px;padding:.6rem .8rem;
+}
+.chat-note{padding:.8rem 1rem 1rem;font-size:.75rem;color:var(--body)}
+@media (max-width:480px){
+  .chat-panel{position:fixed;right:.5rem;left:.5rem;bottom:.5rem;width:auto}
+}

@@ -255,4 +255,6 @@
     });
   </script>
   @endpush
+
+  <x-chat />
 </x-dynamic-component>

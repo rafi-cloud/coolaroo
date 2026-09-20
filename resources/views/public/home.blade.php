@@ -221,4 +221,6 @@
 
   {{-- Section Anchor Hooks for subsequent Phase 6 tasks --}}
   <div id="table-order-info" class="visually-hidden" aria-hidden="true"></div>
+
+  <x-chat />
 </x-layouts.public>
