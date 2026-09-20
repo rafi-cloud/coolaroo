@@ -24,6 +24,23 @@ class OrderController extends Controller
     {
     }
 
+    /**
+     * FR39, UC11: View customer order history.
+     */
+    public function index(Request $request): View
+    {
+        $customer = $request->user('customer');
+
+        $orders = Order::where('customer_id', $customer->customer_id)
+            ->with(['restaurantTable', 'items', 'payments', 'refunds'])
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        return view('customer.orders', [
+            'orders' => $orders,
+        ]);
+    }
+
     public function show(Order $order): View
     {
         Gate::authorize('view', $order);

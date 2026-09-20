@@ -93,10 +93,14 @@ Route::middleware('auth:customer')->group(function () {
     Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
 
+    Route::get('/my/reservations', [CustomerReservationController::class, 'index'])->name('reservations.index');
     Route::post('/reservations', [CustomerReservationController::class, 'store'])
         ->middleware('verified')
         ->name('reservations.store');
+    Route::patch('/reservations/{reservation}', [CustomerReservationController::class, 'update'])->name('reservations.update');
+    Route::post('/reservations/{reservation}/cancel', [CustomerReservationController::class, 'cancel'])->name('reservations.cancel');
 
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/state', [OrderController::class, 'state'])->name('orders.state');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');

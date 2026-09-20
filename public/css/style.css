@@ -959,4 +959,155 @@ svg{display:block}
   .wizard-step-node .step-label{display:none}
 }
 
+/* ==========================================================================
+   Customer Account Pages (S13 My Orders, S19 My Reservations)
+   ========================================================================== */
+.customer-container{
+  padding-block:clamp(2rem,5vw,3.5rem);
+}
+
+.customer-nav-tabs{
+  display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+  border-bottom:2px solid #EFE4D6;padding-bottom:.6rem;margin-bottom:2rem;
+}
+.customer-nav-tabs .tab-item{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.55rem 1rem;border-radius:8px;font-size:.92rem;font-weight:600;
+  color:var(--body);background:transparent;border:none;cursor:pointer;
+  transition:all .15s ease;
+}
+.customer-nav-tabs .tab-item svg{width:18px;height:18px;flex:none}
+.customer-nav-tabs .tab-item:hover{background:var(--sand);color:var(--ink)}
+.customer-nav-tabs .tab-item.active{background:var(--orange);color:#fff}
+.customer-nav-tabs .tab-item.active svg{stroke:#fff}
+.customer-nav-tabs .tab-logout{color:#9A2D14}
+.customer-nav-tabs .tab-logout:hover{background:#FBEAE5;color:#9A2D14}
+
+.customer-page-header{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;margin-bottom:1.8rem;
+}
+.customer-page-header h1{font-size:clamp(1.6rem,3.5vw,2.2rem)}
+.customer-page-header .sub{color:var(--body);font-size:.95rem;margin-top:.2rem}
+
+.customer-empty-card{
+  background:#fff;border-radius:12px;box-shadow:var(--shadow);
+  padding:3rem 1.5rem;text-align:center;max-width:540px;margin:2rem auto;
+}
+.customer-empty-card .empty-icon{font-size:2.8rem;margin-bottom:1rem}
+.customer-empty-card h3{font-size:1.3rem;margin-bottom:.4rem}
+.customer-empty-card p{color:var(--body);font-size:.93rem}
+
+/* Orders list (S13) */
+.orders-list{display:flex;flex-direction:column;gap:1.2rem}
+.order-card{
+  background:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(43,26,16,.06);
+  border:1px solid #EFE4D6;padding:1.4rem;
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+.order-card:hover{border-color:var(--amber);box-shadow:0 6px 22px rgba(43,26,16,.09)}
+.order-card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid #F3EAE0;padding-bottom:.8rem;margin-bottom:1rem;
+  flex-wrap:wrap;gap:.6rem;
+}
+.order-ref-meta{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.order-number{font-size:1.05rem;color:var(--ink)}
+.order-date{font-size:.85rem;color:var(--body)}
+.order-badges{display:flex;align-items:center;gap:.5rem}
+.order-badge-refund{
+  display:inline-block;padding:.2rem .6rem;border-radius:4px;
+  font-size:.75rem;font-weight:700;background:#FDE8E8;color:#9B1C1C;
+}
+
+.order-card-body{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:1.5rem;flex-wrap:wrap;
+}
+.order-details-col{font-size:.9rem;line-height:1.6}
+.order-details-col p{margin-bottom:.2rem}
+.order-total-col{text-align:right}
+.order-total-label{display:block;font-size:.78rem;text-transform:uppercase;color:var(--body);letter-spacing:.05em}
+.order-total-amount{font-size:1.3rem;font-weight:700;color:var(--ink)}
+
+.order-card-actions{
+  display:flex;align-items:center;gap:.7rem;margin-top:1.1rem;
+  padding-top:.9rem;border-top:1px solid #F7F0E8;flex-wrap:wrap;
+}
+.btn-subtle{
+  background:#F5EDE2;color:var(--ink);font-weight:600;font-size:.85rem;
+  padding:.55em 1.2em;border-radius:6px;border:1px solid #E5D5C2;
+}
+.btn-subtle:hover{background:#EFE2D2}
+
+/* Reservations (S19) */
+.reservations-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1.4rem;
+}
+.res-card{
+  background:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(43,26,16,.06);
+  border:1px solid #EFE4D6;padding:1.4rem;display:flex;flex-direction:column;
+}
+.res-card-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:.6rem;margin-bottom:1rem;border-bottom:1px solid #F3EAE0;padding-bottom:.8rem;
+}
+.res-ref-group{display:flex;flex-direction:column}
+.res-ref-code{font-size:1.1rem;font-weight:700;color:var(--ink);letter-spacing:.02em}
+.res-date-sub{font-size:.82rem;color:var(--body);margin-top:.1rem}
+
+.res-card-details{display:flex;flex-direction:column;gap:.4rem;font-size:.9rem;margin-bottom:1.2rem}
+.res-detail-row{display:flex;align-items:center;gap:.6rem}
+.res-label{color:var(--body);font-size:.85rem;min-width:65px}
+.res-requests-text{font-style:italic;color:var(--body);font-size:.86rem}
+.table-chip{
+  background:var(--cream);border:1px solid #E5D5C2;padding:.15rem .5rem;
+  border-radius:4px;font-size:.8rem;font-weight:600;color:var(--ink);
+}
+
+.res-card-actions{
+  margin-top:auto;display:flex;flex-direction:column;gap:.6rem;
+  padding-top:.8rem;border-top:1px solid #F7F0E8;
+}
+.res-details-panel{width:100%}
+.res-details-panel > summary{list-style:none;cursor:pointer}
+.res-details-panel > summary::-webkit-details-marker{display:none}
+.res-drawer-content{
+  margin-top:.8rem;background:var(--cream);border:1px solid #E5D5C2;
+  border-radius:8px;padding:1rem;
+}
+.res-cancel-box{background:#FDF2F2;border-color:#F8B4B4;color:#9B1C1C}
+
+.btn-danger{background:#C81E1E;color:#fff;border-color:#C81E1E}
+.btn-danger:hover{background:#9B1C1C}
+.btn-danger-outline{border-color:#E02424;color:#C81E1E}
+.btn-danger-outline:hover{background:#C81E1E;color:#fff}
+
+.badge{
+  display:inline-block;padding:.25rem .6rem;border-radius:4px;
+  font-size:.78rem;font-weight:700;line-height:1;
+}
+.badge-amber{background:#FEF3C7;color:#92400E}
+.badge-green{background:#DEF7EC;color:#03543F}
+.badge-red{background:#FDE8E8;color:#9B1C1C}
+.badge-gray{background:#F3F4F6;color:#4B5563}
+
+.data-table{
+  width:100%;border-collapse:collapse;background:#fff;border-radius:8px;
+  overflow:hidden;box-shadow:0 2px 10px rgba(43,26,16,.05);border:1px solid #EFE4D6;
+}
+.data-table th{
+  background:#FBF3EB;text-align:left;padding:.85rem 1rem;
+  font-size:.82rem;text-transform:uppercase;color:var(--body);letter-spacing:.04em;
+  border-bottom:1.5px solid #EAE0D4;
+}
+.data-table td{
+  padding:.85rem 1rem;border-bottom:1px solid #F3EAE0;font-size:.9rem;
+}
+.data-table tbody tr:last-child td{border-bottom:none}
+.data-table tbody tr:hover{background:var(--cream)}
+
+.customer-pagination{margin-top:1.8rem;display:flex;justify-content:center}
+
+
 
