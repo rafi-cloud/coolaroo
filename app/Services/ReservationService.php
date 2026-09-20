@@ -12,10 +12,18 @@ use App\Models\RestaurantTable;
 use App\Models\Setting;
 use App\Models\SlotCapacity;
 use App\Models\Staff;
+use App\Mail\QueuedMailable;
+use App\Mail\ReservationCancelledMail;
+use App\Mail\ReservationConfirmedMail;
+use App\Mail\ReservationDeclinedMail;
+use App\Mail\ReservationExpiredMail;
+use App\Mail\ReservationReceivedMail;
+use App\Mail\ReservationReminderMail;
 use App\Models\Visit;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -127,7 +135,7 @@ class ReservationService
             ]);
         }
 
-        return DB::transaction(function () use ($customer, $slot, $bookingDate, $partySize, $data) {
+        $reservation = DB::transaction(function () use ($customer, $slot, $bookingDate, $partySize, $data) {
             SlotCapacity::whereKey($slot->slot_id)->lockForUpdate()->first();
 
             if (! $this->availability->hasSlotCapacity($slot, $bookingDate, $partySize)) {
@@ -155,6 +163,10 @@ class ReservationService
 
             return $reservation;
         });
+
+        $this->queueMail($reservation, new ReservationReceivedMail($reservation));
+
+        return $reservation;
     }
 
     /**
@@ -259,7 +271,7 @@ class ReservationService
      */
     public function approve(Reservation $reservation, Staff $staff): Reservation
     {
-        return DB::transaction(function () use ($reservation, $staff) {
+        $locked = DB::transaction(function () use ($reservation, $staff) {
             $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
 
             $locked->status->ensureCanTransitionTo(ReservationStatus::Confirmed);
@@ -284,6 +296,10 @@ class ReservationService
 
             return $locked;
         });
+
+        $this->queueMail($locked, new ReservationConfirmedMail($locked));
+
+        return $locked;
     }
 
     /**
@@ -292,7 +308,7 @@ class ReservationService
      */
     public function decline(Reservation $reservation, Staff $staff, ?string $reason = null): Reservation
     {
-        return DB::transaction(function () use ($reservation, $staff, $reason) {
+        $locked = DB::transaction(function () use ($reservation, $staff, $reason) {
             $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
 
             $locked->status->ensureCanTransitionTo(ReservationStatus::Declined);
@@ -310,6 +326,10 @@ class ReservationService
 
             return $locked;
         });
+
+        $this->queueMail($locked, new ReservationDeclinedMail($locked, $reason));
+
+        return $locked;
     }
 
     /**
@@ -324,7 +344,7 @@ class ReservationService
             ]);
         }
 
-        return DB::transaction(function () use ($reservation, $customer) {
+        $locked = DB::transaction(function () use ($reservation, $customer) {
             $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
 
             $locked->status->ensureCanTransitionTo(ReservationStatus::Cancelled);
@@ -344,6 +364,10 @@ class ReservationService
 
             return $locked;
         });
+
+        $this->queueMail($locked, new ReservationCancelledMail($locked));
+
+        return $locked;
     }
 
     /**
@@ -352,7 +376,7 @@ class ReservationService
      */
     public function cancelByStaff(Reservation $reservation, Staff $staff, ?string $reason = null): Reservation
     {
-        return DB::transaction(function () use ($reservation, $staff, $reason) {
+        $locked = DB::transaction(function () use ($reservation, $staff, $reason) {
             $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
 
             $locked->status->ensureCanTransitionTo(ReservationStatus::Cancelled);
@@ -373,6 +397,10 @@ class ReservationService
 
             return $locked;
         });
+
+        $this->queueMail($locked, new ReservationCancelledMail($locked, $reason));
+
+        return $locked;
     }
 
     /**
@@ -555,7 +583,7 @@ class ReservationService
      */
     public function expire(Reservation $reservation): Reservation
     {
-        return DB::transaction(function () use ($reservation) {
+        $locked = DB::transaction(function () use ($reservation) {
             $locked = Reservation::whereKey($reservation->reservation_id)->lockForUpdate()->firstOrFail();
 
             $locked->status->ensureCanTransitionTo(ReservationStatus::Expired);
@@ -570,6 +598,10 @@ class ReservationService
 
             return $locked;
         });
+
+        $this->queueMail($locked, new ReservationExpiredMail($locked));
+
+        return $locked;
     }
 
     /**
@@ -975,5 +1007,36 @@ class ReservationService
         $first = array_shift($parts);
 
         return $parts === [] ? $first : $first.' '.strtoupper(substr((string) end($parts), 0, 1));
+    }
+
+    /**
+     * FR75: Send reservation reminder email (default 24 hours before booking).
+     */
+    public function sendReminder(Reservation $reservation): bool
+    {
+        if (! in_array($reservation->status, [ReservationStatus::Requested, ReservationStatus::Confirmed], true)) {
+            return false;
+        }
+
+        if ($reservation->reminder_sent_at !== null) {
+            return false;
+        }
+
+        $this->queueMail($reservation, new ReservationReminderMail($reservation));
+
+        $reservation->forceFill(['reminder_sent_at' => now()])->save();
+
+        return true;
+    }
+
+    /**
+     * FR74, FR75, NFR15: Queue transactional email to reservation holder.
+     */
+    private function queueMail(Reservation $reservation, QueuedMailable $mailable): void
+    {
+        $email = $reservation->customer?->email;
+        if (! empty($email)) {
+            Mail::to($email)->queue($mailable);
+        }
     }
 }
