@@ -38,6 +38,7 @@ use App\Http\Controllers\Customer\ReservationController as CustomerReservationCo
 use App\Http\Controllers\Public\AiController;
 use App\Http\Controllers\Public\AvailabilityController as PublicAvailabilityController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\LegalController;
 use App\Http\Controllers\Public\MealBuilderController;
 use App\Http\Controllers\Public\MenuController;
 use App\Http\Controllers\Public\TableScanController;
@@ -60,6 +61,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
 Route::get('/reservations/availability', [PublicAvailabilityController::class, 'index'])->name('reservations.availability');
+Route::get('/privacy', [LegalController::class, 'privacy'])->name('privacy');
+Route::get('/terms', [LegalController::class, 'terms'])->name('terms');
 
 Route::get('/meal-builder', [MealBuilderController::class, 'show'])->name('meal-builder');
 Route::post('/ai/chat', [AiController::class, 'chat'])->name('ai.chat');

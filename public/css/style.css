@@ -1200,3 +1200,37 @@ svg{display:block}
 @media (max-width:480px){
   .chat-panel{position:fixed;right:.5rem;left:.5rem;bottom:.5rem;width:auto}
 }
+
+/* Footer legal links (NFR12) */
+.foot-links{display:flex;align-items:center;gap:.7rem;color:rgba(255,255,255,.75);font-size:.88rem}
+.foot-links a{color:rgba(255,255,255,.8);text-decoration:underline;text-underline-offset:3px}
+.foot-links a:hover{color:var(--orange)}
+
+/* Legal pages (Privacy Policy & Terms — NFR12) */
+.legal-card{
+  background:#fff;border-radius:12px;box-shadow:var(--shadow);
+  padding:clamp(1.5rem,4vw,3.5rem);margin-bottom:3rem;
+}
+.legal-header{margin-bottom:2.5rem;border-bottom:2px solid var(--sand);padding-bottom:1.5rem}
+.legal-header h1{font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:.5rem;color:var(--ink)}
+.legal-header .legal-meta{font-size:.9rem;color:var(--body)}
+.legal-body{line-height:1.8;color:var(--body)}
+.legal-body h2{font-size:1.4rem;color:var(--ink);margin:2rem 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid var(--sand)}
+.legal-body h3{font-size:1.15rem;color:var(--ink);margin:1.4rem 0 .5rem}
+.legal-body p{margin-bottom:1rem}
+.legal-body ul{list-style:disc;margin:0 0 1.2rem 1.5rem}
+.legal-body li{margin-bottom:.5rem}
+.legal-callout{
+  background:var(--cream);border-left:4px solid var(--orange);
+  padding:1.2rem 1.5rem;border-radius:0 8px 8px 0;margin:1.5rem 0;
+}
+.legal-callout strong{color:var(--ink);display:block;margin-bottom:.3rem}
+.legal-nav{
+  display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;
+}
+.legal-nav-link{
+  display:inline-block;padding:.4rem 1rem;border-radius:999px;
+  background:var(--sand);color:var(--ink);font-size:.9rem;font-weight:600;
+}
+.legal-nav-link.active{background:var(--orange);color:#fff}
+

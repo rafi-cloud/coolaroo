@@ -61,6 +61,11 @@
 
     <div class="foot-base">
       <span data-testid="site-footer-copyright">&copy; {{ now()->year }} {{ $venue['name'] ?? 'Coolaroo Restaurant' }}. All rights reserved.</span>
+      <div class="foot-links">
+        <a href="{{ route('privacy') }}" data-testid="site-footer-privacy-link">Privacy Policy</a>
+        <span aria-hidden="true">&bull;</span>
+        <a href="{{ route('terms') }}" data-testid="site-footer-terms-link">Terms &amp; Conditions</a>
+      </div>
       <span class="socials">
         @php
             $fb = $venue['socials']['facebook'] ?? '';
