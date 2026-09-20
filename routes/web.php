@@ -55,6 +55,7 @@ Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
 Route::get('/reservations/availability', [PublicAvailabilityController::class, 'index'])->name('reservations.availability');
 
 Route::post('/ai/chat', [AiController::class, 'chat'])->name('ai.chat');
+Route::post('/ai/meal-builder', [AiController::class, 'mealBuilder'])->name('ai.meal-builder');
 
 Route::get('/t/{table}/{token}', [TableScanController::class, 'show'])
     ->middleware('signed')

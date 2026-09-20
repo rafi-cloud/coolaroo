@@ -8,6 +8,7 @@ use App\Models\AddOnOption;
 use App\Models\MenuItem;
 use App\Models\MenuItemSize;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -147,6 +148,191 @@ class AiMenuService
             'items' => $this->resolveItems($payload['item_ids'] ?? [], $context),
             'usage' => $this->usage($response),
         ];
+    }
+
+    /**
+     * FR44, BR47. The model picks ids; every price, line total and meal
+     * total below is calculated here from the live menu. A suggestion is
+     * returned only if the whole basket is orderable as it stands and
+     * still fits the budget once we have priced it ourselves.
+     *
+     * @param array{budget:float|int|string, party_size:int, dietary?:array<int,string>, preferences?:?string} $brief
+     * @return array{summary:string, suggestions:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}}
+     */
+    public function buildMeal(array $brief): array
+    {
+        $context = $this->buildContext();
+
+        $response = $this->chat(
+            [
+                ['role' => 'system', 'content' => $this->mealBuilderSystemPrompt($context)],
+                ['role' => 'user', 'content' => $this->briefLine($brief)],
+            ],
+            $this->mealBuilderResponseFormat(),
+        );
+
+        $payload = $this->applyOffTopicGuard($this->decodeStructured($response));
+        $byId = collect($context['items'])->keyBy('id');
+        $budget = (float) $brief['budget'];
+
+        $suggestions = collect($payload['suggestions'] ?? [])
+            ->map(fn ($suggestion) => is_array($suggestion)
+                ? $this->priceSuggestion($suggestion, $byId, $budget)
+                : null)
+            ->filter()
+            ->values()
+            ->all();
+
+        return [
+            'summary' => (string) ($payload['summary'] ?? ''),
+            'suggestions' => $suggestions,
+            'usage' => $this->usage($response),
+        ];
+    }
+
+    /** @param array<string, mixed> $brief */
+    private function briefLine(array $brief): string
+    {
+        $parts = [
+            'Budget: $'.number_format((float) $brief['budget'], 2).' for the whole table.',
+            'Party size: '.(int) $brief['party_size'].'.',
+        ];
+
+        if (! empty($brief['dietary'])) {
+            $parts[] = 'Dietary needs: '.implode(', ', $brief['dietary']).'.';
+        }
+
+        if (! empty($brief['preferences'])) {
+            $parts[] = 'Preferences: '.$brief['preferences'];
+        }
+
+        return implode(' ', $parts);
+    }
+
+    /**
+     * A suggestion survives only whole: one unorderable line and the meal
+     * goes, because a repriced remainder is no longer what was suggested.
+     *
+     * @param array<string, mixed> $suggestion
+     * @param \Illuminate\Support\Collection<int, array<string, mixed>> $byId
+     * @return array<string, mixed>|null
+     */
+    private function priceSuggestion(array $suggestion, Collection $byId, float $budget): ?array
+    {
+        $lines = [];
+        $total = 0.0;
+
+        foreach ($suggestion['lines'] ?? [] as $line) {
+            $priced = is_array($line) ? $this->priceLine($line, $byId) : null;
+
+            if ($priced === null) {
+                return null;
+            }
+
+            $lines[] = $priced;
+            $total += $priced['line_total'];
+        }
+
+        $total = round($total, 2);
+
+        if ($lines === [] || $total > $budget) {
+            return null;
+        }
+
+        return [
+            'title' => (string) ($suggestion['title'] ?? ''),
+            'rationale' => (string) ($suggestion['rationale'] ?? ''),
+            'total' => $total,
+            'lines' => $lines,
+        ];
+    }
+
+    /**
+     * The keys `item_id`, `size_id`, `add_on_option_ids` and `quantity` are
+     * exactly what `AddCartLineRequest` expects, so T124's Add to cart can
+     * post a line back unchanged.
+     *
+     * @param array<string, mixed> $line
+     * @param \Illuminate\Support\Collection<int, array<string, mixed>> $byId
+     * @return array<string, mixed>|null
+     */
+    private function priceLine(array $line, Collection $byId): ?array
+    {
+        $item = $byId[$line['item_id'] ?? null] ?? null;
+        $quantity = (int) ($line['qty'] ?? 0);
+
+        if ($item === null || $quantity < 1) {
+            return null;
+        }
+
+        $size = $this->sizeFrom($item, $line['size_id'] ?? null);
+        $options = $this->optionsFrom($item, (array) ($line['option_ids'] ?? []));
+
+        if ($size === null || $options === null) {
+            return null;
+        }
+
+        $unitPrice = $size['price'] + array_sum(array_column($options, 'delta'));
+
+        return [
+            'item_id' => $item['id'],
+            'size_id' => $size['id'],
+            'add_on_option_ids' => array_column($options, 'id'),
+            'quantity' => $quantity,
+            'name' => $item['name'],
+            'size_name' => $size['name'],
+            'options' => array_column($options, 'name'),
+            'line_total' => round($unitPrice * $quantity, 2),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     * @return array{id:int, name:string, price:float}|null
+     */
+    private function sizeFrom(array $item, mixed $sizeId): ?array
+    {
+        if (isset($item['sizes'])) {
+            $match = collect($item['sizes'])->firstWhere('id', $sizeId);
+
+            return $match ? ['id' => $match['id'], 'name' => $match['name'], 'price' => (float) $match['price']] : null;
+        }
+
+        return $item['size_id'] === $sizeId
+            ? ['id' => $item['size_id'], 'name' => '', 'price' => (float) $item['price']]
+            : null;
+    }
+
+    /**
+     * BR47 drops an id that does not belong to the item; a group left
+     * outside its min/max by that drop makes the whole line unorderable,
+     * because `AddCartLineRequest` would reject it too. Null says so.
+     *
+     * @param array<string, mixed> $item
+     * @param array<int, mixed> $optionIds
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function optionsFrom(array $item, array $optionIds): ?array
+    {
+        $groups = $item['addons'] ?? [];
+        $available = collect($groups)->pluck('opts')->flatten(1)->keyBy('id');
+        $chosen = [];
+
+        foreach ($optionIds as $optionId) {
+            if (is_int($optionId) && $available->has($optionId)) {
+                $chosen[$optionId] = $available[$optionId];
+            }
+        }
+
+        foreach ($groups as $group) {
+            $selected = collect($group['opts'])->pluck('id')->intersect(array_keys($chosen))->count();
+
+            if ($selected < $group['min'] || $selected > $group['max']) {
+                return null;
+            }
+        }
+
+        return array_values($chosen);
     }
 
     /**
