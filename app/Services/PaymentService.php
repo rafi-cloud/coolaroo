@@ -17,10 +17,8 @@ use App\Models\Order;
 use App\Models\OrderStatusHistory;
 use App\Models\Payment;
 use App\Models\RestaurantTable;
-use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\Visit;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -36,6 +34,7 @@ class PaymentService
         private TableStatusService $tableStatus,
         private AuditLogger $auditLogger,
         private StripeService $stripe,
+        private EtaService $eta,
     ) {
     }
 
@@ -73,8 +72,8 @@ class PaymentService
                 'status' => OrderStatus::Paid,
                 'payment_status' => PaymentStatus::Paid,
                 'paid_at' => now(),
-                'kitchen_eta_at' => $this->estimateEta($order, $items, Destination::Kitchen),
-                'bar_eta_at' => $this->estimateEta($order, $items, Destination::Bar),
+                'kitchen_eta_at' => $this->eta->estimate($order, $items, Destination::Kitchen),
+                'bar_eta_at' => $this->eta->estimate($order, $items, Destination::Bar),
             ])->save();
 
             $table = $order->restaurantTable()->lockForUpdate()->first();
@@ -158,27 +157,4 @@ class PaymentService
         return $visit;
     }
 
-    /** BR30. The formula only — EtaService's staff-adjustment half is T082. */
-    private function estimateEta(Order $order, Collection $items, Destination $destination): ?Carbon
-    {
-        $lines = $items->filter(fn ($line) => $line->destination === $destination);
-
-        if ($lines->isEmpty()) {
-            return null;
-        }
-
-        $longestPrep = $lines->max(fn ($line) => $line->menuItem->prep_minutes);
-
-        $settingKey = $destination === Destination::Kitchen ? 'avg_ticket_minutes_kitchen' : 'avg_ticket_minutes_bar';
-        $default = $destination === Destination::Kitchen ? 8 : 3;
-        $avgMinutes = (int) (Setting::find($settingKey)?->setting_value ?? $default);
-
-        $queueAhead = \App\Models\OrderItem::where('destination', $destination->value)
-            ->whereIn('status', ['pending', 'preparing'])
-            ->where('order_id', '!=', $order->order_id)
-            ->distinct('order_id')
-            ->count('order_id');
-
-        return now()->addMinutes($longestPrep + $queueAhead * $avgMinutes);
-    }
 }

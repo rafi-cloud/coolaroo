@@ -6,7 +6,9 @@ use App\Enums\Destination;
 use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Staff\AdjustEtaRequest;
 use App\Models\Order;
+use App\Services\EtaService;
 use App\Services\KitchenService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
@@ -17,14 +19,16 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 /**
- * FR56, FR57 (queue and filters, T080) and FR58 (Start/Ready, T081).
- * S30, UC28. The order status behind the two actions is derived by
- * KitchenService, never set here (BR28).
+ * FR56, FR57 (queue and filters, T080), FR58 (Start/Ready, T081) and FR59
+ * (ETA adjustment, T082). S30, UC28. The order status behind Start/Ready is
+ * derived by KitchenService, never set here (BR28).
  */
 class StationController extends Controller
 {
-    public function __construct(private KitchenService $kitchen)
-    {
+    public function __construct(
+        private KitchenService $kitchen,
+        private EtaService $eta,
+    ) {
     }
 
     private const ACTIVE_ORDER_STATUSES = [
@@ -96,6 +100,16 @@ class StationController extends Controller
         $this->kitchen->ready($order, $destination, $request->user('staff'));
 
         return back()->with('status', 'lines-ready');
+    }
+
+    /** FR59. Same station-scoped ability as start()/ready(). */
+    public function adjustEta(AdjustEtaRequest $request, Order $order, Destination $destination): RedirectResponse
+    {
+        Gate::authorize('updateStation', [Order::class, $destination]);
+
+        $this->eta->adjust($order, $destination, (int) $request->validated('minutes'), $request->user('staff'));
+
+        return back()->with('status', 'eta-adjusted');
     }
 
     /** FR56: oldest first, this station's active lines only. */

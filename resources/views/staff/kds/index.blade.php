@@ -11,7 +11,7 @@
   @if (session('status'))
     <div class="auth-error auth-success" role="status">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
-      <span>{{ session('status') === 'lines-started' ? 'Started.' : 'Marked ready.' }}</span>
+      <span>{{ match(session('status')) { 'lines-started' => 'Started.', 'lines-ready' => 'Marked ready.', 'eta-adjusted' => 'ETA updated.', default => '' } }}</span>
     </div>
   @endif
 
@@ -108,6 +108,21 @@
             <form method="POST" action="{{ route('staff.kds.ready', [$order, $destination->value]) }}">
               @csrf
               <button type="submit" class="btn btn-solid" data-testid="kds-ready-{{ $order->order_id }}">Ready</button>
+            </form>
+          @endif
+
+          @if ($eta)
+            <form method="POST" action="{{ route('staff.kds.eta', [$order, $destination->value]) }}" class="kds-eta-form">
+              @csrf
+              @method('PATCH')
+              <input type="hidden" name="minutes" value="-5">
+              <button type="submit" class="btn btn-ghost" data-testid="kds-eta-minus-{{ $order->order_id }}">&minus;5 min</button>
+            </form>
+            <form method="POST" action="{{ route('staff.kds.eta', [$order, $destination->value]) }}" class="kds-eta-form">
+              @csrf
+              @method('PATCH')
+              <input type="hidden" name="minutes" value="5">
+              <button type="submit" class="btn btn-ghost" data-testid="kds-eta-plus-{{ $order->order_id }}">+5 min</button>
             </form>
           @endif
         </footer>

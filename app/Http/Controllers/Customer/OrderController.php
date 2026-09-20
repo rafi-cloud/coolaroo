@@ -45,6 +45,8 @@ class OrderController extends Controller
         return response()->json([
             'status' => $order->status->value,
             'payment_status' => $order->payment_status->value,
+            'kitchen_eta' => $this->formatEtaRange($this->etaRange($order->kitchen_eta_at)),
+            'bar_eta' => $this->formatEtaRange($this->etaRange($order->bar_eta_at)),
         ]);
     }
 
@@ -91,5 +93,15 @@ class OrderController extends Controller
         }
 
         return ['from' => $eta, 'to' => $eta->copy()->addMinutes(5)];
+    }
+
+    /** FR59: "customer ETA updates live" needs formatted strings on state(), not just show(). */
+    private function formatEtaRange(?array $range): ?array
+    {
+        if ($range === null) {
+            return null;
+        }
+
+        return ['from' => $range['from']->format('g:i A'), 'to' => $range['to']->format('g:i A')];
     }
 }

@@ -21,6 +21,19 @@ function applyStatus(page, status, lastStatus) {
     }
 }
 
+/** FR59: "customer ETA updates live." range is {from, to} strings, or null once the station is done. */
+function applyEta(page, key, range) {
+    const node = page.querySelector(`[data-testid="order-eta-${key}"]`);
+    if (!node) {
+        return;
+    }
+
+    node.hidden = !range;
+    if (range) {
+        node.textContent = `${key === 'kitchen' ? 'Kitchen' : 'Bar'}: ready between ${range.from} and ${range.to}`;
+    }
+}
+
 export function initOrderStatus() {
     const page = document.querySelector('[data-order-page]');
     if (!page) {
@@ -32,6 +45,8 @@ export function initOrderStatus() {
 
     const refresh = () => refreshFrom(page.dataset.stateUrl, (state) => {
         applyStatus(page, state.status, lastStatus);
+        applyEta(page, 'kitchen', state.kitchen_eta);
+        applyEta(page, 'bar', state.bar_eta);
         lastStatus = state.status;
 
         if (state.status === 'served' || state.status === 'cancelled') {

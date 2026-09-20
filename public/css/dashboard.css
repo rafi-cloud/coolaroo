@@ -923,3 +923,6 @@ input{font:inherit}
 
 .kds-actions{display:flex;gap:.5rem;margin-top:.9rem}
 .kds-actions .btn{min-height:44px;flex:1}
+
+.kds-eta-form{display:inline-flex}
+.kds-eta-form .btn{min-width:44px;min-height:44px;padding:0 .6rem}

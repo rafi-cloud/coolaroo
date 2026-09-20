@@ -59,10 +59,10 @@
   <div class="order-ready-alert" hidden data-ready-alert data-testid="order-ready-alert">Your order is ready!</div>
 
   @if ($kitchenEta)
-    <p>Kitchen: ready between {{ $kitchenEta['from']->format('g:i A') }} and {{ $kitchenEta['to']->format('g:i A') }}</p>
+    <p data-testid="order-eta-kitchen">Kitchen: ready between {{ $kitchenEta['from']->format('g:i A') }} and {{ $kitchenEta['to']->format('g:i A') }}</p>
   @endif
   @if ($barEta)
-    <p>Bar: ready between {{ $barEta['from']->format('g:i A') }} and {{ $barEta['to']->format('g:i A') }}</p>
+    <p data-testid="order-eta-bar">Bar: ready between {{ $barEta['from']->format('g:i A') }} and {{ $barEta['to']->format('g:i A') }}</p>
   @endif
 
   <h2>Items</h2>
