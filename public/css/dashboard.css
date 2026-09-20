@@ -446,6 +446,15 @@ input{font:inherit}
 .b-active{background:#FFE7DA;color:var(--orange-dark)}
 .b-inactive{background:#EFEAE5;color:#8A7B6C}
 
+/* refund status (5.5) — again a separate set from order status */
+.b-requested{background:#FFF2D9;color:#8A5B00}
+.b-processing{background:#E4EEFB;color:#1F4E87}
+.b-completed{background:#DFF3E6;color:#1E6B3A}
+.b-failed{background:#FBE3DE;color:#8C2F1C}
+.b-rejected{background:#EFE9E3;color:#6B5647}
+
+.refund-action{display:inline-flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin-bottom:.3rem}
+
 .row-actions{display:flex;gap:.35rem;justify-content:flex-end}
 
 

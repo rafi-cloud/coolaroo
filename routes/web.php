@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DietaryTagController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MenuItemSizeController;
+use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\SlotCapacityController;
 use App\Http\Controllers\Admin\StaffAccountController;
 use App\Http\Controllers\Admin\TableController;
@@ -115,6 +116,12 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {
+    Route::get('/refunds', [RefundController::class, 'index'])->name('refunds.index');
+    Route::patch('/refunds/{refund}/approve', [RefundController::class, 'approve'])->name('refunds.approve');
+    Route::patch('/refunds/{refund}/reject', [RefundController::class, 'reject'])->name('refunds.reject');
+    Route::patch('/refunds/{refund}/complete', [RefundController::class, 'complete'])->name('refunds.complete');
+    Route::patch('/refunds/{refund}/retry', [RefundController::class, 'retry'])->name('refunds.retry');
+
     Route::get('/staff', [StaffAccountController::class, 'index'])->name('staff.index');
     Route::get('/staff/create', [StaffAccountController::class, 'create'])->name('staff.create');
     Route::post('/staff', [StaffAccountController::class, 'store'])->name('staff.store');
