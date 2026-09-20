@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Enums\PaymentAttemptStatus;
 use App\Enums\PaymentMethod;
+use App\Events\CashPaymentRequested;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Payment;
@@ -17,8 +18,9 @@ use Illuminate\View\View;
 use Stripe\Exception\ApiErrorException;
 
 /**
- * FR46, FR47, BR24, BR25. show()/stripe()/return()/check() are this task's
- * "pay by card" half; cash() is T072's, added to this same class later.
+ * FR46, FR47, FR48, BR24, BR25. show()/stripe()/return()/check() are
+ * T070's "pay by card" half; cash() is T072's "request cash" half — the
+ * actual "record cash payment" (FR49) is Staff\Floor\CashPaymentController.
  */
 class PaymentController extends Controller
 {
@@ -57,6 +59,22 @@ class PaymentController extends Controller
         $payment->update(['stripe_session_id' => $session->id]);
 
         return redirect()->away($session->url);
+    }
+
+    /** FR48: order stays pending_payment; the floor's cash-waiting list is told (07.8). */
+    public function cash(Order $order): RedirectResponse
+    {
+        Gate::authorize('pay', $order);
+
+        Payment::create([
+            'order_id' => $order->order_id,
+            'method' => PaymentMethod::Cash,
+            'amount' => $order->total_amount,
+        ]);
+
+        event(new CashPaymentRequested($order));
+
+        return redirect()->route('orders.show', $order)->with('status', 'cash-requested');
     }
 
     public function return(Request $request): RedirectResponse

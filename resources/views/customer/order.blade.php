@@ -10,6 +10,11 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
       <span>Payment received.</span>
     </div>
+  @elseif (session('status') === 'cash-requested')
+    <div class="auth-error auth-success" role="status" data-testid="cash-requested-notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>A staff member will come to collect payment.</span>
+    </div>
   @endif
 
   @if (session('error'))

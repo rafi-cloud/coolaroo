@@ -25,6 +25,7 @@ use App\Http\Controllers\Customer\Auth\VerifyEmailController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Public\TableScanController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
+use App\Http\Controllers\Staff\Floor\CashPaymentController;
 use App\Http\Controllers\Staff\ProfileController as StaffProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -74,6 +75,7 @@ Route::middleware('auth:customer')->group(function () {
     Route::get('/orders/{order}/receipt', [ReceiptController::class, 'show'])->name('orders.receipt');
     Route::get('/orders/{order}/pay', [PaymentController::class, 'show'])->name('orders.pay.show');
     Route::post('/orders/{order}/pay/stripe', [PaymentController::class, 'stripe'])->name('orders.pay.stripe');
+    Route::post('/orders/{order}/pay/cash', [PaymentController::class, 'cash'])->name('orders.pay.cash');
     Route::post('/orders/{order}/payment-check', [PaymentController::class, 'check'])->name('orders.pay.check');
     Route::get('/payment/success', [PaymentController::class, 'return'])->name('payment.success');
     Route::get('/payment/cancelled', [PaymentController::class, 'return'])->name('payment.cancelled');
@@ -98,6 +100,10 @@ Route::middleware(['auth:staff', 'staff.session'])->group(function () {
 
     Route::get('/staff/profile', [StaffProfileController::class, 'edit'])->name('staff.profile.edit');
     Route::patch('/staff/profile', [StaffProfileController::class, 'update'])->name('staff.profile.update');
+});
+
+Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitstaff'])->group(function () {
+    Route::post('/orders/{order}/cash', [CashPaymentController::class, 'store'])->name('staff.orders.cash.store');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session', 'role:admin'])->group(function () {

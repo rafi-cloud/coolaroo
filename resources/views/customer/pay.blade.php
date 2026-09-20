@@ -18,5 +18,10 @@
     @csrf
     <button class="btn btn-orange" type="submit" data-testid="pay-stripe">Pay with card</button>
   </form>
+
+  <form method="POST" action="{{ route('orders.pay.cash', $order) }}">
+    @csrf
+    <button class="btn btn-outline" type="submit" data-testid="pay-cash">Pay with cash</button>
+  </form>
 </div>
 </x-layouts.customer>

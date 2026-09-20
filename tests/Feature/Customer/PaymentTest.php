@@ -117,4 +117,18 @@ class PaymentTest extends TestCase
             ->post(route('orders.pay.stripe', $order))
             ->assertForbidden();
     }
+
+    public function test_requesting_cash_payment_creates_a_pending_cash_payment_and_keeps_the_order_pending(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->pendingOrderFor($customer);
+
+        $this->actingAs($customer, 'customer')
+            ->post(route('orders.pay.cash', $order))
+            ->assertRedirect(route('orders.show', $order));
+
+        $payment = Payment::where('order_id', $order->order_id)->firstOrFail();
+        $this->assertSame('cash', $payment->method->value);
+        $this->assertSame('pending_payment', $order->fresh()->status->value);
+    }
 }
