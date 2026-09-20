@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\AiUnavailableException;
 use App\Exceptions\InvalidTransitionException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -31,6 +32,14 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $exceptions->render(function (InvalidTransitionException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $e->getMessage()], $e->getStatusCode());
+            }
+
+            return back()->with('error', $e->getMessage());
+        });
+
+        $exceptions->render(function (AiUnavailableException $e, Request $request) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => $e->getMessage()], $e->getStatusCode());
             }
