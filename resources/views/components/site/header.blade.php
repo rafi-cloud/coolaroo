@@ -27,11 +27,6 @@
         <a href="{{ url('/login') }}" data-testid="site-nav-sign-in">Sign in</a>
       @endauth
       <a class="btn btn-orange" href="{{ url('/#reserve') }}" data-testid="site-book-table">Book a table</a>
-      <span class="icons">
-        <a href="{{ url('/menu') }}" aria-label="Search the menu" data-testid="site-search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-        </a>
-      </span>
     </nav>
   </div>
 </header>

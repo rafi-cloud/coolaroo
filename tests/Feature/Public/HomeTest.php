@@ -40,7 +40,9 @@ class HomeTest extends TestCase
         $response->assertSee('data-testid="site-nav-about"', false);
         $response->assertSee('data-testid="site-nav-sign-in"', false);
         $response->assertSee('data-testid="site-book-table"', false);
-        $response->assertSee('data-testid="site-search"', false);
+
+        // The search icon was dropped so the nav fits on one line at 1024px.
+        $response->assertDontSee('data-testid="site-search"', false);
     }
 
     public function test_header_shows_account_link_for_authenticated_customer(): void

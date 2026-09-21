@@ -428,7 +428,7 @@ svg{display:block}
 }
 
 /* menu category links */
-.menu-filter{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:-1rem 0 2.4rem}
+.menu-filter{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:.6rem 0 2.4rem}
 .menu-filter a{
   padding:.45em 1.1em;border:1px solid #E6D3BF;border-radius:999px;
   font-size:.88rem;font-weight:500;color:var(--ink);background:#fff;
