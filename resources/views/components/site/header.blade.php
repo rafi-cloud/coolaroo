@@ -14,6 +14,11 @@
     <nav class="mainnav" aria-label="Main">
       <a href="{{ url('/') }}" data-testid="site-nav-home">Home</a>
       <a href="{{ url('/menu') }}" data-testid="site-nav-menu">Menu</a>
+      @if(app(\App\Services\SettingService::class)->getBool('ai_enabled', true))
+        <a href="{{ route('meal-builder') }}" class="nav-ai" data-testid="site-nav-meal-builder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="width:14px;height:14px;vertical-align:-1px;margin-right:4px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Build a Meal
+        </a>
+      @endif
       <a href="{{ url('/#reviews') }}" data-testid="site-nav-reviews">Reviews</a>
       <a href="{{ url('/#about') }}" data-testid="site-nav-about">About</a>
       @auth('customer')
