@@ -21,16 +21,20 @@
   data-testid="item-modal-{{ $item->item_id }}"
 >
   <div class="item-modal" data-testid="item-modal-box-{{ $item->item_id }}">
+    {{-- Sticky, and a direct child of the scroll container on purpose: inside
+         .item-modal-wrap it scrolled out of reach on a phone, leaving no way
+         to close a modal taller than the screen. --}}
+    <button
+      class="item-modal-close"
+      type="button"
+      data-close-modal="item-modal-{{ $item->item_id }}"
+      aria-label="Close"
+      data-testid="item-modal-close-{{ $item->item_id }}"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2B1A10" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+
     <div class="item-modal-wrap">
-      <button
-        class="item-modal-close"
-        type="button"
-        data-close-modal="item-modal-{{ $item->item_id }}"
-        aria-label="Close"
-        data-testid="item-modal-close-{{ $item->item_id }}"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2B1A10" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
-      </button>
       <img src="{{ $item->image_url ? asset($item->image_url) : asset('images/dish-burger.jpg') }}" alt="{{ $item->item_name }}">
     </div>
 

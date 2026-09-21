@@ -93,7 +93,9 @@
           $hasNutrition = $item->calories_kcal || $item->protein_g || $item->carbohydrates_g || $item->fat_g;
         @endphp
         <article class="order-card @if(! $item->is_available) is-soldout @endif" data-testid="menu-card-{{ $item->item_id }}">
-          <img src="{{ $item->image_url ? asset($item->image_url) : asset('images/dish-burger.jpg') }}" alt="{{ $item->item_name }}">
+          <div class="order-card-media">
+            <img src="{{ $item->image_url ? asset($item->image_url) : asset('images/dish-burger.jpg') }}" alt="{{ $item->item_name }}">
+          </div>
           <div class="order-card-body">
             <div class="order-card-head">
               <h4>{{ $item->item_name }}</h4>
@@ -114,7 +116,7 @@
             @if($item->dietaryTags->isNotEmpty())
               <p class="tags">
                 @foreach($item->dietaryTags as $tag)
-                  <span class="tag" title="{{ $tag->tag_name }}">{{ strtoupper(str_starts_with(strtoupper($tag->tag_name), 'GF') ? 'GF' : substr($tag->tag_name, 0, 1)) }}</span>
+                  <span class="tag">{{ $tag->tag_name }}</span>
                 @endforeach
               </p>
             @endif
@@ -145,14 +147,16 @@
               </button>
             </div>
           </div>
-
-          {{-- S03: Item detail modal --}}
-          <x-menu.item-modal
-            :item="$item"
-            :has-table-context="(bool) $table"
-            :qr-ordering-enabled="$qrOrderingEnabled"
-          />
         </article>
+
+        {{-- S03: Item detail modal. Outside the card on purpose: the card's
+             hover transform would otherwise become the containing block for
+             the modal's position:fixed scrim, trapping it inside the card. --}}
+        <x-menu.item-modal
+          :item="$item"
+          :has-table-context="(bool) $table"
+          :qr-ordering-enabled="$qrOrderingEnabled"
+        />
       @empty
         <p class="menu-empty" data-testid="menu-empty">No dishes found matching your selected filters.</p>
       @endforelse
