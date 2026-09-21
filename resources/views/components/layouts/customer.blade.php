@@ -13,6 +13,4 @@
 <main id="top">
   {{ $slot }}
 </main>
-
-<x-chat />
 </x-document>

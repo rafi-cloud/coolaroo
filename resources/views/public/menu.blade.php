@@ -8,17 +8,6 @@
     <h1>Our Menu</h1>
     <p class="sub">Hand-made dishes, wood-fired mains and fresh local ingredients.</p>
 
-    @if(app(\App\Services\SettingService::class)->getBool('ai_enabled', true))
-      <div class="menu-ai-banner" data-testid="menu-ai-banner">
-        <div class="menu-ai-banner-content">
-          <span class="menu-ai-badge">AI Assistant</span>
-          <strong>Want a personalised meal recommendation?</strong>
-          <span>Let our smart dining assistant build the perfect meal tailored to your budget and dietary preferences.</span>
-        </div>
-        <a href="{{ route('meal-builder') }}" class="btn btn-sm btn-orange" data-testid="menu-banner-meal-builder">Try Meal Builder &rarr;</a>
-      </div>
-    @endif
-
     {{-- Category tabs --}}
     <nav class="cat-tabs" aria-label="Menu categories" data-testid="menu-cat-tabs">
       <a class="cat-tab @if($selectedCategory === 'all') active @endif" href="{{ route('menu.index', array_merge(request()->except(['category', 'page']), ['category' => 'all'])) }}" data-testid="menu-tab-all">All</a>
@@ -267,4 +256,6 @@
     });
   </script>
   @endpush
+
+  <x-chat />
 </x-dynamic-component>
