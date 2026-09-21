@@ -10,7 +10,14 @@
     <div class="wrap hero-inner">
       <h1>TASTE SOMETHING NEW</h1>
       <p>Wood-fired, hand-made, and served hot since 2005</p>
-      <a class="btn btn-amber" href="{{ url('/#menu') }}" data-testid="home-hero-menu">See the menu</a>
+      <div class="hero-actions">
+        <a class="btn btn-amber" href="{{ url('/#menu') }}" data-testid="home-hero-menu">See the menu</a>
+        @if(app(\App\Services\SettingService::class)->getBool('ai_enabled', true))
+          <a class="btn btn-white" href="{{ route('meal-builder') }}" data-testid="home-hero-meal-builder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="width:16px;height:16px;margin-right:6px;display:inline-block;vertical-align:-2px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Build a meal
+          </a>
+        @endif
+      </div>
     </div>
 
     <div class="dots" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
@@ -221,6 +228,4 @@
 
   {{-- Section Anchor Hooks for subsequent Phase 6 tasks --}}
   <div id="table-order-info" class="visually-hidden" aria-hidden="true"></div>
-
-  <x-chat />
 </x-layouts.public>

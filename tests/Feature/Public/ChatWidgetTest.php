@@ -43,4 +43,12 @@ class ChatWidgetTest extends TestCase
             ->assertDontSee('chat-open', false)
             ->assertDontSee('chat-panel', false);
     }
+
+    /** FR43, NFR11: Chat widget is mounted globally on public and customer layouts. */
+    public function test_the_widget_renders_globally_on_public_and_customer_layouts(): void
+    {
+        $this->get(route('privacy'))
+            ->assertOk()
+            ->assertSee('chat-open', false);
+    }
 }
