@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\AddCartLineRequest;
 use App\Http\Requests\Customer\UpdateCartLineRequest;
+use App\Models\RestaurantTable;
 use App\Services\CartService;
 use App\Services\SettingService;
 use Illuminate\Http\RedirectResponse;
@@ -16,9 +17,14 @@ class CartController extends Controller
 
     public function index(): View
     {
+        $tableId = session('table_id');
+        $table = $tableId ? RestaurantTable::find($tableId) : null;
+
         return view('customer.cart', [
             'lines' => $this->cart->lines(),
             'total' => $this->cart->total(),
+            'table' => $table,
+            'tableLabel' => $table ? 'Table '.$table->table_number : null,
             'qrOrderingEnabled' => app(SettingService::class)->getBool('qr_ordering_enabled', true),
         ]);
     }
