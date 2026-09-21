@@ -41,8 +41,8 @@ return [
     ],
 
     'ai' => [
-        'base_url' => env('AI_BASE_URL', 'https://models.github.ai/inference'),
-        'model' => env('AI_MODEL', 'openai/gpt-4.1-mini'),
+        'base_url' => env('AI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta/openai'),
+        'model' => env('AI_MODEL', 'gemini-flash-lite-latest'),
         'api_key' => env('AI_API_KEY'),
         'timeout' => 20,
     ],

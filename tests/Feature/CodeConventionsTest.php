@@ -10,7 +10,7 @@ use SplFileInfo;
 use Tests\TestCase;
 
 /**
- * T223, NFR19. The conventions in AGENTS.md, as assertions.
+ * T223, NFR19. The project coding conventions, as assertions.
  *
  * A convention nobody checks is a convention that decays: these fail the suite
  * rather than waiting to be noticed in review.
@@ -45,7 +45,7 @@ class CodeConventionsTest extends TestCase
         }
 
         $this->assertSame([], $missing,
-            'AGENTS rule 2: a service must name the FR/BR it implements in its class docblock. Missing: '
+            'Service layer rule: a service must name the FR/BR it implements in its class docblock. Missing: '
             .implode(', ', $missing));
     }
 
@@ -58,7 +58,7 @@ class CodeConventionsTest extends TestCase
             ->all();
 
         $this->assertSame([], $offenders,
-            'AGENTS rule 2: controllers stay thin — a transaction belongs in a service. Found in: '
+            'Controller rule: controllers stay thin — a transaction belongs in a service. Found in: '
             .implode(', ', $offenders));
     }
 
@@ -78,7 +78,7 @@ class CodeConventionsTest extends TestCase
             ->all();
 
         $this->assertSame([], $offenders,
-            'AGENTS rule 3: a status change goes through the enum transition map in a service. Found in: '
+            'Status rule: a status change goes through the enum transition map in a service. Found in: '
             .implode(', ', $offenders));
     }
 
@@ -97,7 +97,7 @@ class CodeConventionsTest extends TestCase
         }
 
         $this->assertSame([], $offenders,
-            'AGENTS rule 11 / SDD 8.7: pages wrap content in <x-layouts.*> components. Found: '
+            'SDD 8.7: pages wrap content in <x-layouts.*> components. Found: '
             .implode(', ', $offenders));
     }
 

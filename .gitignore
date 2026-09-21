@@ -23,19 +23,8 @@ yarn-error.log
 /.zed
 /.obsidian
 
-# Claude Code - local state
-.claude/
-CLAUDE.local.md
-.mcp.json
+# Local scratch (never committed)
 /notes/
-/docs/MODEL-GUIDE.md
-/docs/PROGRESS.md
-
-# Antigravity / Gemini - local state
-.antigravity/
-.gemini/
-GEMINI.md
-implementation_plan.md
 
 # Tests
 /tests/selenium/screenshots

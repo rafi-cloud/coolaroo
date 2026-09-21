@@ -38,7 +38,7 @@ class AiMenuServiceTest extends TestCase
         $this->assertSame('hello', $result['choices'][0]['message']['content']);
 
         Http::assertSent(function ($request) {
-            return $request->url() === 'https://models.github.ai/inference/chat/completions'
+            return $request->url() === rtrim(config('services.ai.base_url'), '/').'/chat/completions'
                 && $request->hasHeader('Authorization', 'Bearer test-key')
                 && $request['model'] === config('services.ai.model')
                 && $request['messages'] === [['role' => 'user', 'content' => 'hi']];
