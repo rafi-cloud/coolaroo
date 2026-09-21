@@ -22,7 +22,7 @@
       <a href="{{ url('/#reviews') }}" data-testid="site-nav-reviews">Reviews</a>
       <a href="{{ url('/#about') }}" data-testid="site-nav-about">About</a>
       @auth('customer')
-        <a href="{{ url('/profile') }}" data-testid="site-nav-account">My account</a>
+        <a href="{{ route('orders.index') }}" data-testid="site-nav-account">My account</a>
       @else
         <a href="{{ url('/login') }}" data-testid="site-nav-sign-in">Sign in</a>
       @endauth

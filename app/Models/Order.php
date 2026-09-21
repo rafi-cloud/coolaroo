@@ -48,6 +48,11 @@ class Order extends Model
         return $this->belongsTo(RestaurantTable::class, 'table_id', 'table_id');
     }
 
+    public function table(): BelongsTo
+    {
+        return $this->restaurantTable();
+    }
+
     public function visit(): BelongsTo
     {
         return $this->belongsTo(Visit::class, 'visit_id', 'visit_id');

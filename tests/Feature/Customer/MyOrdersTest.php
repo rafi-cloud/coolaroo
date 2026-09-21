@@ -114,4 +114,21 @@ class MyOrdersTest extends TestCase
         $response->assertOk()
             ->assertDontSee('ORD-OTHER-999');
     }
+
+    public function test_orders_page_renders_pagination_when_orders_exceed_ten(): void
+    {
+        Order::factory()->count(15)->create([
+            'customer_id' => $this->customer->customer_id,
+        ]);
+
+        $response = $this->actingAs($this->customer, 'customer')
+            ->get(route('orders.index'));
+
+        $response->assertOk()
+            ->assertSee('data-testid="orders-pagination"', false)
+            ->assertSee('data-testid="pagination"', false)
+            ->assertSee('Showing')
+            ->assertSee('data-testid="pagination-next"', false)
+            ->assertSee('data-testid="pagination-page-2"', false);
+    }
 }

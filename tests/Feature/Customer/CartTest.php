@@ -111,6 +111,25 @@ class CartTest extends TestCase
         $response->assertSessionDoesntHaveErrors();
     }
 
+    public function test_add_on_selections_submitted_as_strings_from_browser_forms_are_accepted(): void
+    {
+        $customer = Customer::factory()->create();
+        $this->withTable();
+        [$item, $size] = $this->itemWithSize();
+        $group = AddOnGroup::create(['item_id' => $item->item_id, 'group_name' => 'Sauce', 'min_select' => 1, 'max_select' => 1]);
+        $option = $group->options()->create(['option_name' => 'BBQ', 'price_delta' => 0.5]);
+
+        $response = $this->actingAs($customer, 'customer')->post('/cart/lines', [
+            'item_id' => $item->item_id,
+            'size_id' => $size->size_id,
+            'quantity' => 1,
+            'add_on_option_ids' => [(string) $option->option_id],
+        ]);
+
+        $response->assertSessionDoesntHaveErrors();
+        $this->assertCount(1, app(CartService::class)->lines());
+    }
+
     public function test_line_total_includes_add_on_price_deltas(): void
     {
         $customer = Customer::factory()->create();

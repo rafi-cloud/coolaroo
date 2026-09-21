@@ -98,9 +98,9 @@
                     <form method="POST" action="{{ route('reservations.update', $res) }}">
                       @csrf
                       @method('PATCH')
-                      <p class="text-xs text-muted" style="margin-bottom:0.8rem">
-                        <em>Changes to date, time or party size require staff review and revert confirmed status to 'Requested'. Edits are locked within 2 hours of booking time.</em>
-                      </p>
+                      <div class="res-drawer-notice">
+                        <strong>Important:</strong> Changes to date, time or party size require staff review and revert status to <em>Requested</em>. Edits are locked within 2 hours of booking time.
+                      </div>
                       
                       <div class="form-row-2">
                         <div class="form-group">
@@ -119,7 +119,7 @@
                         </div>
                       </div>
 
-                      <div class="form-group" style="margin-top:0.6rem">
+                      <div class="form-group" style="margin-top:0.75rem">
                         <label for="edit-party-{{ $res->reservation_id }}">Party size</label>
                         <select id="edit-party-{{ $res->reservation_id }}" name="party_size" class="form-input" data-testid="edit-party-select-{{ $res->reservation_id }}">
                           @for ($i = 1; $i <= 10; $i++)
@@ -130,12 +130,12 @@
                         </select>
                       </div>
 
-                      <div class="form-group" style="margin-top:0.6rem">
+                      <div class="form-group" style="margin-top:0.75rem">
                         <label for="edit-requests-{{ $res->reservation_id }}">Special requests (optional)</label>
-                        <textarea id="edit-requests-{{ $res->reservation_id }}" name="special_requests" maxlength="500" class="form-input" rows="2" data-testid="edit-requests-input-{{ $res->reservation_id }}">{{ old('special_requests', $res->special_requests) }}</textarea>
+                        <textarea id="edit-requests-{{ $res->reservation_id }}" name="special_requests" maxlength="500" class="form-input" rows="2" placeholder="Dietary requirements, seating preferences, etc." data-testid="edit-requests-input-{{ $res->reservation_id }}">{{ old('special_requests', $res->special_requests) }}</textarea>
                       </div>
 
-                      <div style="margin-top:0.8rem;display:flex;gap:0.5rem">
+                      <div class="res-drawer-actions">
                         <button type="submit" class="btn btn-amber btn-sm" data-testid="save-res-btn-{{ $res->reservation_id }}">Save changes</button>
                       </div>
                     </form>
@@ -145,14 +145,14 @@
                 <!-- Cancel Disclosure -->
                 <details class="res-details-panel" data-testid="cancel-details-{{ $res->reservation_id }}">
                   <summary class="btn btn-outline btn-sm btn-danger-outline" data-testid="cancel-res-btn-{{ $res->reservation_id }}">
-                    Cancel
+                    Cancel booking
                   </summary>
                   <div class="res-drawer-content res-cancel-box">
-                    <p>Are you sure you want to cancel reservation <strong>{{ $res->reference_code }}</strong>?</p>
-                    <p class="text-xs text-muted" style="margin-top:0.4rem">
-                      <em>Cancellations made within 2 hours of the booking time are recorded as late cancellations.</em>
+                    <p style="font-weight:600;margin-bottom:0.3rem">Cancel reservation {{ $res->reference_code }}?</p>
+                    <p style="font-size:0.8rem;color:#9B1C1C;margin-bottom:0.8rem;line-height:1.4">
+                      Cancellations made within 2 hours of the booking time are recorded as late cancellations.
                     </p>
-                    <form method="POST" action="{{ route('reservations.cancel', $res) }}" style="margin-top:0.8rem">
+                    <form method="POST" action="{{ route('reservations.cancel', $res) }}">
                       @csrf
                       <button type="submit" class="btn btn-danger btn-sm" data-testid="confirm-cancel-res-btn-{{ $res->reservation_id }}">
                         Confirm cancellation

@@ -8,6 +8,19 @@
     <h1>Our Menu</h1>
     <p class="sub">Hand-made dishes, wood-fired mains and fresh local ingredients.</p>
 
+    @if (session('error'))
+      <div class="auth-error" role="alert" style="margin-block:1rem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <span>{{ session('error') }}</span>
+      </div>
+    @endif
+    @if ($errors->any())
+      <div class="auth-error" role="alert" style="margin-block:1rem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <span>{{ $errors->first() }}</span>
+      </div>
+    @endif
+
     @if(app(\App\Services\SettingService::class)->getBool('ai_enabled', true))
       <div class="menu-ai-banner" data-testid="menu-ai-banner">
         <div class="menu-ai-banner-content">

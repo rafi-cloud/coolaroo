@@ -23,7 +23,7 @@ class CartService
         $cart['lines'][$lineId] = [
             'item_id' => $itemId,
             'size_id' => $sizeId,
-            'add_on_option_ids' => array_values($addOnOptionIds),
+            'add_on_option_ids' => array_values(array_map('intval', $addOnOptionIds)),
             'quantity' => $quantity,
             'special_request' => $specialRequest,
         ];

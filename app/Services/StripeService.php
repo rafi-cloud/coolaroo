@@ -26,6 +26,10 @@ class StripeService
     /** BR24: amount fixed here. 30-minute expiry (07.9, Stripe's own minimum). */
     public function createCheckoutSession(Order $order, Payment $payment): Session
     {
+        $base = request()->hasSession() ? request()->getSchemeAndHttpHost() : '';
+        $successUrl = ($base ? $base.route('payment.success', [], false) : route('payment.success')).'?session_id={CHECKOUT_SESSION_ID}';
+        $cancelUrl = ($base ? $base.route('payment.cancelled', [], false) : route('payment.cancelled')).'?session_id={CHECKOUT_SESSION_ID}';
+
         return $this->client->checkout->sessions->create([
             'mode' => 'payment',
             'line_items' => [[
@@ -40,8 +44,8 @@ class StripeService
                 'order_id' => (string) $order->order_id,
                 'payment_id' => (string) $payment->payment_id,
             ],
-            'success_url' => route('payment.success').'?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('payment.cancelled').'?session_id={CHECKOUT_SESSION_ID}',
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
             'expires_at' => now()->addMinutes(30)->timestamp,
         ]);
     }

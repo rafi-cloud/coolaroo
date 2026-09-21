@@ -43,10 +43,12 @@ class OrderController extends Controller
     {
         Gate::authorize('view', $order);
 
-        $order->load(['items', 'feedback']);
+        $order->load(['restaurantTable', 'items.menuItem', 'feedback', 'payments']);
 
         return view('customer.order', [
             'order' => $order,
+            'table' => $order->restaurantTable,
+            'tableLabel' => $order->restaurantTable ? 'Table '.$order->restaurantTable->table_number : null,
             'timeline' => $this->timeline($order),
             'kitchenEta' => $this->etaRange($order->kitchen_eta_at),
             'barEta' => $this->etaRange($order->bar_eta_at),

@@ -14,6 +14,15 @@ class AddCartLineRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('add_on_option_ids') && is_array($this->add_on_option_ids)) {
+            $this->merge([
+                'add_on_option_ids' => array_map('intval', $this->add_on_option_ids),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -35,9 +44,9 @@ class AddCartLineRequest extends FormRequest
                 return;
             }
 
-            $optionIds = $this->input('add_on_option_ids', []);
+            $optionIds = array_map('intval', (array) $this->input('add_on_option_ids', []));
             $groups = AddOnGroup::where('item_id', $itemId)->with('options')->get();
-            $validOptionIds = $groups->pluck('options')->flatten()->pluck('option_id')->all();
+            $validOptionIds = $groups->pluck('options')->flatten()->pluck('option_id')->map(fn ($id) => (int) $id)->all();
 
             foreach ($optionIds as $optionId) {
                 if (! in_array($optionId, $validOptionIds, true)) {

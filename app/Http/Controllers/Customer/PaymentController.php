@@ -30,7 +30,13 @@ class PaymentController extends Controller
     {
         Gate::authorize('pay', $order);
 
-        return view('customer.pay', ['order' => $order]);
+        $order->loadMissing(['restaurantTable', 'items.menuItem', 'items.size']);
+
+        return view('customer.pay', [
+            'order' => $order,
+            'table' => $order->restaurantTable,
+            'tableLabel' => $order->restaurantTable ? 'Table '.$order->restaurantTable->table_number : null,
+        ]);
     }
 
     public function stripe(Order $order): RedirectResponse
@@ -47,6 +53,13 @@ class PaymentController extends Controller
             $session = $this->stripe->createCheckoutSession($order, $payment);
         } catch (ApiErrorException $e) {
             Log::channel('integrations')->error('Stripe session creation failed', [
+                'order_id' => $order->order_id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Card payment is temporarily unavailable — please try again or ask a staff member.');
+        } catch (\Throwable $e) {
+            Log::channel('integrations')->error('Stripe session creation failed with unexpected error', [
                 'order_id' => $order->order_id,
                 'message' => $e->getMessage(),
             ]);
