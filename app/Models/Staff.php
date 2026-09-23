@@ -38,4 +38,13 @@ class Staff extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
+
+    /**
+     * 3.2, FR04. Admin clears every role check, so admin sees the shared
+     * staff screens (S22, S27) with admin navigation around them.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role?->role_name === 'admin';
+    }
 }

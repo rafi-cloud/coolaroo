@@ -24,6 +24,25 @@ class FloorViewTest extends TestCase
         return Staff::factory()->create(['role_id' => $roleModel->role_id]);
     }
 
+    public function test_an_admin_keeps_admin_navigation_on_the_shared_floor_screen(): void
+    {
+        $this->actingAs($this->staffWithRole('admin'), 'staff')
+            ->get('/staff/floor')
+            ->assertOk()
+            ->assertSee('aria-label="Admin"', false)
+            ->assertSee('data-testid="nav-admin-settings"', false)
+            ->assertDontSee('aria-label="Staff"', false);
+    }
+
+    public function test_waitstaff_keep_staff_navigation_on_the_floor_screen(): void
+    {
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->get('/staff/floor')
+            ->assertOk()
+            ->assertSee('aria-label="Staff"', false)
+            ->assertDontSee('data-testid="nav-admin-settings"', false);
+    }
+
     public function test_the_floor_page_lists_ready_orders_and_cash_waiting(): void
     {
         $ready = Order::factory()->create();

@@ -14,6 +14,12 @@
             ['id' => 'admin-reservations', 'label' => 'Reservations', 'url' => '/staff/reservations', 'match' => ['staff/reservations*'],
              'icon' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>'],
         ],
+        'Stations' => [
+            ['id' => 'admin-kds-kitchen', 'label' => 'Kitchen display', 'url' => '/staff/kds/kitchen', 'match' => ['staff/kds/kitchen*'],
+             'icon' => '<path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/>'],
+            ['id' => 'admin-kds-bar', 'label' => 'Bar display', 'url' => '/staff/kds/bar', 'match' => ['staff/kds/bar*'],
+             'icon' => '<path d="M6 3h12l-5 8v7h3v3H8v-3h3v-7z"/>'],
+        ],
         'Catalogue' => [
             ['id' => 'admin-menu-items', 'label' => 'Menu items', 'url' => '/admin/menu-items', 'match' => ['admin/menu-items*'],
              'icon' => '<path d="M4 6h9M4 12h9M4 18h9"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/>'],

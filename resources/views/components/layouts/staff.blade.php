@@ -6,17 +6,11 @@
     'bare' => false,
 ])
 @php
-    $staffHome = '/staff/floor';
-
-    if (auth('staff')->check()) {
-        $landingScreen = auth('staff')->user()->role->landing_screen;
-
-        if (\Illuminate\Support\Facades\Route::has($landingScreen)) {
-            $staffHome = route($landingScreen);
-        }
-    }
+    $viewer = auth('staff')->user();
+    $staffHome = $viewer?->role?->landingUrl() ?? '/staff/floor';
+    $viewerIsAdmin = (bool) $viewer?->isAdmin();
 @endphp
-<x-document css="dashboard.css" suffix="Coolaroo Staff" :vite="true" :title="$title" :body-class="$bodyClass">
+<x-document css="dashboard.css" :suffix="$viewerIsAdmin ? 'Coolaroo Admin' : 'Coolaroo Staff'" :vite="true" :title="$title" :body-class="$bodyClass">
 @if ($bare)
 {{ $slot }}
 @else
@@ -26,9 +20,13 @@
 <aside class="sidebar">
   <a class="brand" href="{{ $staffHome }}" data-testid="staff-home">
     <img src="{{ asset('images/logo.svg') }}" alt="Coolaroo Restaurant Logo">
-    <span class="brand-text"><strong>COOLAROO</strong><span>STAFF</span></span>
+    <span class="brand-text"><strong>COOLAROO</strong><span>{{ $viewerIsAdmin ? 'ADMIN' : 'STAFF' }}</span></span>
   </a>
-  <x-dashboard.nav-staff />
+  @if ($viewerIsAdmin)
+    <x-dashboard.nav-admin />
+  @else
+    <x-dashboard.nav-staff />
+  @endif
 </aside>
 
 <div class="shell">
