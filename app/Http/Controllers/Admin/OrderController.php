@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\RestaurantTable;
+use App\Services\RefundService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -14,6 +15,8 @@ use Illuminate\View\View;
 /** Read-only search and detail. */
 class OrderController extends Controller
 {
+    public function __construct(private RefundService $refunds) {}
+
     public function index(Request $request): View
     {
         $filters = Validator::make($request->query(), [
@@ -47,6 +50,7 @@ class OrderController extends Controller
             'items',
             'payments',
             'refunds.requestedBy',
+            'refunds.requestedByCustomer',
             'refunds.processedBy',
             'statusHistory',
             'restaurantTable',
@@ -54,6 +58,9 @@ class OrderController extends Controller
             'takenBy',
         ]);
 
-        return view('admin.orders.show', ['order' => $order]);
+        return view('admin.orders.show', [
+            'order' => $order,
+            'canRequestRefund' => $this->refunds->canBeRefundRequested($order),
+        ]);
     }
 }

@@ -80,16 +80,6 @@ class TableStatusServiceTest extends TestCase
         app(TableStatusService::class)->seatWalkIn($table, Staff::factory()->create());
     }
 
-    public function test_seating_a_group_opens_a_visit_on_every_table(): void
-    {
-        $tables = RestaurantTable::factory()->count(2)->create(['status' => TableStatus::Available]);
-
-        $visits = app(TableStatusService::class)->seatGroup($tables, Staff::factory()->create(), guestCount: 6);
-
-        $this->assertCount(2, $visits);
-        $tables->each(fn (RestaurantTable $table) => $this->assertSame(TableStatus::Occupied, $table->fresh()->status));
-    }
-
     /** BR06: one table with an active order blocks the whole group. */
     public function test_clearing_a_group_is_blocked_if_any_table_has_active_orders(): void
     {
@@ -106,12 +96,26 @@ class TableStatusServiceTest extends TestCase
         }
     }
 
+    /** BR05: a party seated a minute ago has no orders yet and must not be swept. */
+    public function test_auto_clear_leaves_a_table_that_was_only_just_occupied(): void
+    {
+        $justSeated = RestaurantTable::factory()->create(['status' => TableStatus::Occupied]);
+        $justSeated->forceFill(['status_changed_at' => now()->subMinutes(2)])->save();
+
+        $cleared = app(TableStatusService::class)->autoClearIdleTables(idleMinutes: 45);
+
+        $this->assertSame(0, $cleared);
+        $this->assertSame(TableStatus::Occupied, $justSeated->fresh()->status);
+    }
+
     public function test_auto_clear_skips_a_table_paid_within_the_idle_window_but_clears_an_old_one(): void
     {
         $recentlyPaid = RestaurantTable::factory()->create(['status' => TableStatus::Occupied]);
+        $recentlyPaid->forceFill(['status_changed_at' => now()->subMinutes(90)])->save();
         $this->makeOrder($recentlyPaid, 'served', now()->subMinutes(10));
 
         $longDone = RestaurantTable::factory()->create(['status' => TableStatus::Occupied]);
+        $longDone->forceFill(['status_changed_at' => now()->subMinutes(90)])->save();
         $this->makeOrder($longDone, 'served', now()->subMinutes(60));
 
         $cleared = app(TableStatusService::class)->autoClearIdleTables(idleMinutes: 45);

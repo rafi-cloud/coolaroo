@@ -110,6 +110,24 @@ class OrderTest extends TestCase
             ->assertDontSee('Check payment status');
     }
 
+    public function test_a_station_eta_disappears_once_that_station_has_nothing_left_to_cook(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->orderFor($customer, 'preparing');
+        $order->forceFill(['kitchen_eta_at' => now()->addMinutes(10)])->save();
+
+        $this->actingAs($customer, 'customer')
+            ->get(route('orders.show', $order))
+            ->assertSee('Kitchen: ready between');
+
+        $order->items()->update(['status' => 'served']);
+        $order->forceFill(['status' => 'served'])->save();
+
+        $this->actingAs($customer, 'customer')
+            ->get(route('orders.show', $order))
+            ->assertDontSee('Kitchen: ready between');
+    }
+
     public function test_the_state_endpoint_reports_the_current_status(): void
     {
         $customer = Customer::factory()->create();
@@ -132,6 +150,19 @@ class OrderTest extends TestCase
 
         $this->assertSame('cancelled', $order->fresh()->status->value);
         $this->assertNotNull($order->fresh()->cancelled_at);
+    }
+
+    /** A cancelled order must not leave lines the station queue and BR30 still count. */
+    public function test_cancelling_an_order_cancels_its_unstarted_lines(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->orderFor($customer, 'pending_payment');
+
+        $this->actingAs($customer, 'customer')
+            ->post(route('orders.cancel', $order))
+            ->assertRedirect(route('orders.show', $order));
+
+        $this->assertSame(['cancelled'], $order->items()->pluck('status')->map->value->all());
     }
 
     public function test_a_customer_cannot_cancel_someone_elses_order(): void

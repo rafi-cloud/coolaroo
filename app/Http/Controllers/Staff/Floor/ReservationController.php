@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Staff\StorePhoneBookingRequest;
 use App\Models\Customer;
 use App\Models\Reservation;
-use App\Models\RestaurantTable;
 use App\Models\Setting;
 use App\Models\SlotCapacity;
 use App\Services\ReservationService;
@@ -99,7 +98,6 @@ class ReservationController extends Controller
 
         $activeSlots = SlotCapacity::where('is_active', true)->orderBy('slot_time')->get();
         $recentCustomers = Customer::where('is_active', true)->orderBy('full_name')->take(50)->get();
-        $allTables = RestaurantTable::where('is_active', true)->orderBy('table_number')->get();
 
         return view('staff.reservations.index', [
             'reservations' => $reservations,
@@ -109,7 +107,6 @@ class ReservationController extends Controller
             'isToday' => $isToday,
             'activeSlots' => $activeSlots,
             'recentCustomers' => $recentCustomers,
-            'allTables' => $allTables,
         ]);
     }
 
@@ -153,35 +150,6 @@ class ReservationController extends Controller
 
         return back()->with('status', 'reservation-declined')
             ->with('message', "Reservation {$reservation->reference_code} declined.");
-    }
-
-    public function assign(Request $request, Reservation $reservation): RedirectResponse
-    {
-        $request->validate([
-            'table_ids' => ['required', 'array', 'min:1'],
-            'table_ids.*' => ['integer', 'exists:restaurant_table,table_id'],
-        ]);
-
-        $staff = $request->user('staff');
-
-        $this->reservationService->assignTables(
-            $reservation,
-            $request->input('table_ids'),
-            $staff
-        );
-
-        return back()->with('status', 'tables-assigned')
-            ->with('message', "Tables assigned to reservation {$reservation->reference_code}.");
-    }
-
-    public function unassign(Request $request, Reservation $reservation): RedirectResponse
-    {
-        $staff = $request->user('staff');
-
-        $this->reservationService->unassignTables($reservation, $staff);
-
-        return back()->with('status', 'tables-unassigned')
-            ->with('message', "Tables unassigned from reservation {$reservation->reference_code}.");
     }
 
     public function seat(Request $request, Reservation $reservation): RedirectResponse

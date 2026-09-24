@@ -46,9 +46,12 @@ class StationController extends Controller
 
     public function index(Request $request, Destination $destination): View
     {
+        $orders = $this->queue($request, $destination);
+
         return view('staff.kds.index', [
             'destination' => $destination,
-            'orders' => $this->queue($request, $destination),
+            'orders' => $orders,
+            'signature' => $this->signature($orders, $destination),
             'status' => $request->query('status'),
             'window' => $request->query('window'),
             'availabilityItems' => $this->availabilityItems($destination),
@@ -63,6 +66,7 @@ class StationController extends Controller
         return response()->json([
             'destination' => $destination->value,
             'count' => $orders->count(),
+            'signature' => $this->signature($orders, $destination),
             'orders' => $orders->map(fn (Order $order) => [
                 'order_id' => $order->order_id,
                 'order_number' => $order->order_number,
@@ -159,6 +163,23 @@ class StationController extends Controller
             ])
             ->orderBy('paid_at')
             ->get();
+    }
+
+    /**
+     * One string for "is the board showing something different now". The page
+     * carries the value it was rendered with, the poll and every station
+     * broadcast compare against it, and a difference re-renders the page —
+     * cheaper than keeping a second copy of the ticket markup in JavaScript.
+     */
+    private function signature(Collection $orders, Destination $destination): string
+    {
+        return md5($orders->map(fn (Order $order) => implode(':', [
+            $order->order_id,
+            $order->status->value,
+            $order->has_stock_conflict ? '1' : '0',
+            $this->etaFor($order, $destination)?->toIso8601String() ?? '-',
+            $order->items->map(fn (OrderItem $line) => $line->order_item_id.'='.$line->status->value)->implode(','),
+        ]))->implode('|'));
     }
 
     /** the status filter applies to the line, not the order. */

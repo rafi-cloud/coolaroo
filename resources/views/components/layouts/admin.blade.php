@@ -13,6 +13,7 @@
     <span class="brand-text"><strong>COOLAROO</strong><span>ADMIN</span></span>
   </a>
   <x-dashboard.nav-admin />
+  <x-dashboard.nav-logout />
 </aside>
 
 <div class="shell">

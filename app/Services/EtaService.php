@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Enums\Destination;
 use App\Enums\OrderItemStatus;
+use App\Enums\OrderStatus;
 use App\Events\OrderLinesUpdated;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Setting;
 use App\Models\Staff;
 use Illuminate\Support\Carbon;
@@ -33,11 +33,18 @@ class EtaService
         $default = $destination === Destination::Kitchen ? 8 : 3;
         $avgMinutes = (int) (Setting::find($settingKey)?->setting_value ?? $default);
 
-        $queueAhead = OrderItem::where('destination', $destination->value)
-            ->whereIn('status', [OrderItemStatus::Pending, OrderItemStatus::Preparing])
-            ->where('order_id', '!=', $order->order_id)
-            ->distinct('order_id')
-            ->count('order_id');
+        // BR30 counts "orders ahead in that station queue", and FR56 defines
+        // that queue as paid orders' active lines. Counting the lines alone
+        // also swept up every cancelled and served order whose lines were never
+        // moved off pending — 22 of them on this database, all of them finished
+        // days earlier, which is what pushed a burger's ETA three hours out.
+        $queueAhead = Order::query()
+            ->whereIn('status', [OrderStatus::Paid, OrderStatus::Preparing, OrderStatus::Ready])
+            ->whereKeyNot($order->order_id)
+            ->whereHas('items', fn ($query) => $query
+                ->where('destination', $destination->value)
+                ->whereIn('status', [OrderItemStatus::Pending, OrderItemStatus::Preparing]))
+            ->count();
 
         return now()->addMinutes($longestPrep + $queueAhead * $avgMinutes);
     }

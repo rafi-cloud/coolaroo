@@ -83,6 +83,14 @@
     </table>
   </div>
 
+  @if ($canRequestRefund)
+    <x-staff.refund-request :order="$order" />
+  @elseif ($order->paid_at !== null)
+    <p class="muted" data-testid="admin-order-refund-window-closed">
+      A refund can only be requested within {{ \App\Services\RefundService::REQUEST_WINDOW_HOURS }} hours of payment, or once a line still has units left to refund.
+    </p>
+  @endif
+
   <h2>Refunds</h2>
   <div class="table-scroll">
     <table class="table">
@@ -99,7 +107,7 @@
                 <a href="{{ route('admin.refunds.index') }}">Queue</a>
               @endif
             </td>
-            <td>{{ $refund->requestedBy->full_name }}</td>
+            <td>{{ $refund->requesterName() }}</td>
           </tr>
         @empty
           <tr><td colspan="5">No refunds.</td></tr>

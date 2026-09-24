@@ -105,6 +105,10 @@ class TableScanTest extends TestCase
 
     public function test_the_holder_scanning_inside_the_window_is_seated(): void
     {
+        // The booking is "now + 5 minutes" on today's date, so on a real clock
+        // within 5 minutes of midnight it books a time that has already passed.
+        $this->travelTo(now()->startOfDay()->addHours(18));
+
         $holder = Customer::factory()->create();
         [$table, $reservation, $visit] = $this->reservedTableFor($holder, now()->addMinutes(5)->format('H:i'));
 
@@ -116,6 +120,24 @@ class TableScanTest extends TestCase
         $this->assertSame(TableStatus::Occupied, $table->fresh()->status);
         $this->assertNotNull($visit->fresh()->opened_at);
         $this->assertNull($visit->fresh()->opened_by_staff_id);
+    }
+
+    /** The T-30 sweep may not have run yet, so the table can still read Available. */
+    public function test_the_holder_is_seated_even_before_the_table_turns_reserved(): void
+    {
+        $this->travelTo(now()->startOfDay()->addHours(18));
+
+        $holder = Customer::factory()->create();
+        [$table, $reservation, $visit] = $this->reservedTableFor($holder, now()->addMinutes(5)->format('H:i'));
+        $table->forceFill(['status' => TableStatus::Available])->save();
+
+        $this->actingAs($holder, 'customer')
+            ->get($this->scanUrl($table))
+            ->assertRedirect(route('menu.index'));
+
+        $this->assertSame(ReservationStatus::Seated, $reservation->fresh()->status);
+        $this->assertSame(TableStatus::Occupied, $table->fresh()->status);
+        $this->assertNotNull($visit->fresh()->opened_at);
     }
 
     public function test_scanning_another_table_asks_before_clearing_the_cart(): void

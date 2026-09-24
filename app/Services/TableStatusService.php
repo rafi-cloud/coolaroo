@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\OrderStatus;
 use App\Enums\TableStatus;
+use App\Enums\VisitCloseReason;
 use App\Events\TableStatusChanged;
 use App\Models\RestaurantTable;
 use App\Models\Staff;
@@ -49,7 +50,7 @@ class TableStatusService
     {
         if ($table->status !== TableStatus::Available) {
             throw ValidationException::withMessages([
-                'table' => 'Only an available table can be seated as a walk-in.',
+                'table' => "Table {$table->table_number} is {$table->status->value} — only an available table can be seated as a walk-in.",
             ]);
         }
 
@@ -62,19 +63,50 @@ class TableStatusService
         ]);
     }
 
-    /** "one or more tables" — each gets its own transition and visit row, one guest count. */
-    public function seatGroup(Collection $tables, Staff $actor, ?int $guestCount = null): Collection
+    /** 6.3: close_reason is a fixed vocabulary — staff_clear here, auto_clear for the idle sweep. */
+    /**
+     * BR01: a table is taken from the moment an order is placed on it, paid or
+     * not. Both the customer checkout and the payment path call this, so an
+     * order created before this rule still occupies its table when it settles;
+     * it is idempotent either way.
+     */
+    public function occupyForOrder(RestaurantTable $table, ?Staff $actor = null): Visit
     {
-        return DB::transaction(fn () => $tables->map(
-            fn (RestaurantTable $table) => $this->seatWalkIn($table, $actor, $guestCount)
-        ));
+        $visit = $table->visits()->whereNull('closed_at')->latest('visit_id')->first();
+
+        if ($visit === null) {
+            $visit = $table->visits()->create(['opened_at' => now(), 'opened_by_staff_id' => $actor?->staff_id]);
+        } elseif ($visit->opened_at === null) {
+            $visit->update([
+                'opened_at' => now(),
+                'opened_by_staff_id' => $actor?->staff_id ?? $visit->opened_by_staff_id,
+            ]);
+        }
+
+        if ($table->status !== TableStatus::Occupied) {
+            $this->transition($table, TableStatus::Occupied, $actor);
+        }
+
+        return $visit;
     }
 
-    public function clearTable(RestaurantTable $table, ?Staff $actor = null, bool $force = false): void
-    {
+    public function clearTable(
+        RestaurantTable $table,
+        ?Staff $actor = null,
+        bool $force = false,
+        VisitCloseReason $reason = VisitCloseReason::StaffClear,
+    ): void {
+        // Without this the stale drawer of a table someone else already cleared
+        // reaches transition() and answers with a 409 page instead of a message.
+        if ($table->status === TableStatus::Available) {
+            throw ValidationException::withMessages([
+                'table' => "Table {$table->table_number} is already available.",
+            ]);
+        }
+
         if (! $force && $this->hasActiveOrders($table)) {
             throw ValidationException::withMessages([
-                'table' => 'This table has active orders — confirm before clearing.',
+                'table' => "Table {$table->table_number} has active orders — confirm before clearing.",
             ]);
         }
 
@@ -84,7 +116,7 @@ class TableStatusService
             $openVisit->update([
                 'closed_at' => now(),
                 'closed_by_staff_id' => $actor?->staff_id,
-                'close_reason' => 'cleared',
+                'close_reason' => $reason,
             ]);
         }
 
@@ -114,7 +146,7 @@ class TableStatusService
                 continue;
             }
 
-            $this->clearTable($table, actor: null, force: true);
+            $this->clearTable($table, actor: null, force: true, reason: VisitCloseReason::AutoClear);
             $cleared++;
         }
 
@@ -128,6 +160,13 @@ class TableStatusService
 
     private function hasBlockingOrdersForAutoClear(RestaurantTable $table, int $idleMinutes): bool
     {
+        // A table seated a minute ago has no orders yet, so the order checks
+        // alone would sweep a party the moment they sat down. "Idle" has to
+        // mean the table has been Occupied that long.
+        if ($table->status_changed_at !== null && $table->status_changed_at->gt(now()->subMinutes($idleMinutes))) {
+            return true;
+        }
+
         if ($this->hasActiveOrders($table)) {
             return true;
         }

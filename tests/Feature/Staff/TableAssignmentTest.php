@@ -92,12 +92,12 @@ class TableAssignmentTest extends TestCase
 
         $response = $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $reservation), [
-                'table_ids' => [$table1->table_id],
+            ->post(route('staff.tables.assign-reservation', $table1), [
+                'reservation_id' => $reservation->reservation_id,
             ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', 'tables-assigned');
+        $response->assertSessionHas('status', 'reservation-assigned');
 
         // Check visit row created with opened_at = null (BR04, FR65)
         $visit = Visit::where('reservation_id', $reservation->reservation_id)
@@ -132,8 +132,8 @@ class TableAssignmentTest extends TestCase
 
         $response = $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $reservation), [
-                'table_ids' => [$table->table_id],
+            ->post(route('staff.tables.assign-reservation', $table), [
+                'reservation_id' => $reservation->reservation_id,
             ]);
 
         $response->assertSessionHasErrors('table_ids');
@@ -158,8 +158,8 @@ class TableAssignmentTest extends TestCase
 
         $response = $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $reservation), [
-                'table_ids' => [$table->table_id],
+            ->post(route('staff.tables.assign-reservation', $table), [
+                'reservation_id' => $reservation->reservation_id,
             ]);
 
         $response->assertSessionHasErrors('table_ids');
@@ -201,15 +201,15 @@ class TableAssignmentTest extends TestCase
         // Assign table to res1
         $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $res1), [
-                'table_ids' => [$table->table_id],
+            ->post(route('staff.tables.assign-reservation', $table), [
+                'reservation_id' => $res1->reservation_id,
             ]);
 
         // Try assigning table to res2 -> fails overlap check (BR33)
         $response = $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $res2), [
-                'table_ids' => [$table->table_id],
+            ->post(route('staff.tables.assign-reservation', $table), [
+                'reservation_id' => $res2->reservation_id,
             ]);
 
         $response->assertSessionHasErrors('table_ids');
@@ -239,8 +239,8 @@ class TableAssignmentTest extends TestCase
 
         $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $reservation), [
-                'table_ids' => [$table->table_id],
+            ->post(route('staff.tables.assign-reservation', $table), [
+                'reservation_id' => $reservation->reservation_id,
             ]);
 
         $table->refresh();
@@ -278,10 +278,12 @@ class TableAssignmentTest extends TestCase
 
         $response = $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->delete(route('staff.reservations.tables.unassign', $reservation));
+            ->delete(route('staff.tables.release-reservation', $table), [
+                'reservation_id' => $reservation->reservation_id,
+            ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', 'tables-unassigned');
+        $response->assertSessionHas('status', 'reservation-released');
 
         // Table reverted to Available (BR64)
         $table->refresh();
@@ -293,7 +295,12 @@ class TableAssignmentTest extends TestCase
         $this->assertSame(VisitCloseReason::Unassigned, $visit->close_reason);
     }
 
-    public function test_reassign_tables_unassigns_old_and_assigns_new(): void
+    /**
+     * FR65 from S23: each drawer adds its own table, so a party too big for one
+     * table is assigned by repeating the action — the seats check then passes
+     * across the pair, where either table alone would have been refused.
+     */
+    public function test_assigning_a_second_table_adds_it_to_the_same_booking(): void
     {
         $table1 = RestaurantTable::factory()->create([
             'table_number' => 21,
@@ -313,43 +320,52 @@ class TableAssignmentTest extends TestCase
             'customer_id' => $this->customer->customer_id,
             'booking_date' => '2026-09-25',
             'slot_id' => $this->slot->slot_id,
-            'party_size' => 4,
+            'party_size' => 6,
             'status' => ReservationStatus::Confirmed,
         ]);
 
-        // First assignment: table 1
         $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $reservation), [
-                'table_ids' => [$table1->table_id],
-            ]);
+            ->post(route('staff.tables.assign-reservation', $table1), [
+                'reservation_id' => $reservation->reservation_id,
+            ])
+            ->assertSessionHasErrors('table_ids');
 
-        $this->assertDatabaseHas('visit', [
-            'reservation_id' => $reservation->reservation_id,
-            'table_id' => $table1->table_id,
-            'closed_at' => null,
-        ]);
+        $table1->forceFill(['seat_capacity' => 6])->save();
 
-        // Reassign to table 2 (FR95)
         $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $reservation), [
-                'table_ids' => [$table2->table_id],
+            ->post(route('staff.tables.assign-reservation', $table1), [
+                'reservation_id' => $reservation->reservation_id,
             ]);
 
-        // Old visit closed
-        $this->assertDatabaseHas('visit', [
-            'reservation_id' => $reservation->reservation_id,
-            'table_id' => $table1->table_id,
-            'close_reason' => VisitCloseReason::Unassigned->value,
-        ]);
+        $this->actingAs($this->waitstaff, 'staff')
+            ->withSession(['staff_last_activity' => now()])
+            ->post(route('staff.tables.assign-reservation', $table2), [
+                'reservation_id' => $reservation->reservation_id,
+            ]);
 
-        // New visit active
-        $this->assertDatabaseHas('visit', [
-            'reservation_id' => $reservation->reservation_id,
-            'table_id' => $table2->table_id,
-            'closed_at' => null,
-        ]);
+        foreach ([$table1, $table2] as $table) {
+            $this->assertDatabaseHas('visit', [
+                'reservation_id' => $reservation->reservation_id,
+                'table_id' => $table->table_id,
+                'closed_at' => null,
+            ]);
+        }
+
+        $this->actingAs($this->waitstaff, 'staff')
+            ->withSession(['staff_last_activity' => now()])
+            ->delete(route('staff.tables.release-reservation', $table2), [
+                'reservation_id' => $reservation->reservation_id,
+            ]);
+
+        $this->assertSame(
+            [$table1->table_id],
+            Visit::where('reservation_id', $reservation->reservation_id)
+                ->whereNull('closed_at')
+                ->pluck('table_id')
+                ->all()
+        );
     }
 
     public function test_kitchen_role_cannot_assign_tables(): void
@@ -370,8 +386,8 @@ class TableAssignmentTest extends TestCase
 
         $response = $this->actingAs($this->kitchen, 'staff')
             ->withSession(['staff_last_activity' => now()])
-            ->post(route('staff.reservations.tables.assign', $reservation), [
-                'table_ids' => [$table->table_id],
+            ->post(route('staff.tables.assign-reservation', $table), [
+                'reservation_id' => $reservation->reservation_id,
             ]);
 
         $response->assertForbidden();

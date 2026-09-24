@@ -7,9 +7,27 @@ export function initKds() {
         return;
     }
 
+    const rendered = page.dataset.signature;
+    let timer = null;
+    let reloading = false;
+
+    // A ticket is a form per line, a per-station ETA control and a stock
+    // conflict banner. Rebuilding that here would be a second copy of the
+    // Blade, so the board re-renders itself whenever the station's state
+    // stops matching the one this page was drawn from.
     const refresh = () => refreshFrom(page.dataset.stateUrl, (state) => {
-        page.dispatchEvent(new CustomEvent('kds:state', { detail: state }));
+        if (reloading || state.signature === rendered) {
+            return;
+        }
+
+        reloading = true;
+        clearInterval(timer);
+        window.location.reload();
     });
+
+    // Reverb is a separate process and the broadcast itself is queued, so the
+    // poll is the floor under the socket rather than a duplicate of it.
+    timer = setInterval(refresh, 10000);
 
     listenOn(privateChannel(`station.${page.dataset.destination}`), [
         'OrderPaid',

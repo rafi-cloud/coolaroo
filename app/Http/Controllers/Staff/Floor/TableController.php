@@ -3,24 +3,95 @@
 namespace App\Http\Controllers\Staff\Floor;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Staff\AssignReservationRequest;
 use App\Http\Requests\Staff\ClearTablesRequest;
+use App\Http\Requests\Staff\SeatReservationRequest;
 use App\Http\Requests\Staff\SeatTableRequest;
+use App\Models\Reservation;
 use App\Models\RestaurantTable;
+use App\Services\ReservationService;
 use App\Services\TableStatusService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
 
 class TableController extends Controller
 {
-    public function __construct(private TableStatusService $tableStatus) {}
+    public function __construct(
+        private TableStatusService $tableStatus,
+        private ReservationService $reservations,
+    ) {}
 
     public function seat(SeatTableRequest $request, RestaurantTable $table): RedirectResponse
     {
-        $tableIds = array_unique([$table->table_id, ...$request->validated('other_table_ids', [])]);
-        $tables = RestaurantTable::whereIn('table_id', $tableIds)->get();
-
-        $this->tableStatus->seatGroup($tables, $request->user('staff'), $request->validated('guest_count'));
+        $this->tableStatus->seatWalkIn($table, $request->user('staff'), $request->validated('guest_count'));
 
         return back()->with('status', 'table-seated');
+    }
+
+    /**
+     * FR69 from the floor: the same service call S27's Seat button makes, so a
+     * booking seated here opens every table it was assigned, not just this one.
+     */
+    public function seatReservation(SeatReservationRequest $request, RestaurantTable $table): RedirectResponse
+    {
+        $reservation = Reservation::findOrFail($request->validated('reservation_id'));
+
+        $this->reservations->seatReservation($reservation, $request->user('staff'));
+
+        return back()
+            ->with('status', 'reservation-seated')
+            ->with('message', "Reservation {$reservation->reference_code} seated successfully.");
+    }
+
+    /**
+     * FR65 from the floor: pick the table first, then the booking. The table is
+     * added to whatever the booking already holds rather than replacing it, so
+     * a party too big for one table is assigned by repeating this on a second
+     * table — `assignTables()` still applies BR04 and its seats/overlap checks
+     * across the whole set.
+     */
+    public function assignReservation(AssignReservationRequest $request, RestaurantTable $table): RedirectResponse
+    {
+        $reservation = Reservation::findOrFail($request->validated('reservation_id'));
+
+        $tableIds = $this->assignedTableIds($reservation)
+            ->push($table->table_id)
+            ->unique()
+            ->all();
+
+        $this->reservations->assignTables($reservation, $tableIds, $request->user('staff'));
+
+        return back()
+            ->with('status', 'reservation-assigned')
+            ->with('message', "Table {$table->table_number} given to {$reservation->reference_code}.");
+    }
+
+    /** The undo for the above: drop this table, keeping any others the booking holds. */
+    public function releaseReservation(AssignReservationRequest $request, RestaurantTable $table): RedirectResponse
+    {
+        $reservation = Reservation::findOrFail($request->validated('reservation_id'));
+
+        $remaining = $this->assignedTableIds($reservation)
+            ->reject(fn (int $tableId) => $tableId === $table->table_id)
+            ->all();
+
+        if ($remaining === []) {
+            $this->reservations->unassignTables($reservation, $request->user('staff'));
+        } else {
+            $this->reservations->assignTables($reservation, $remaining, $request->user('staff'));
+        }
+
+        return back()
+            ->with('status', 'reservation-released')
+            ->with('message', "Table {$table->table_number} released from {$reservation->reference_code}.");
+    }
+
+    /** @return Collection<int, int> */
+    private function assignedTableIds(Reservation $reservation): Collection
+    {
+        return $reservation->visits()
+            ->whereNull('closed_at')
+            ->pluck('table_id');
     }
 
     public function clear(ClearTablesRequest $request): RedirectResponse

@@ -54,6 +54,18 @@ class Refund extends Model
         return $this->belongsTo(Staff::class, 'requested_by_staff_id', 'staff_id');
     }
 
+    public function requestedByCustomer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'requested_by_customer_id', 'customer_id');
+    }
+
+    /** BR27: exactly one of the two requesters is set, so screens can name whoever asked. */
+    public function requesterName(): string
+    {
+        return $this->requestedBy?->full_name
+            ?? ($this->requestedByCustomer !== null ? $this->requestedByCustomer->full_name.' (customer)' : '—');
+    }
+
     public function processedBy(): BelongsTo
     {
         return $this->belongsTo(Staff::class, 'processed_by_staff_id', 'staff_id');

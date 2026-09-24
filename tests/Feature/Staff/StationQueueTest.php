@@ -121,6 +121,30 @@ class StationQueueTest extends TestCase
             ->assertJsonPath('orders.0.lines.0.quantity', 2);
     }
 
+    /** The board re-renders when this stops matching the page's own value. */
+    public function test_the_state_signature_changes_when_a_line_moves_on(): void
+    {
+        $order = $this->orderWithLine(Destination::Kitchen);
+        $cook = $this->staffWithRole('kitchen');
+
+        $before = $this->actingAs($cook, 'staff')
+            ->getJson(route('staff.kds.state', 'kitchen'))
+            ->json('signature');
+
+        $this->actingAs($cook, 'staff')
+            ->get(route('staff.kds.index', 'kitchen'))
+            ->assertOk()
+            ->assertSee('data-signature="'.$before.'"', false);
+
+        $order->items()->update(['status' => 'preparing']);
+
+        $after = $this->actingAs($cook, 'staff')
+            ->getJson(route('staff.kds.state', 'kitchen'))
+            ->json('signature');
+
+        $this->assertNotSame($before, $after);
+    }
+
     public function test_waitstaff_cannot_open_a_station_display(): void
     {
         $this->actingAs($this->staffWithRole('waitstaff'), 'staff')

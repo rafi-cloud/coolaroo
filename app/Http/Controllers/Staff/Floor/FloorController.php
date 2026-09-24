@@ -6,9 +6,11 @@ use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentAttemptStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Reservation;
 use App\Models\RestaurantTable;
 use App\Models\Setting;
 use Illuminate\Database\Eloquent\Collection;
@@ -39,7 +41,24 @@ class FloorController extends Controller
             'cashWaiting' => $cashWaiting,
             'attention' => $this->attention($readyToServe, $cashWaiting),
             'qrOrderingPaused' => $this->qrOrderingPaused(),
+            'assignableReservations' => $this->assignableReservations(),
         ]);
+    }
+
+    /**
+     * FR65 moved onto S23: today's bookings that can still be given a table.
+     * Loaded once for the whole grid rather than per drawer.
+     *
+     * @return Collection<int, Reservation>
+     */
+    private function assignableReservations(): Collection
+    {
+        return Reservation::query()
+            ->whereDate('booking_date', now()->toDateString())
+            ->whereIn('status', [ReservationStatus::Requested, ReservationStatus::Confirmed])
+            ->with(['slot', 'visits'])
+            ->orderBy('booking_time')
+            ->get();
     }
 
     /**
@@ -133,7 +152,7 @@ class FloorController extends Controller
             ->with(['visits' => fn ($query) => $query
                 ->whereNull('closed_at')
                 ->whereNotNull('reservation_id')
-                ->with('reservation.slot')
+                ->with(['reservation.slot', 'reservation.visits'])
                 ->oldest('created_at')])
             ->orderBy('table_number')
             ->get();
@@ -141,7 +160,8 @@ class FloorController extends Controller
 
     private function nextReservationPayload(RestaurantTable $table): ?array
     {
-        $reservation = $table->visits->first()?->reservation;
+        $visit = $table->visits->first();
+        $reservation = $visit?->reservation;
 
         if ($reservation === null) {
             return null;
@@ -149,9 +169,11 @@ class FloorController extends Controller
 
         return [
             'reservation_id' => $reservation->reservation_id,
+            'reference_code' => $reservation->reference_code,
             'booking_date' => $reservation->booking_date->toDateString(),
             'slot_time' => $reservation->slot->slot_time,
             'party_size' => $reservation->party_size,
+            'seated' => $visit->opened_at !== null,
         ];
     }
 

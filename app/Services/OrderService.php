@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\OrderItemStatus;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentAttemptStatus;
 use App\Enums\PaymentMethod;
@@ -28,6 +29,25 @@ class OrderService
         private PaymentService $payments,
     ) {}
 
+    /**
+     * An order that ends must not leave lines sitting at pending or preparing:
+     * anything reading line status — the station queue, BR30's "orders ahead"
+     * — would keep counting work nobody is doing. 5.2 has no ready → cancelled
+     * edge, so a plated dish keeps its status and only unstarted work is
+     * cancelled, one line at a time through the transition map (AGENTS rule 3).
+     */
+    public function cancelActiveLines(Order $order): void
+    {
+        $lines = $order->items()
+            ->whereIn('status', [OrderItemStatus::Pending, OrderItemStatus::Preparing])
+            ->get();
+
+        foreach ($lines as $line) {
+            $line->status->ensureCanTransitionTo(OrderItemStatus::Cancelled);
+            $line->forceFill(['status' => OrderItemStatus::Cancelled])->save();
+        }
+    }
+
     /** pending_payment only. step 2's local half — see class docblock. */
     public function cancelUnpaid(Order $order, Customer $actor): Order
     {
@@ -46,6 +66,8 @@ class OrderService
                 'status' => OrderStatus::Cancelled,
                 'cancelled_at' => now(),
             ])->save();
+
+            $this->cancelActiveLines($locked);
 
             $this->expirePendingStripeAttempts($locked);
 
@@ -138,6 +160,8 @@ class OrderService
                 'cancelled_at' => now(),
             ])->save();
 
+            $this->cancelActiveLines($locked);
+
             $this->markPendingAttemptsExpired($locked);
 
             OrderStatusHistory::create([
@@ -178,6 +202,8 @@ class OrderService
                 'status' => OrderStatus::Cancelled,
                 'cancelled_at' => now(),
             ])->save();
+
+            $this->cancelActiveLines($locked);
 
             $this->markPendingAttemptsExpired($locked);
 

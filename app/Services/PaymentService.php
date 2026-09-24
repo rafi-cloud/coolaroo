@@ -7,7 +7,6 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentAttemptStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
-use App\Enums\TableStatus;
 use App\Events\OrderPaid;
 use App\Events\OrderStatusChanged;
 use App\Events\StockConflictDetected;
@@ -16,9 +15,7 @@ use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
 use App\Models\Payment;
-use App\Models\RestaurantTable;
 use App\Models\Staff;
-use App\Models\Visit;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -126,12 +123,8 @@ class PaymentService
             ])->save();
 
             $table = $order->restaurantTable()->lockForUpdate()->first();
-            $visit = $this->openVisit($table);
+            $visit = $this->tableStatus->occupyForOrder($table);
             $order->update(['visit_id' => $visit->visit_id]);
-
-            if ($table->status !== TableStatus::Occupied) {
-                $this->tableStatus->transition($table, TableStatus::Occupied);
-            }
 
             OrderStatusHistory::create([
                 'order_id' => $order->order_id,
@@ -188,21 +181,5 @@ class PaymentService
         if ($conflict) {
             $order->update(['has_stock_conflict' => true]);
         }
-    }
-
-    /** 16: opened_by_staff_id stays NULL — no staff is present for a QR payment. */
-    private function openVisit(RestaurantTable $table): Visit
-    {
-        $visit = Visit::where('table_id', $table->table_id)->whereNull('closed_at')->first();
-
-        if ($visit === null) {
-            return Visit::create(['table_id' => $table->table_id, 'opened_at' => now()]);
-        }
-
-        if ($visit->opened_at === null) {
-            $visit->update(['opened_at' => now()]);
-        }
-
-        return $visit;
     }
 }

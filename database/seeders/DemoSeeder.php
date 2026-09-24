@@ -818,9 +818,9 @@ class DemoSeeder extends Seeder
             );
 
             // Add Order lines
-            $this->createOrderLine($order, 1, $items['parma'], 'Regular', 28.50, 2);
-            $this->createOrderLine($order, 2, $items['beer'], 'Pint 570ml', 12.50, 1);
-            $this->createOrderLine($order, 3, $items['bread'], 'Regular Loaf', 11.00, 1);
+            $this->createOrderLine($order, 1, $items['parma'], 'Regular', 28.50, 2, OrderItemStatus::Served);
+            $this->createOrderLine($order, 2, $items['beer'], 'Pint 570ml', 12.50, 1, OrderItemStatus::Served);
+            $this->createOrderLine($order, 3, $items['bread'], 'Regular Loaf', 11.00, 1, OrderItemStatus::Served);
 
             Payment::firstOrCreate(
                 ['order_id' => $order->order_id],

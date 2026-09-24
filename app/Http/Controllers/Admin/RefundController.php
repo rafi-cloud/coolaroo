@@ -25,7 +25,7 @@ class RefundController extends Controller
         $status = $request->query('status');
 
         $refunds = Refund::query()
-            ->with(['order', 'orderItem', 'payment', 'requestedBy', 'processedBy'])
+            ->with(['order', 'orderItem', 'payment', 'requestedBy', 'requestedByCustomer', 'processedBy'])
             ->when(
                 RefundStatus::tryFrom((string) $status),
                 fn ($query, RefundStatus $only) => $query->where('status', $only),

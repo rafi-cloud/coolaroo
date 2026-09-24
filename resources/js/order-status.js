@@ -43,6 +43,11 @@ export function initOrderStatus() {
         applyEta(page, 'kitchen', state.kitchen_eta);
         applyEta(page, 'bar', state.bar_eta);
 
+        const etaGrid = page.querySelector('[data-eta-grid]');
+        if (etaGrid) {
+            etaGrid.hidden = !state.kitchen_eta && !state.bar_eta;
+        }
+
         if (state.status === 'served' || state.status === 'cancelled') {
             clearInterval(timer);
         }

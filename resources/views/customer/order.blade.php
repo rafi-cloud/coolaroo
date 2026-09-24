@@ -21,6 +21,14 @@
         <span>A staff member will come to collect payment.</span>
       </div>
     </div>
+  @elseif (session('status') === 'refund-requested')
+    <div class="auth-error auth-success" role="status" data-testid="refund-requested-notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+      <div>
+        <strong>Refund requested</strong>
+        <span>A manager will review it and be in touch.</span>
+      </div>
+    </div>
   @elseif (session('status') === 'feedback-submitted')
     <div class="auth-error auth-success" role="status" data-testid="feedback-submitted-notice">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
@@ -142,25 +150,10 @@
         </div>
 
         {{-- Kitchen & Bar Live ETAs --}}
-        @if ($kitchenEta || $barEta)
-          <div class="order-etas-grid">
-            @if ($kitchenEta)
-              <div class="order-eta-card" data-testid="order-eta-kitchen">Kitchen: ready between {{ $kitchenEta['from']->format('g:i A') }} and {{ $kitchenEta['to']->format('g:i A') }}</div>
-            @else
-              <div class="order-eta-card" data-testid="order-eta-kitchen" hidden></div>
-            @endif
-            @if ($barEta)
-              <div class="order-eta-card" data-testid="order-eta-bar">Bar: ready between {{ $barEta['from']->format('g:i A') }} and {{ $barEta['to']->format('g:i A') }}</div>
-            @else
-              <div class="order-eta-card" data-testid="order-eta-bar" hidden></div>
-            @endif
-          </div>
-        @else
-          <div class="order-etas-grid" style="display:none">
-            <div class="order-eta-card" data-testid="order-eta-kitchen" hidden></div>
-            <div class="order-eta-card" data-testid="order-eta-bar" hidden></div>
-          </div>
-        @endif
+        <div class="order-etas-grid" data-eta-grid @if (! $kitchenEta && ! $barEta) hidden @endif>
+          <div class="order-eta-card" data-testid="order-eta-kitchen" @if (! $kitchenEta) hidden @endif>@if ($kitchenEta)Kitchen: ready between @auTime($kitchenEta['from']) and @auTime($kitchenEta['to'])@endif</div>
+          <div class="order-eta-card" data-testid="order-eta-bar" @if (! $barEta) hidden @endif>@if ($barEta)Bar: ready between @auTime($barEta['from']) and @auTime($barEta['to'])@endif</div>
+        </div>
 
         {{-- Pending Payment Action Box --}}
         @if ($order->status->value === 'pending_payment')
@@ -199,6 +192,11 @@
               </div>
             </div>
           @endif
+        @endif
+
+        {{-- FR51: raise a refund request on a paid order, inside the 24-hour window --}}
+        @if ($refundableLines->isNotEmpty())
+          <x-refund-request :order="$order" :lines="$refundableLines" />
         @endif
 
         {{-- Feedback Section when served --}}

@@ -197,15 +197,6 @@
                 <span class="assigned-table-list" data-testid="reservations-tables-{{ $r->reservation_id }}">
                   {{ $r->assigned_tables->pluck('table_number')->map(fn($n) => 'Table '.$n)->join(', ') }}
                 </span>
-                @if (in_array($r->status, [\App\Enums\ReservationStatus::Confirmed, \App\Enums\ReservationStatus::Requested], true))
-                  <form method="POST" action="{{ route('staff.reservations.tables.unassign', $r) }}" style="display:inline; margin-left:0.4rem;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-xs btn-ghost text-danger" data-testid="reservations-unassign-btn-{{ $r->reservation_id }}">
-                      Unassign
-                    </button>
-                  </form>
-                @endif
               @else
                 <span class="unassigned-tag {{ $r->is_unassigned_inside_t30 ? 'unassigned-urgent' : '' }}" data-testid="reservations-unassigned-tag-{{ $r->reservation_id }}">
                   Unassigned
@@ -214,31 +205,9 @@
             </div>
 
             @if (in_array($r->status, [\App\Enums\ReservationStatus::Confirmed, \App\Enums\ReservationStatus::Requested], true))
-              <details class="table-assign-drawer" data-testid="reservations-assign-drawer-{{ $r->reservation_id }}">
-                <summary class="btn btn-xs btn-outline" data-testid="reservations-toggle-assign-{{ $r->reservation_id }}">
-                  {{ $r->assigned_tables->isNotEmpty() ? 'Reassign tables' : 'Assign tables' }}
-                </summary>
-                <form method="POST" action="{{ route('staff.reservations.tables.assign', $r) }}" class="table-assign-form" data-testid="reservations-assign-form-{{ $r->reservation_id }}">
-                  @csrf
-                  <p class="text-muted text-xs" style="margin-bottom:0.4rem">
-                    Select active table(s) to seat {{ $r->party_size }} {{ \Illuminate\Support\Str::plural('guest', $r->party_size) }}:
-                  </p>
-                  <div class="table-checkboxes-grid">
-                    @php
-                      $assignedIds = $r->assigned_tables->pluck('table_id')->all();
-                    @endphp
-                    @foreach ($allTables as $t)
-                      <label class="table-chk-label">
-                        <input type="checkbox" name="table_ids[]" value="{{ $t->table_id }}" {{ in_array($t->table_id, $assignedIds, true) ? 'checked' : '' }} data-testid="reservations-table-chk-{{ $r->reservation_id }}-{{ $t->table_id }}">
-                        <span>T{{ $t->table_number }} ({{ $t->seat_capacity }}s)</span>
-                      </label>
-                    @endforeach
-                  </div>
-                  <button type="submit" class="btn btn-xs btn-primary" data-testid="reservations-save-tables-{{ $r->reservation_id }}">
-                    Save assignment
-                  </button>
-                </form>
-              </details>
+              <p class="text-muted text-xs" data-testid="reservations-assign-hint-{{ $r->reservation_id }}">
+                Give this booking a table from the <a href="{{ route('staff.floor.index') }}">floor view</a>.
+              </p>
             @endif
           </div>
 

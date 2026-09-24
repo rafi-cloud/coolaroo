@@ -10,6 +10,7 @@ use App\Enums\RefundMethod;
 use App\Enums\RefundStatus;
 use App\Events\OrderStatusChanged;
 use App\Events\RefundRequested;
+use App\Models\Customer;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -32,8 +33,52 @@ class RefundService
         private StripeService $stripe,
     ) {}
 
-    /** payment.method (PaymentMethod) and refund.method (RefundMethod) are separate enums; mapped via ::from() below. */
-    public function request(OrderItem $item, int $quantity, string $reason, Staff $actor): Refund
+    /**
+     * How long after payment a refund may still be asked for. A rolling window
+     * rather than "same service day", so a table that pays at 11pm still has
+     * the next morning to raise a problem.
+     */
+    public const REQUEST_WINDOW_HOURS = 24;
+
+    /** Units of a line not already refunded or claimed by an open request. */
+    public function remainingQuantity(OrderItem $item): int
+    {
+        $claimed = $item->refunded_qty + $item->refunds()
+            ->whereIn('status', [RefundStatus::Requested, RefundStatus::Processing])
+            ->sum('quantity');
+
+        return max(0, $item->quantity - $claimed);
+    }
+
+    /** The one place the window is decided, so the screens and the write agree. */
+    public function isWithinRequestWindow(Order $order): bool
+    {
+        return $order->paid_at !== null
+            && $order->paid_at->gte(now()->subHours(self::REQUEST_WINDOW_HOURS));
+    }
+
+    /** Whether this order can still be the subject of a new refund request at all. */
+    public function canBeRefundRequested(Order $order): bool
+    {
+        if (! $this->isWithinRequestWindow($order)) {
+            return false;
+        }
+
+        if (! $order->payments()->where('status', PaymentAttemptStatus::Succeeded)->exists()) {
+            return false;
+        }
+
+        return $order->items->contains(fn (OrderItem $item) => $this->remainingQuantity($item) > 0);
+    }
+
+    /**
+     * BR27: the request may come from staff or, since it is their own paid
+     * order, from the customer on it. Exactly one requester column is filled.
+     *
+     * payment.method (PaymentMethod) and refund.method (RefundMethod) are
+     * separate enums; mapped via ::from() below.
+     */
+    public function request(OrderItem $item, int $quantity, string $reason, Staff|Customer $actor): Refund
     {
         $order = $item->order;
         $succeededPayment = $order->payments()->where('status', PaymentAttemptStatus::Succeeded)->first();
@@ -44,11 +89,13 @@ class RefundService
             ]);
         }
 
-        $alreadyClaimed = $item->refunded_qty + $item->refunds()
-            ->whereIn('status', [RefundStatus::Requested, RefundStatus::Processing])
-            ->sum('quantity');
+        if (! $this->isWithinRequestWindow($order)) {
+            throw ValidationException::withMessages([
+                'order' => 'Refunds can only be requested within '.self::REQUEST_WINDOW_HOURS.' hours of payment.',
+            ]);
+        }
 
-        $remaining = $item->quantity - $alreadyClaimed;
+        $remaining = $this->remainingQuantity($item);
 
         if ($quantity < 1 || $quantity > $remaining) {
             throw ValidationException::withMessages([
@@ -64,7 +111,8 @@ class RefundService
             'order_id' => $order->order_id,
             'order_item_id' => $item->order_item_id,
             'payment_id' => $succeededPayment->payment_id,
-            'requested_by_staff_id' => $actor->staff_id,
+            'requested_by_staff_id' => $actor instanceof Staff ? $actor->staff_id : null,
+            'requested_by_customer_id' => $actor instanceof Customer ? $actor->customer_id : null,
             'method' => RefundMethod::from($succeededPayment->method->value),
             'quantity' => $quantity,
             'amount' => round($perUnitAmount * $quantity, 2),

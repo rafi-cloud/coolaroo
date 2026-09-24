@@ -117,6 +117,70 @@ class ReservationSeatingAndNoShowTest extends TestCase
         $this->assertSame(TableStatus::Occupied, $table->status);
     }
 
+    public function test_waitstaff_can_seat_a_confirmed_reservation_from_the_floor_drawer(): void
+    {
+        $table = RestaurantTable::factory()->create([
+            'table_number' => 31,
+            'seat_capacity' => 4,
+            'is_active' => true,
+            'status' => TableStatus::Reserved,
+        ]);
+
+        $reservation = Reservation::factory()->create([
+            'customer_id' => $this->customer->customer_id,
+            'booking_date' => '2026-09-22',
+            'slot_id' => $this->slot->slot_id,
+            'booking_time' => '18:00',
+            'party_size' => 4,
+            'status' => ReservationStatus::Confirmed,
+        ]);
+
+        $visit = Visit::create([
+            'table_id' => $table->table_id,
+            'reservation_id' => $reservation->reservation_id,
+            'opened_at' => null,
+            'guest_count' => 4,
+        ]);
+
+        $this->actingAs($this->waitstaff, 'staff')
+            ->withSession(['staff_last_activity' => now()])
+            ->post(route('staff.tables.seat-reservation', $table), ['reservation_id' => $reservation->reservation_id])
+            ->assertRedirect()
+            ->assertSessionHas('status', 'reservation-seated');
+
+        $this->assertSame(ReservationStatus::Seated, $reservation->fresh()->status);
+        $this->assertNotNull($visit->fresh()->opened_at);
+        $this->assertSame(TableStatus::Occupied, $table->fresh()->status);
+    }
+
+    public function test_the_floor_drawer_refuses_a_booking_assigned_to_another_table(): void
+    {
+        $assigned = RestaurantTable::factory()->create(['table_number' => 32, 'status' => TableStatus::Reserved]);
+        $other = RestaurantTable::factory()->create(['table_number' => 33, 'status' => TableStatus::Available]);
+
+        $reservation = Reservation::factory()->create([
+            'customer_id' => $this->customer->customer_id,
+            'booking_date' => '2026-09-22',
+            'slot_id' => $this->slot->slot_id,
+            'booking_time' => '18:00',
+            'party_size' => 2,
+            'status' => ReservationStatus::Confirmed,
+        ]);
+
+        Visit::create([
+            'table_id' => $assigned->table_id,
+            'reservation_id' => $reservation->reservation_id,
+            'opened_at' => null,
+        ]);
+
+        $this->actingAs($this->waitstaff, 'staff')
+            ->withSession(['staff_last_activity' => now()])
+            ->post(route('staff.tables.seat-reservation', $other), ['reservation_id' => $reservation->reservation_id])
+            ->assertSessionHasErrors('reservation_id');
+
+        $this->assertSame(ReservationStatus::Confirmed, $reservation->fresh()->status);
+    }
+
     public function test_cannot_seat_reservation_without_assigned_tables(): void
     {
         $reservation = Reservation::factory()->create([

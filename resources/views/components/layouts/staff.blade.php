@@ -27,6 +27,7 @@
   @else
     <x-dashboard.nav-staff />
   @endif
+  <x-dashboard.nav-logout />
 </aside>
 
 <div class="shell">

@@ -94,6 +94,67 @@ class RefundRequestTest extends TestCase
         $this->assertSame(0, Refund::count());
     }
 
+    /** FR51 lists Waitstaff, so the form has to be on a screen they can open. */
+    public function test_waitstaff_reach_the_refund_screen_from_the_floor(): void
+    {
+        $order = $this->paidOrder(2);
+        $waiter = $this->staffWithRole('waitstaff');
+
+        $this->actingAs($waiter, 'staff')
+            ->get(route('staff.floor.index'))
+            ->assertOk()
+            ->assertSee('floor-table-order-link-'.$order->table_id, false)
+            ->assertSee('floor-table-refund-link-'.$order->table_id, false);
+
+        $this->actingAs($waiter, 'staff')
+            ->get(route('staff.tables.refunds', $order->table_id))
+            ->assertOk()
+            ->assertSee('staff-refund-order-'.$order->order_id, false)
+            ->assertSee('refund-request-submit', false);
+    }
+
+    /** The screen has to show what has already been asked for on each line. */
+    public function test_the_refund_screen_tracks_a_request_already_raised(): void
+    {
+        $order = $this->paidOrder(2);
+        $item = $order->items->first();
+        $waiter = $this->staffWithRole('waitstaff');
+
+        $this->actingAs($waiter, 'staff')
+            ->post(route('staff.orders.refund-requests.store', $order), [
+                'order_item_id' => $item->order_item_id,
+                'quantity' => 1,
+                'reason' => 'Steak was cold',
+            ]);
+
+        $refund = Refund::where('order_item_id', $item->order_item_id)->firstOrFail();
+
+        $this->actingAs($waiter, 'staff')
+            ->get(route('staff.tables.refunds', $order->table_id))
+            ->assertOk()
+            ->assertSee('refund-progress-'.$refund->refund_id, false)
+            ->assertSee('Requested')
+            ->assertDontSee('refund-none-'.$item->order_item_id, false);
+    }
+
+    /** A refund is asked for on the day, not a week later. */
+    public function test_an_order_paid_more_than_a_day_ago_is_out_of_the_request_window(): void
+    {
+        $order = $this->paidOrder(2);
+        $order->forceFill(['paid_at' => now()->subHours(25)])->save();
+
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->from(route('admin.orders.show', $order))
+            ->post(route('staff.orders.refund-requests.store', $order), [
+                'order_item_id' => $order->items->first()->order_item_id,
+                'quantity' => 1,
+                'reason' => 'Too late',
+            ])
+            ->assertSessionHasErrors('order');
+
+        $this->assertSame(0, Refund::where('order_id', $order->order_id)->count());
+    }
+
     public function test_a_guest_cannot_reach_the_staff_refund_route(): void
     {
         $order = $this->paidOrder(1);

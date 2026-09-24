@@ -63,6 +63,11 @@
                   Download receipt (PDF)
                 </a>
               @endif
+              @if (($refundable[$order->order_id] ?? false))
+                <a href="{{ route('orders.show', $order) }}#request-refund" class="btn btn-sm btn-subtle" data-testid="refund-order-{{ $order->order_id }}">
+                  Request a refund
+                </a>
+              @endif
             </div>
           </div>
         @endforeach

@@ -4,7 +4,7 @@
   @if (session('status'))
     <div class="auth-error auth-success" role="status">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
-      <span>{{ match(session('status')) { 'table-seated' => 'Table seated.', 'table-cleared' => 'Table cleared.', 'order-served' => 'Marked served.', default => '' } }}</span>
+      <span>{{ match(session('status')) { 'table-seated' => 'Table seated.', 'table-cleared' => 'Table cleared.', 'order-served' => 'Marked served.', 'reservation-seated', 'reservation-assigned', 'reservation-released' => session('message', 'Booking updated.'), default => '' } }}</span>
     </div>
   @endif
 
@@ -46,6 +46,7 @@
                ])
                data-table-row="{{ $table->table_id }}"
                data-table-card="{{ $table->table_id }}"
+               data-rendered-status="{{ $table->status->value }}"
                data-testid="floor-table-{{ $table->table_id }}">
         <header class="kds-card-head">
           <div>
@@ -66,16 +67,28 @@
           {{ $table->active_order_count }} active order(s)
         </p>
 
-        @php($nextReservation = $table->visits->first()?->reservation)
+        <div class="floor-table-links">
+          <a href="{{ route('staff.tables.order', $table) }}" class="btn btn-ghost" data-testid="floor-table-order-link-{{ $table->table_id }}">
+            Take order
+          </a>
+          <a href="{{ route('staff.tables.refunds', $table) }}" class="btn btn-ghost" data-testid="floor-table-refund-link-{{ $table->table_id }}">
+            Request a refund
+          </a>
+        </div>
+
+        @php($nextVisit = $table->visits->first())
+        @php($nextReservation = $nextVisit?->reservation)
         <p data-table-reservation="{{ $table->table_id }}" data-testid="floor-table-reservation-{{ $table->table_id }}">
-          @if ($nextReservation)
-            Next: {{ $nextReservation->party_size }} guests, {{ $nextReservation->slot->slot_time }}
+          @if ($nextReservation && $nextVisit->opened_at !== null)
+            Seated: {{ $nextReservation->reference_code }}, {{ $nextReservation->party_size }} guests
+          @elseif ($nextReservation)
+            Next: {{ $nextReservation->reference_code }}, {{ $nextReservation->party_size }} guests, {{ $nextReservation->slot->slot_time }}
           @else
             No upcoming reservation
           @endif
         </p>
 
-        <x-floor.table-drawer :table="$table" :tables="$tables" />
+        <x-floor.table-drawer :table="$table" :tables="$tables" :assignable="$assignableReservations" />
       </article>
     @endforeach
   </div>
@@ -128,6 +141,29 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Each drawer offers Seat or Clear based on the status the page was rendered
+  // with, and lists the tables that were free or occupied at that moment. None
+  // of that can be patched from the state payload without rebuilding the form,
+  // so a table status change re-renders the page — deferred while a drawer is
+  // open so a waiter is never reloaded mid-action.
+  let pendingReload = false;
+
+  const reloadWhenIdle = () => {
+    if (page.querySelector('details[open]')) {
+      pendingReload = true;
+
+      return;
+    }
+
+    window.location.reload();
+  };
+
+  page.addEventListener('toggle', () => {
+    if (pendingReload && ! page.querySelector('details[open]')) {
+      window.location.reload();
+    }
+  }, true);
+
   page.addEventListener('floor:state', (event) => {
     const state = event.detail;
 
@@ -162,9 +198,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const reservation = page.querySelector(`[data-table-reservation="${table.table_id}"]`);
       if (reservation) {
-        reservation.textContent = table.next_reservation
-          ? `Next: ${table.next_reservation.party_size} guests, ${table.next_reservation.slot_time}`
-          : 'No upcoming reservation';
+        const booking = table.next_reservation;
+
+        if (! booking) {
+          reservation.textContent = 'No upcoming reservation';
+        } else if (booking.seated) {
+          reservation.textContent = `Seated: ${booking.reference_code}, ${booking.party_size} guests`;
+        } else {
+          reservation.textContent = `Next: ${booking.reference_code}, ${booking.party_size} guests, ${booking.slot_time}`;
+        }
       }
     });
 
@@ -222,6 +264,16 @@ document.addEventListener('DOMContentLoaded', () => {
               + '</li>';
           }).join('')
         : '<li>Nothing waiting.</li>';
+    }
+
+    const statusChanged = state.tables.some((table) => {
+      const card = page.querySelector(`[data-table-card="${table.table_id}"]`);
+
+      return card && card.dataset.renderedStatus !== table.status;
+    });
+
+    if (statusChanged) {
+      reloadWhenIdle();
     }
   });
 });

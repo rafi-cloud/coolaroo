@@ -7,6 +7,7 @@
   data-kds-page
   data-destination="{{ $destination->value }}"
   data-state-url="{{ route('staff.kds.state', ['destination' => $destination->value] + request()->query()) }}"
+  data-signature="{{ $signature }}"
 >
   @if (session('status'))
     <div class="auth-error auth-success" role="status">

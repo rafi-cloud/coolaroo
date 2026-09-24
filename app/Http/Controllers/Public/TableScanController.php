@@ -42,19 +42,22 @@ class TableScanController extends Controller
             return redirect()->route('customer.login');
         }
 
-        if ($table->status === TableStatus::Reserved) {
-            $reservation = $this->reservations->assignedReservation($table);
+        $reservation = $this->reservations->assignedReservation($table);
 
-            if ($reservation === null || ! $this->reservations->isHolderWithinWindow($reservation, $customer)) {
-                return view('public.table-reserved', [
-                    'table' => $table,
-                    'holderName' => $reservation === null
-                        ? 'a booking'
-                        : $this->reservations->holderDisplayName($reservation),
-                ]);
-            }
-
+        // BR03/FR69: the holder's own scan seats them. This is deliberately not
+        // gated on the table already reading Reserved — that only happens once
+        // the T-30 sweep has run, and a holder arriving before it would
+        // otherwise walk in as an anonymous diner and leave their booking
+        // Confirmed with the floor none the wiser.
+        if ($reservation !== null && $this->reservations->isHolderWithinWindow($reservation, $customer)) {
             $this->reservations->seatOnHolderScan($table, $reservation);
+        } elseif ($table->status === TableStatus::Reserved) {
+            return view('public.table-reserved', [
+                'table' => $table,
+                'holderName' => $reservation === null
+                    ? 'a booking'
+                    : $this->reservations->holderDisplayName($reservation),
+            ]);
         }
 
         $boundTableId = $this->cart->boundTableId();

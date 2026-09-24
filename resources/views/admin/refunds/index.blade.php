@@ -56,7 +56,7 @@
             <td>{{ $refund->quantity }}</td>
             <td>@money($refund->amount)</td>
             <td>{{ $refund->reason }}</td>
-            <td>{{ $refund->requestedBy->full_name }}</td>
+            <td>{{ $refund->requesterName() }}</td>
             <td>
               <span class="badge b-{{ $refund->status->value }}" data-testid="admin-refund-status-{{ $refund->refund_id }}">{{ ucfirst($refund->status->value) }}</span>
               @if ($refund->status === \App\Enums\RefundStatus::Rejected && $refund->rejection_reason)

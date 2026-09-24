@@ -34,6 +34,7 @@ use App\Http\Controllers\Customer\OrderController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Customer\ReceiptController;
+use App\Http\Controllers\Customer\RefundRequestController as CustomerRefundRequestController;
 use App\Http\Controllers\Customer\ReservationController as CustomerReservationController;
 use App\Http\Controllers\Public\AiController;
 use App\Http\Controllers\Public\AvailabilityController as PublicAvailabilityController;
@@ -128,6 +129,7 @@ Route::middleware('auth:customer')->group(function () {
     Route::post('/orders/{order}/pay/cash', [PaymentController::class, 'cash'])->name('orders.pay.cash');
     Route::post('/orders/{order}/payment-check', [PaymentController::class, 'check'])->name('orders.pay.check');
     Route::post('/orders/{order}/feedback', [FeedbackController::class, 'store'])->name('orders.feedback.store');
+    Route::post('/orders/{order}/refund-requests', [CustomerRefundRequestController::class, 'store'])->name('orders.refund-requests.store');
     Route::get('/payment/success', [PaymentController::class, 'return'])->name('payment.success');
     Route::get('/payment/cancelled', [PaymentController::class, 'return'])->name('payment.cancelled');
 
@@ -154,6 +156,7 @@ Route::middleware(['auth:staff', 'staff.session'])->group(function () {
 
     // No role: restriction — the actor list (Waitstaff, Kitchen, Bar, Admin)
     // is enforced by OrderPolicy::requestRefund() itself, not route middleware.
+    Route::get('/staff/tables/{table}/refunds', [RefundRequestController::class, 'index'])->name('staff.tables.refunds');
     Route::post('/staff/orders/{order}/refund-requests', [RefundRequestController::class, 'store'])->name('staff.orders.refund-requests.store');
 });
 
@@ -161,6 +164,9 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
     Route::get('/floor', [FloorController::class, 'index'])->name('staff.floor.index');
     Route::get('/floor/state', [FloorController::class, 'state'])->name('staff.floor.state');
     Route::post('/tables/{table}/seat', [StaffTableController::class, 'seat'])->name('staff.tables.seat');
+    Route::post('/tables/{table}/seat-reservation', [StaffTableController::class, 'seatReservation'])->name('staff.tables.seat-reservation');
+    Route::post('/tables/{table}/assign-reservation', [StaffTableController::class, 'assignReservation'])->name('staff.tables.assign-reservation');
+    Route::delete('/tables/{table}/assign-reservation', [StaffTableController::class, 'releaseReservation'])->name('staff.tables.release-reservation');
     Route::post('/tables/clear', [StaffTableController::class, 'clear'])->name('staff.tables.clear');
     Route::get('/tables/{table}/order', [StaffOrderController::class, 'index'])->name('staff.tables.order');
     Route::post('/tables/{table}/order', [StaffOrderController::class, 'store'])->name('staff.tables.order.store');
@@ -174,8 +180,6 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
     Route::post('/reservations', [StaffReservationController::class, 'store'])->name('staff.reservations.store');
     Route::post('/reservations/{reservation}/approve', [StaffReservationController::class, 'approve'])->name('staff.reservations.approve');
     Route::post('/reservations/{reservation}/decline', [StaffReservationController::class, 'decline'])->name('staff.reservations.decline');
-    Route::post('/reservations/{reservation}/tables', [StaffReservationController::class, 'assign'])->name('staff.reservations.tables.assign');
-    Route::delete('/reservations/{reservation}/tables', [StaffReservationController::class, 'unassign'])->name('staff.reservations.tables.unassign');
     Route::post('/reservations/{reservation}/seat', [StaffReservationController::class, 'seat'])->name('staff.reservations.seat');
     Route::post('/reservations/{reservation}/no-show', [StaffReservationController::class, 'noShow'])->name('staff.reservations.no-show');
     Route::get('/customers/{customer}/trust', [TrustController::class, 'show'])->name('staff.customers.trust');

@@ -8,6 +8,7 @@ use App\Models\MenuItemSize;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
+use App\Models\RestaurantTable;
 use App\Models\Staff;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -20,7 +21,10 @@ use Illuminate\Validation\ValidationException;
  */
 class CheckoutService
 {
-    public function __construct(private StockService $stock) {}
+    public function __construct(
+        private StockService $stock,
+        private TableStatusService $tableStatus,
+    ) {}
 
     /**
      * @param  array<int, array{item_id:int,size_id:int,quantity:int,special_request:?string,add_on_option_ids:int[]}>  $cartLines
@@ -179,6 +183,15 @@ class CheckoutService
             'occurred_at' => now(),
             'event_source' => $staffActor !== null ? 'waitstaff' : 'customer',
         ]);
+
+        // BR01: the table is taken from the moment the order is placed, so the
+        // floor sees a diner before the payment clears.
+        $table = RestaurantTable::whereKey($tableId)->lockForUpdate()->first();
+
+        if ($table !== null) {
+            $visit = $this->tableStatus->occupyForOrder($table, $staffActor);
+            $order->update(['visit_id' => $visit->visit_id]);
+        }
 
         return $order->refresh();
     }

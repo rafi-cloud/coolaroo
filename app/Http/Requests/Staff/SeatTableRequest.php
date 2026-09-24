@@ -16,8 +16,6 @@ class SeatTableRequest extends FormRequest
     {
         return [
             'guest_count' => ['nullable', 'integer', 'min:1', 'max:20'],
-            'other_table_ids' => ['nullable', 'array'],
-            'other_table_ids.*' => ['integer', 'exists:restaurant_table,table_id'],
         ];
     }
 }

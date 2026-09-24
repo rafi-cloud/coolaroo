@@ -33,6 +33,7 @@
     <button type="button" id="staff-order-add-line" class="btn btn-ghost" data-testid="staff-order-add-line">+ Add another item</button>
     <button type="submit" class="btn btn-solid" data-testid="staff-order-submit">Create order</button>
   </form>
+
 </div>
 
 @push('scripts')

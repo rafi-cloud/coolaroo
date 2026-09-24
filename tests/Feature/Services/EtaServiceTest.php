@@ -4,6 +4,8 @@ namespace Tests\Feature\Services;
 
 use App\Enums\Destination;
 use App\Events\OrderLinesUpdated;
+use App\Models\MenuCategory;
+use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\Role;
 use App\Models\Staff;
@@ -53,6 +55,57 @@ class EtaServiceTest extends TestCase
         $this->expectException(ValidationException::class);
 
         app(EtaService::class)->adjust($order, Destination::Kitchen, 5, $this->staffWithRole('kitchen'));
+    }
+
+    /** @param  'pending_payment'|'paid'|'served'|'cancelled'  $status */
+    private function kitchenOrder(string $status, string $lineStatus = 'pending'): Order
+    {
+        $item = MenuItem::factory()->create([
+            'category_id' => MenuCategory::factory(),
+            'destination' => Destination::Kitchen,
+            'prep_minutes' => 10,
+        ]);
+        $size = $item->sizes()->create(['size_name' => 'Regular', 'price' => 12]);
+
+        $order = Order::factory()->create();
+        $order->forceFill(['status' => $status])->save();
+
+        $order->items()->create([
+            'line_no' => 1,
+            'item_id' => $item->item_id,
+            'size_id' => $size->size_id,
+            'item_name' => $item->item_name,
+            'size_name' => $size->size_name,
+            'destination' => Destination::Kitchen,
+            'quantity' => 1,
+            'original_unit_price' => 12,
+            'unit_price' => 12,
+            'line_total' => 12,
+        ]);
+
+        $order->items()->update(['status' => $lineStatus]);
+
+        return $order->fresh();
+    }
+
+    /**
+     * BR30's "orders ahead" is the station queue, which is paid orders only.
+     * A cancelled or served order whose lines were never moved off pending is
+     * not work anyone is doing.
+     */
+    public function test_only_orders_still_in_the_station_queue_count_as_ahead(): void
+    {
+        $this->kitchenOrder('cancelled');
+        $this->kitchenOrder('served');
+        $this->kitchenOrder('paid');
+
+        $subject = $this->kitchenOrder('paid');
+        $items = $subject->items()->with('menuItem')->get();
+
+        $eta = app(EtaService::class)->estimate($subject, $items, Destination::Kitchen);
+
+        // 10 minutes prep + one genuine ticket ahead x 8 minutes
+        $this->assertSame(18, (int) round(now()->diffInMinutes($eta)));
     }
 
     public function test_estimate_returns_null_when_the_station_has_no_lines(): void

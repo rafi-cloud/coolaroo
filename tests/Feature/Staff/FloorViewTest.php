@@ -4,12 +4,16 @@ namespace Tests\Feature\Staff;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\ReservationStatus;
+use App\Enums\TableStatus;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Reservation;
 use App\Models\RestaurantTable;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\Staff;
+use App\Models\Visit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -22,6 +26,42 @@ class FloorViewTest extends TestCase
         $roleModel = Role::firstWhere('role_name', $role) ?? Role::factory()->{$role}()->create();
 
         return Staff::factory()->create(['role_id' => $roleModel->role_id]);
+    }
+
+    public function test_a_reserved_table_offers_its_confirmed_booking_instead_of_a_dead_end(): void
+    {
+        $table = RestaurantTable::factory()->create(['status' => TableStatus::Reserved]);
+        $reservation = Reservation::factory()->create([
+            'booking_date' => now()->toDateString(),
+            'status' => ReservationStatus::Confirmed,
+        ]);
+        Visit::create([
+            'table_id' => $table->table_id,
+            'reservation_id' => $reservation->reservation_id,
+            'opened_at' => null,
+        ]);
+
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->get(route('staff.floor.index'))
+            ->assertOk()
+            ->assertSee('floor-seat-reservation-select-'.$table->table_id, false)
+            ->assertSee($reservation->reference_code)
+            ->assertDontSee('floor-reserved-note-'.$table->table_id, false);
+    }
+
+    public function test_an_available_table_offers_todays_unassigned_bookings(): void
+    {
+        $table = RestaurantTable::factory()->create(['status' => TableStatus::Available]);
+        $booking = Reservation::factory()->create([
+            'booking_date' => now()->toDateString(),
+            'status' => ReservationStatus::Confirmed,
+        ]);
+
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->get(route('staff.floor.index'))
+            ->assertOk()
+            ->assertSee('floor-assign-reservation-select-'.$table->table_id, false)
+            ->assertSee($booking->reference_code);
     }
 
     public function test_an_admin_keeps_admin_navigation_on_the_shared_floor_screen(): void
@@ -49,6 +89,7 @@ class FloorViewTest extends TestCase
             ->get(route('staff.floor.index'))
             ->assertOk()
             ->assertSee('data-testid="nav-staff-floor"', false)
+            ->assertSee('data-testid="staff-logout"', false)
             ->assertDontSee('data-testid="nav-staff-kds-kitchen"', false)
             ->assertDontSee('data-testid="nav-staff-kds-bar"', false);
     }

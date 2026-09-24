@@ -129,6 +129,17 @@ input{font:inherit}
 .shift{color:#fff;font-size:.82rem;font-weight:600}
 .shift-sub{font-size:.74rem;opacity:.55;font-family:var(--serif);font-style:italic}
 
+/* log out sits below .nav, which is flex:1, so it is pushed to the bottom of the
+   sidebar without a margin-top:auto. Styled as a .nav-item rather than reusing
+   .sidebar-foot because that class is display:none under 1200px — log out has to
+   survive the icon rail. */
+.nav-foot{
+  padding:.8rem;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.nav-logout{width:100%;color:#CFBFB1}
+.nav-logout:hover{background:rgba(184,64,44,.25);color:#fff}
+
 /* everything to the right of the sidebar */
 .shell{margin-left:var(--rail);min-height:100vh;display:flex;flex-direction:column}
 
@@ -475,6 +486,7 @@ input{font:inherit}
   .brand{justify-content:center;padding:1.4rem .5rem}
   .brand-text,.nav-item > span:first-of-type,.nav-label,.sidebar-foot{display:none}
   .nav{padding:.9rem .6rem}
+  .nav-foot{padding:.7rem .6rem}
   .nav-item{justify-content:center;padding:.7rem 0;margin-bottom:4px}
   .pill{
     position:absolute;top:4px;right:6px;
@@ -974,11 +986,38 @@ input{font:inherit}
 .floor-alerts-list,.floor-list-panel ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4rem;font-size:.86rem}
 .floor-alert-item{color:var(--pending);font-weight:600}
 
+.floor-table-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem}
+.floor-table-links .btn{flex:1 1 auto;min-height:38px;font-size:.82rem}
+
+.refund-progress{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-bottom:.5rem}
+.refund-progress-qty{font-size:.82rem;font-weight:600;color:var(--ink)}
+.refund-progress-note,.refund-progress-meta{font-size:.78rem;color:var(--body)}
+.refund-progress-steps{
+  list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;
+  margin:0;padding:0;font-size:.76rem;color:var(--body);
+}
+.refund-progress-steps li{display:flex;align-items:center;gap:.35rem}
+.refund-progress-steps li::before{
+  content:'';width:8px;height:8px;border-radius:50%;
+  background:var(--line);flex:none;
+}
+.refund-progress-steps li.is-done::before{background:#1E6B3A}
+.refund-progress-steps li.is-done{color:var(--ink);font-weight:600}
+
 .floor-table-drawer{margin-top:.7rem}
 .floor-drawer-form{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
 .floor-drawer-form fieldset{border:1px solid var(--line);border-radius:8px;padding:.5rem .7rem}
 .floor-drawer-form legend{font-size:.78rem;color:var(--body);padding:0 .3rem}
 .floor-drawer-form label{display:flex;align-items:center;gap:.4rem;font-size:.85rem}
+.floor-drawer-form select,.floor-drawer-form input[type="number"]{
+  width:100%;padding:.5rem .7rem;
+  border:1px solid var(--line);border-radius:8px;
+  background:var(--white);color:var(--ink);font-family:inherit;font-size:.85rem;
+}
+.floor-drawer-form select:focus,.floor-drawer-form input[type="number"]:focus{
+  outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,107,44,.14);
+}
+.floor-drawer-form + .floor-drawer-form{margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--line)}
 
 .staff-order-line{display:flex;flex-wrap:wrap;gap:.6rem;align-items:flex-end;margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid var(--line)}
 .staff-order-line label{display:block;font-size:.78rem;color:var(--body);margin-bottom:.2rem}
