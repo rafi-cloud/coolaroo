@@ -7,9 +7,6 @@ use App\Models\Customer;
 use App\Services\TrustService;
 use Illuminate\Http\JsonResponse;
 
-/**
- * View Customer Trust Profile.
- */
 class TrustController extends Controller
 {
     public function __construct(private TrustService $trustService) {}

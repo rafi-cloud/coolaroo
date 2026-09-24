@@ -8,12 +8,6 @@ use Illuminate\Support\Facades\Process;
 use SplFileInfo;
 use Tests\TestCase;
 
-/**
- * T223, NFR19. The project coding conventions, as assertions.
- *
- * A convention nobody checks is a convention that decays: these fail the suite
- * rather than waiting to be noticed in review.
- */
 class CodeConventionsTest extends TestCase
 {
     public function test_the_code_is_formatted_to_the_pint_preset(): void
@@ -82,7 +76,9 @@ class CodeConventionsTest extends TestCase
             .implode(', ', $offenders));
     }
 
-    /** @return Collection<int, SplFileInfo> */
+    /**
+     * @return Collection<int, SplFileInfo>
+     */
     private function phpFilesIn(string $directory)
     {
         return collect(File::allFiles($directory))

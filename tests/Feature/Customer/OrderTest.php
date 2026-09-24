@@ -152,7 +152,6 @@ class OrderTest extends TestCase
         $this->assertNotNull($order->fresh()->cancelled_at);
     }
 
-    /** A cancelled order must not leave lines the station queue and BR30 still count. */
     public function test_cancelling_an_order_cancels_its_unstarted_lines(): void
     {
         $customer = Customer::factory()->create();

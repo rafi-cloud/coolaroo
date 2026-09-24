@@ -9,28 +9,18 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        Role::create([
-            'role_name' => 'admin',
-            'description' => 'Full access to every admin screen.',
-            'landing_screen' => 'admin.dashboard',
-        ]);
+        $roles = [
+            ['admin', 'Full access to every admin screen.', 'admin.dashboard'],
+            ['waitstaff', 'Floor, orders, reservations, refund requests.', 'staff.floor.index'],
+            ['kitchen', 'Kitchen station display.', 'staff.kds.kitchen'],
+            ['bar', 'Bar station display.', 'staff.kds.bar'],
+        ];
 
-        Role::create([
-            'role_name' => 'waitstaff',
-            'description' => 'Floor, orders, reservations, refund requests.',
-            'landing_screen' => 'staff.floor.index',
-        ]);
-
-        Role::create([
-            'role_name' => 'kitchen',
-            'description' => 'Kitchen station display.',
-            'landing_screen' => 'staff.kds.kitchen',
-        ]);
-
-        Role::create([
-            'role_name' => 'bar',
-            'description' => 'Bar station display.',
-            'landing_screen' => 'staff.kds.bar',
-        ]);
+        foreach ($roles as [$name, $description, $landingScreen]) {
+            Role::updateOrCreate(
+                ['role_name' => $name],
+                ['description' => $description, 'landing_screen' => $landingScreen],
+            );
+        }
     }
 }

@@ -99,7 +99,6 @@ class TableAssignmentTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('status', 'reservation-assigned');
 
-        // Check visit row created with opened_at = null (BR04, FR65)
         $visit = Visit::where('reservation_id', $reservation->reservation_id)
             ->where('table_id', $table1->table_id)
             ->first();
@@ -108,7 +107,6 @@ class TableAssignmentTest extends TestCase
         $this->assertNull($visit->opened_at);
         $this->assertNull($visit->closed_at);
 
-        // Booking is more than 30 mins in future; table stays Available
         $table1->refresh();
         $this->assertSame(TableStatus::Available, $table1->status);
     }
@@ -180,7 +178,6 @@ class TableAssignmentTest extends TestCase
             'is_active' => true,
         ]);
 
-        // Res 1: 18:00 (duration 120m for 4 covers -> 18:00 to 20:00)
         $res1 = Reservation::factory()->create([
             'customer_id' => $this->customer->customer_id,
             'booking_date' => '2026-09-25',
@@ -189,7 +186,6 @@ class TableAssignmentTest extends TestCase
             'status' => ReservationStatus::Confirmed,
         ]);
 
-        // Res 2: 18:30 (overlaps 18:00 - 20:00)
         $res2 = Reservation::factory()->create([
             'customer_id' => $this->customer->customer_id,
             'booking_date' => '2026-09-25',
@@ -198,14 +194,12 @@ class TableAssignmentTest extends TestCase
             'status' => ReservationStatus::Confirmed,
         ]);
 
-        // Assign table to res1
         $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
             ->post(route('staff.tables.assign-reservation', $table), [
                 'reservation_id' => $res1->reservation_id,
             ]);
 
-        // Try assigning table to res2 -> fails overlap check (BR33)
         $response = $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
             ->post(route('staff.tables.assign-reservation', $table), [
@@ -219,7 +213,6 @@ class TableAssignmentTest extends TestCase
     {
         Event::fake([ReservationAlertEvent::class]);
 
-        // Set time to 17:40 on booking date (20 mins before 18:00)
         Carbon::setTestNow(Carbon::parse('2026-09-25 17:40:00', 'Australia/Melbourne'));
 
         $table = RestaurantTable::factory()->create([
@@ -285,21 +278,14 @@ class TableAssignmentTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('status', 'reservation-released');
 
-        // Table reverted to Available (BR64)
         $table->refresh();
         $this->assertSame(TableStatus::Available, $table->status);
 
-        // Visit marked closed with reason unassigned (BR64)
         $visit = Visit::where('reservation_id', $reservation->reservation_id)->first();
         $this->assertNotNull($visit->closed_at);
         $this->assertSame(VisitCloseReason::Unassigned, $visit->close_reason);
     }
 
-    /**
-     * FR65 from S23: each drawer adds its own table, so a party too big for one
-     * table is assigned by repeating the action — the seats check then passes
-     * across the pair, where either table alone would have been refused.
-     */
     public function test_assigning_a_second_table_adds_it_to_the_same_booking(): void
     {
         $table1 = RestaurantTable::factory()->create([

@@ -72,8 +72,6 @@ class TableTest extends TestCase
         $admin = $this->admin();
         $table = RestaurantTable::factory()->create();
 
-        // Occupied -> Reserved is not a legal transition per TableStatus::transitions(),
-        // but override doesn't go through that map at all.
         $table->forceFill(['status' => 'occupied'])->save();
 
         $response = $this->actingAs($admin, 'staff')->patch("/admin/tables/{$table->table_id}/status", [

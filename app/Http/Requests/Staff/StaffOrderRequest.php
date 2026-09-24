@@ -4,11 +4,6 @@ namespace App\Http\Requests\Staff;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * item_size flattens item_id/size_id into one dropdown value
- * ("item:size") so the order-builder form needs no cascading-select JS —
- * CheckoutService::revalidate() is still the real source of truth on both.
- */
 class StaffOrderRequest extends FormRequest
 {
     public function authorize(): bool

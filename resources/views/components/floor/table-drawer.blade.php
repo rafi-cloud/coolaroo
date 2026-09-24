@@ -6,13 +6,13 @@
   $offered = $assignable->reject(fn ($reservation) => in_array($reservation->reservation_id, $heldIds, true));
 @endphp
 <details class="kds-drawer floor-table-drawer" data-testid="floor-table-drawer-{{ $table->table_id }}">
-  {{-- the drawer holds the actions this table's status allows --}}
-  <summary>
+    <summary>
     @if ($table->status === \App\Enums\TableStatus::Occupied)
-      Clear table
+      <span class="drawer-closed-text">Clear table</span>
     @else
-      Seat guests
+      <span class="drawer-closed-text">Seat guests</span>
     @endif
+    <span class="drawer-open-text">✕ Close</span>
   </summary>
 
   @if ($table->status !== \App\Enums\TableStatus::Occupied)
@@ -52,9 +52,9 @@
     @endif
 
     @if ($offered->isNotEmpty())
-      <form method="POST" action="{{ route('staff.tables.assign-reservation', $table) }}" class="floor-drawer-form">
+      <form method="POST" action="{{ route('staff.tables.assign-reservation', $table) }}" class="floor-drawer-form floor-drawer-assign-form">
         @csrf
-        <label for="assign-reservation-{{ $table->table_id }}">Give this table to a booking</label>
+        <label for="assign-reservation-{{ $table->table_id }}">📅 Give this table to a booking</label>
         <select id="assign-reservation-{{ $table->table_id }}" name="reservation_id" data-testid="floor-assign-reservation-select-{{ $table->table_id }}">
           @foreach ($offered as $reservation)
             @php($on = $reservation->visits->whereNull('closed_at')->pluck('table_id'))
@@ -69,7 +69,7 @@
           @endforeach
         </select>
 
-        <button type="submit" class="btn btn-outline" data-testid="floor-assign-reservation-{{ $table->table_id }}">Assign booking</button>
+        <button type="submit" class="btn floor-btn-assign" data-testid="floor-assign-reservation-{{ $table->table_id }}">Assign booking</button>
       </form>
     @endif
   @endif
@@ -83,29 +83,23 @@
       <button type="submit" class="btn btn-solid" data-testid="floor-seat-{{ $table->table_id }}">Seat walk-in</button>
     </form>
   @elseif ($table->status === \App\Enums\TableStatus::Occupied)
-    @php($candidates = $tables->where('status', \App\Enums\TableStatus::Occupied)->where('table_id', '!=', $table->table_id))
     <form method="POST" action="{{ route('staff.tables.clear') }}" class="floor-drawer-form">
       @csrf
       <input type="hidden" name="table_ids[]" value="{{ $table->table_id }}">
 
-      @if ($candidates->isNotEmpty())
-        <fieldset>
-          <legend>Clear together with</legend>
-          @foreach ($candidates as $other)
-            <label>
-              <input type="checkbox" name="table_ids[]" value="{{ $other->table_id }}" data-testid="floor-clear-group-{{ $table->table_id }}-{{ $other->table_id }}">
-              Table {{ $other->table_number }}@if ($other->section) &middot; {{ $other->section }}@endif
-            </label>
-          @endforeach
-        </fieldset>
-      @endif
-
       <label>
-        <input type="checkbox" name="force" value="1" data-testid="floor-clear-force-{{ $table->table_id }}">
-        Confirm even with active orders
+        <input type="checkbox" name="force" value="1" aria-describedby="clear-force-hint-{{ $table->table_id }}" data-testid="floor-clear-force-{{ $table->table_id }}">
+        @if ($table->active_order_count > 0)
+          Clear anyway, cancelling the {{ $table->active_order_count }} unfinished {{ \Illuminate\Support\Str::plural('order', $table->active_order_count) }} on this table
+        @else
+          Clear anyway, cancelling unfinished orders
+        @endif
       </label>
+      <p class="form-hint" id="clear-force-hint-{{ $table->table_id }}">
+        Only needed while orders are still open. Unpaid orders are cancelled and their pending payment marked failed. Anything already cooking or ready is kept for the kitchen, but is unlinked from this table.
+      </p>
 
-      <button type="submit" class="btn btn-ghost" data-testid="floor-clear-{{ $table->table_id }}">Clear table</button>
+      <button type="submit" class="btn floor-btn-clear" data-testid="floor-clear-{{ $table->table_id }}">Clear table</button>
     </form>
   @endif
 </details>

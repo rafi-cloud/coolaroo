@@ -9,10 +9,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-/**
- * Cart lines live in the session, not the database —
- * nothing about an unpaid cart is worth persisting past checkout.
- */
 class CartService
 {
     public function add(int $itemId, int $sizeId, array $addOnOptionIds, int $quantity, ?string $specialRequest): string
@@ -57,7 +53,9 @@ class CartService
         session()->forget('cart');
     }
 
-    /** @return array<int, array{item_id:int,size_id:int,quantity:int,special_request:?string,add_on_option_ids:int[]}> */
+    /**
+     * @return array<int, array{item_id:int,size_id:int,quantity:int,special_request:?string,add_on_option_ids:int[]}>
+     */
     public function rawLines(): array
     {
         return array_values($this->rawCart()['lines'] ?? []);

@@ -7,11 +7,6 @@ use App\Models\RestaurantTable;
 use App\Models\Staff;
 use Illuminate\Support\Str;
 
-/**
- * The real transition engine
- * (TableStatusService) is — overrideStatus here is deliberately the
- * one place that bypasses it,'s "any status, mandatory reason."
- */
 class TableService
 {
     public function __construct(private AuditLogger $auditLogger) {}

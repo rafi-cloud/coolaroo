@@ -16,9 +16,6 @@ class NoShowController extends Controller
         private readonly ReservationService $reservationService,
     ) {}
 
-    /**
-     * Admin clears a customer's no-show flag with required reason.
-     */
     public function clear(Request $request, Customer $customer, Reservation $reservation): RedirectResponse
     {
         if ($reservation->customer_id !== $customer->customer_id) {

@@ -5,10 +5,6 @@ namespace App\Console\Commands;
 use App\Services\ReservationService;
 use Illuminate\Console\Command;
 
-/**
- * Scheduled every minute. The job only suggests — the
- * no-show itself is confirmed by staff.
- */
 class SuggestNoShowsCommand extends Command
 {
     protected $signature = 'reservations:suggest-no-shows';

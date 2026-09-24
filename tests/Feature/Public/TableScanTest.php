@@ -105,8 +105,6 @@ class TableScanTest extends TestCase
 
     public function test_the_holder_scanning_inside_the_window_is_seated(): void
     {
-        // The booking is "now + 5 minutes" on today's date, so on a real clock
-        // within 5 minutes of midnight it books a time that has already passed.
         $this->travelTo(now()->startOfDay()->addHours(18));
 
         $holder = Customer::factory()->create();
@@ -122,7 +120,6 @@ class TableScanTest extends TestCase
         $this->assertNull($visit->fresh()->opened_by_staff_id);
     }
 
-    /** The T-30 sweep may not have run yet, so the table can still read Available. */
     public function test_the_holder_is_seated_even_before_the_table_turns_reserved(): void
     {
         $this->travelTo(now()->startOfDay()->addHours(18));

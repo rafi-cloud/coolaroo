@@ -32,8 +32,7 @@
       </div>
     @endif
 
-    {{-- Category tabs --}}
-    <nav class="cat-tabs" aria-label="Menu categories" data-testid="menu-cat-tabs">
+        <nav class="cat-tabs" aria-label="Menu categories" data-testid="menu-cat-tabs">
       <a class="cat-tab @if($selectedCategory === 'all') active @endif" href="{{ route('menu.index', array_merge(request()->except(['category', 'page']), ['category' => 'all'])) }}" data-testid="menu-tab-all">All</a>
       @if($hasSpecials)
         <a class="cat-tab @if($selectedCategory === 'specials') active @endif" href="{{ route('menu.index', array_merge(request()->except(['category', 'page']), ['category' => 'specials'])) }}" data-testid="menu-tab-specials">Specials</a>
@@ -44,8 +43,7 @@
     </nav>
   </div>
 
-  {{-- Filter drawer for Dietary & Allergens --}}
-  <div class="wrap">
+    <div class="wrap">
     <details class="menu-filter-drawer" @if(!empty($selectedDietary) || !empty($selectedAllergens) || $search) open @endif data-testid="menu-filters">
       <summary data-testid="menu-filters-toggle">Filter by Dietary &amp; Allergens</summary>
       <form method="get" action="{{ route('menu.index') }}" data-testid="menu-filter-form">
@@ -88,14 +86,12 @@
       </form>
     </details>
 
-    {{-- Allergen disclaimer --}}
-    <aside class="allergen-disclaimer" role="note" data-testid="menu-allergen-disclaimer">
+        <aside class="allergen-disclaimer" role="note" data-testid="menu-allergen-disclaimer">
       <strong>Allergy Notice:</strong> Please inform our staff of any serious allergies before ordering. Allergen labels reflect ingredients in each dish and its add-on options; however, our kitchen handles nuts, seafood, gluten and dairy, and cross-contact may occur.
     </aside>
   </div>
 
-  {{-- Menu items grid --}}
-  <div class="wrap">
+    <div class="wrap">
     <div class="order-grid" data-testid="menu-grid">
       @forelse($items as $item)
         @php
@@ -134,8 +130,7 @@
               </p>
             @endif
 
-            {{-- Nutrition Information --}}
-            @if($hasNutrition)
+                        @if($hasNutrition)
               <div class="nutrition-pill" data-testid="menu-nutrition-{{ $item->item_id }}">
                 @if($item->calories_kcal) {{ (int) $item->calories_kcal }} kcal @endif
                 @if($item->protein_g) &middot; P: {{ (int) $item->protein_g }}g @endif
@@ -162,10 +157,7 @@
           </div>
         </article>
 
-        {{-- Item detail modal. Outside the card on purpose: the card's
-             hover transform would otherwise become the containing block for
-             the modal's position:fixed scrim, trapping it inside the card. --}}
-        <x-menu.item-modal
+                <x-menu.item-modal
           :item="$item"
           :has-table-context="(bool) $table"
           :qr-ordering-enabled="$qrOrderingEnabled"
@@ -211,14 +203,11 @@
         if (!modal) return;
         modal.classList.remove('open');
         document.body.style.overflow = '';
-        // Drop the #item-N so the same link can reopen this dish later:
-        // navigating to an identical hash fires no hashchange event.
         if (/^#item-\d+$/.test(window.location.hash)) {
           history.replaceState(null, '', window.location.pathname + window.location.search);
         }
       }
 
-      // Deep link from the AI assistant: /menu#item-12 opens that dish
       function openFromHash() {
         var match = /^#item-(\d+)$/.exec(window.location.hash);
         if (!match) return;
@@ -231,7 +220,6 @@
         openModal(document.getElementById('item-modal-' + match[1]));
       }
 
-      // Open modal
       document.addEventListener('click', function (e) {
         var openBtn = e.target.closest('[data-open-modal]');
         if (openBtn) {
@@ -240,7 +228,6 @@
         }
       });
 
-      // Close modal
       document.addEventListener('click', function (e) {
         var closeBtn = e.target.closest('[data-close-modal]');
         if (closeBtn) {
@@ -254,14 +241,12 @@
       openFromHash();
       window.addEventListener('hashchange', openFromHash);
 
-      // Escape key closes modals
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
           document.querySelectorAll('.modal-scrim.open').forEach(closeModal);
         }
       });
 
-      // Quantity buttons
       document.addEventListener('click', function (e) {
         var btn = e.target.closest('[data-qty-action]');
         if (!btn) return;
@@ -278,12 +263,10 @@
         calcTotal(modal);
       });
 
-      // Inputs change (size, addons, quantity)
       document.addEventListener('change', function (e) {
         var modal = e.target.closest('.modal-scrim');
         if (!modal) return;
 
-        // Enforce max-select on addon groups
         if (e.target.name === 'add_on_option_ids[]') {
           var group = e.target.closest('.addon-group');
           if (group) {

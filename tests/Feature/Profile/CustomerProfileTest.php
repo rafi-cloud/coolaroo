@@ -71,8 +71,8 @@ class CustomerProfileTest extends TestCase
             'email' => $customer->email,
             'phone' => $customer->phone,
             'current_password' => 'wrong-password',
-            'password' => 'new-password123',
-            'password_confirmation' => 'new-password123',
+            'password' => 'NewPass@123',
+            'password_confirmation' => 'NewPass@123',
         ]);
 
         $response->assertRedirect('/profile');
@@ -88,11 +88,11 @@ class CustomerProfileTest extends TestCase
             'email' => $customer->email,
             'phone' => $customer->phone,
             'current_password' => 'old-password',
-            'password' => 'new-password123',
-            'password_confirmation' => 'new-password123',
+            'password' => 'NewPass@123',
+            'password_confirmation' => 'NewPass@123',
         ]);
 
-        $this->assertTrue(Hash::check('new-password123', $customer->fresh()->password_hash));
+        $this->assertTrue(Hash::check('NewPass@123', $customer->fresh()->password_hash));
     }
 
     public function test_a_guest_cannot_reach_the_profile_page(): void

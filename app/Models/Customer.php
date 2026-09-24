@@ -12,7 +12,9 @@ use Illuminate\Notifications\Notifiable;
 
 class Customer extends Authenticatable implements MustVerifyEmailContract
 {
-    /** @use HasFactory<CustomerFactory> */
+    /**
+     * @use HasFactory<CustomerFactory>
+     */
     use HasFactory, MustVerifyEmail, Notifiable;
 
     const UPDATED_AT = null;

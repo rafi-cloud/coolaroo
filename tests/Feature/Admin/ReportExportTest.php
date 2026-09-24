@@ -7,9 +7,6 @@ use App\Models\Staff;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * FR88, UC35, TC-UC35-02. PDF and CSV export for any report.
- */
 class ReportExportTest extends TestCase
 {
     use RefreshDatabase;

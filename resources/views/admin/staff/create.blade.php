@@ -34,7 +34,8 @@
 
     <div class="auth-field">
       <label for="password">Temporary password</label>
-      <input id="password" name="password" type="password" minlength="8" required data-testid="admin-staff-create-password">
+      <input id="password" name="password" type="password" minlength="8" required aria-describedby="password-hint" data-testid="admin-staff-create-password">
+      <p class="form-hint" id="password-hint">At least 8 characters, with upper and lower case, a number and a symbol.</p>
       @error('password')<p class="field-error" role="alert">{{ $message }}</p>@enderror
     </div>
 

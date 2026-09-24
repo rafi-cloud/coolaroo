@@ -34,7 +34,6 @@ class ReportServiceTest extends TestCase
         return $order;
     }
 
-    /** Widget 1: today against the same weekday last week, not yesterday. */
     public function test_sales_today_compares_against_the_same_weekday_last_week(): void
     {
         $this->paidOrder(60.00);
@@ -49,7 +48,6 @@ class ReportServiceTest extends TestCase
         $this->assertSame(100.0, $sales['change_pct']);
     }
 
-    /** Widgets 2 and 3: unpaid orders are not sales. */
     public function test_order_count_and_average_ignore_unpaid_orders(): void
     {
         $this->paidOrder(60.00);
@@ -62,7 +60,6 @@ class ReportServiceTest extends TestCase
         $this->assertSame(50.00, $service->averageOrderValue());
     }
 
-    /** Widget 4: the split comes from the payment rows, so rounding and adjustments count. */
     public function test_cash_versus_stripe_splits_todays_takings(): void
     {
         $cashOrder = $this->paidOrder(30.00);
@@ -91,7 +88,6 @@ class ReportServiceTest extends TestCase
         $this->assertSame(30.0, $split['cash_pct']);
     }
 
-    /** Widget 8: hidden feedback is excluded (FR78). */
     public function test_average_rating_excludes_hidden_feedback(): void
     {
         Feedback::factory()->create([
@@ -117,7 +113,6 @@ class ReportServiceTest extends TestCase
         $this->assertSame(1, $rating['count']);
     }
 
-    /** Widget 13: revenue comes from the line snapshots (BR15). */
     public function test_top_items_today_ranks_by_quantity_from_line_snapshots(): void
     {
         $order = $this->paidOrder(100.00);
@@ -135,7 +130,6 @@ class ReportServiceTest extends TestCase
         $this->assertSame('Garden Salad', $top[1]['item_name']);
     }
 
-    /** Widget 14: sold out by hand, or inside 2× the QR buffer (08.5, BR09). */
     public function test_low_stock_lists_sold_out_items_and_items_inside_twice_the_buffer(): void
     {
         Setting::updateOrCreate(['setting_key' => 'qr_stock_buffer_multiplier'], ['setting_value' => '5']);
@@ -155,7 +149,6 @@ class ReportServiceTest extends TestCase
         $this->assertNotContains('Unlimited', $names);
     }
 
-    /** Widget 12: cash waiting only counts past the 10 minute mark. */
     public function test_needs_attention_counts_stock_conflicts_refunds_and_stale_cash(): void
     {
         $conflicted = $this->paidOrder(30.00);
@@ -196,7 +189,6 @@ class ReportServiceTest extends TestCase
         $this->assertSame(3, $attention['total']);
     }
 
-    /** Widgets 9 and 10 zero-fill, so the charts never have gaps. */
     public function test_the_charts_zero_fill_quiet_hours_and_closed_days(): void
     {
         $this->paidOrder(80.00, today()->setHour(19));

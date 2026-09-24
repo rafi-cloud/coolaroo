@@ -37,15 +37,13 @@
   </div>
 
   <div class="pay-layout">
-    {{-- Left Column: Choose Payment Method --}}
-    <div class="pay-methods-column">
+        <div class="pay-methods-column">
       <div class="pay-methods-card">
         <h2 class="pay-methods-heading">Select Payment Method</h2>
         <p class="pay-methods-sub">Choose how you would like to settle this order:</p>
 
         <div class="pay-options-list">
-          {{-- Option 1: Card / Digital Wallet via Stripe --}}
-          <div class="pay-option-card is-primary">
+                    <div class="pay-option-card is-primary">
             <div class="pay-option-badge">Instant &bull; Recommended</div>
             <div class="pay-option-header">
               <div class="pay-option-icon pay-icon-card">
@@ -77,8 +75,7 @@
             </div>
           </div>
 
-          {{-- Option 2: Cash at Table --}}
-          <div class="pay-option-card is-secondary">
+                    <div class="pay-option-card is-secondary">
             <div class="pay-option-header">
               <div class="pay-option-icon pay-icon-cash">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
@@ -102,8 +99,7 @@
       </div>
     </div>
 
-    {{-- Right Column: Order Summary --}}
-    <div class="pay-summary-column">
+        <div class="pay-summary-column">
       <div class="pay-summary-card">
         <h2 class="pay-summary-title">Order Details</h2>
 

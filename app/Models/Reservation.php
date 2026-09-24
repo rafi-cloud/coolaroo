@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Reservation extends Model
 {
-    /** @use HasFactory<ReservationFactory> */
+    /**
+     * @use HasFactory<ReservationFactory>
+     */
     use HasFactory;
 
     protected $table = 'reservation';

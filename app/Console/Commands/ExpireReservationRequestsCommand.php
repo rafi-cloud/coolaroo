@@ -5,9 +5,6 @@ namespace App\Console\Commands;
 use App\Services\ReservationService;
 use Illuminate\Console\Command;
 
-/**
- * Scheduled every five minutes. Each expiry emails the customer.
- */
 class ExpireReservationRequestsCommand extends Command
 {
     protected $signature = 'reservations:expire-requests';

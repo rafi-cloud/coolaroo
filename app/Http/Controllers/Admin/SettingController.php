@@ -9,22 +9,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/**
- * Admin venue settings and operational switches.
- * Manage Venue Settings.
- * Pause QR Ordering.
- * Pause Online Reservations.
- * Toggle AI Assistant.
- */
 class SettingController extends Controller
 {
     public function __construct(
         private readonly SettingService $settingService,
     ) {}
 
-    /**
-     * Display settings form and operational control switches.
-     */
     public function index(): View
     {
         $settings = $this->settingService->all();
@@ -39,13 +29,9 @@ class SettingController extends Controller
         ]);
     }
 
-    /**
-     * Save venue details, hours, reservation rules, and operational timers.
-     */
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            // Venue Details
             'venue_name' => ['required', 'string', 'max:100'],
             'venue_address' => ['required', 'string', 'max:255'],
             'venue_phone' => ['required', 'string', 'max:30'],
@@ -56,13 +42,11 @@ class SettingController extends Controller
             'social_tiktok' => ['nullable', 'string', 'max:255'],
             'social_whatsapp' => ['nullable', 'string', 'max:255'],
 
-            // Trading Hours & Closed Days
             'opening_time' => ['required', 'date_format:H:i'],
             'closing_time' => ['required', 'date_format:H:i'],
             'closed_weekdays' => ['nullable', 'array'],
             'closed_weekdays.*' => ['integer', 'between:1,7'],
 
-            // Reservation Rules & Durations
             'reservation_max_days_ahead' => ['required', 'integer', 'between:1,365'],
             'reservation_min_lead_hours' => ['required', 'integer', 'between:0,72'],
             'reservation_max_party_online' => ['required', 'integer', 'between:1,50'],
@@ -77,7 +61,6 @@ class SettingController extends Controller
             'reserved_switch_before_minutes' => ['required', 'integer', 'between:1,180'],
             'unassigned_admin_alert_minutes' => ['required', 'integer', 'between:1,180'],
 
-            // Operations & Timers
             'qr_stock_buffer_multiplier' => ['required', 'integer', 'between:1,50'],
             'table_idle_autoclear_minutes' => ['required', 'integer', 'between:5,180'],
             'avg_ticket_minutes_kitchen' => ['required', 'integer', 'between:1,60'],
@@ -88,22 +71,21 @@ class SettingController extends Controller
             'no_show_expiry_months' => ['required', 'integer', 'between:1,60'],
             'public_rating_min_count' => ['required', 'integer', 'between:1,100'],
 
-            // Switches
             'qr_ordering_enabled' => ['nullable', 'boolean'],
             'reservations_online_enabled' => ['nullable', 'boolean'],
             'ai_enabled' => ['nullable', 'boolean'],
         ]);
 
-        // Process closed weekdays array to comma-separated string
         $closed = $request->input('closed_weekdays', []);
         $validated['closed_weekdays'] = implode(',', array_filter(array_map('strval', $closed)));
 
-        // Handle switches
         $validated['qr_ordering_enabled'] = $request->boolean('qr_ordering_enabled') ? '1' : '0';
         $validated['reservations_online_enabled'] = $request->boolean('reservations_online_enabled') ? '1' : '0';
         $validated['ai_enabled'] = $request->boolean('ai_enabled') ? '1' : '0';
 
-        /** @var Staff $admin */
+        /**
+         * @var Staff $admin
+         */
         $admin = $request->user('staff');
 
         $this->settingService->updateMany($validated, $admin);
@@ -111,12 +93,11 @@ class SettingController extends Controller
         return back()->with('status', 'Settings saved successfully.');
     }
 
-    /**
-     * Quick toggle for operational switches.
-     */
     public function toggle(Request $request, string $key): RedirectResponse
     {
-        /** @var Staff $admin */
+        /**
+         * @var Staff $admin
+         */
         $admin = $request->user('staff');
 
         try {

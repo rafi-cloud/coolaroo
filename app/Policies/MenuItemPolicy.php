@@ -6,9 +6,6 @@ use App\Enums\Destination;
 use App\Models\MenuItem;
 use App\Models\Staff;
 
-/**
- * 3.3: menu rows. Admin passes every method via Gate::before.
- */
 class MenuItemPolicy
 {
     public function manage(Staff $staff): bool

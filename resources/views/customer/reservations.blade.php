@@ -28,8 +28,7 @@
       </div>
     @endif
 
-    <!-- Upcoming Bookings -->
-    <section class="customer-section" data-testid="upcoming-reservations-section">
+        <section class="customer-section" data-testid="upcoming-reservations-section">
       <h2 style="font-size:1.25rem;margin-bottom:1rem">Upcoming bookings ({{ $upcoming->count() }})</h2>
 
       @if ($upcoming->isEmpty())
@@ -87,10 +86,8 @@
                 @endif
               </div>
 
-              <!-- Action Drawers -->
-              <div class="res-card-actions">
-                <!-- Edit Disclosure -->
-                <details class="res-details-panel" data-testid="edit-details-{{ $res->reservation_id }}">
+                            <div class="res-card-actions">
+                                <details class="res-details-panel" data-testid="edit-details-{{ $res->reservation_id }}">
                   <summary class="btn btn-outline btn-sm" data-testid="edit-res-btn-{{ $res->reservation_id }}">
                     Edit booking
                   </summary>
@@ -101,7 +98,7 @@
                       <div class="res-drawer-notice">
                         <strong>Important:</strong> Changes to date, time or party size require staff review and revert status to <em>Requested</em>. Edits are locked within 2 hours of booking time.
                       </div>
-                      
+
                       <div class="form-row-2">
                         <div class="form-group">
                           <label for="edit-date-{{ $res->reservation_id }}">Date</label>
@@ -142,8 +139,7 @@
                   </div>
                 </details>
 
-                <!-- Cancel Disclosure -->
-                <details class="res-details-panel" data-testid="cancel-details-{{ $res->reservation_id }}">
+                                <details class="res-details-panel" data-testid="cancel-details-{{ $res->reservation_id }}">
                   <summary class="btn btn-outline btn-sm btn-danger-outline" data-testid="cancel-res-btn-{{ $res->reservation_id }}">
                     Cancel booking
                   </summary>
@@ -167,8 +163,7 @@
       @endif
     </section>
 
-    <!-- Past Bookings -->
-    <section class="customer-section" style="margin-top:3rem" data-testid="past-reservations-section">
+        <section class="customer-section" style="margin-top:3rem" data-testid="past-reservations-section">
       <h2 style="font-size:1.25rem;margin-bottom:1rem">Past reservations</h2>
 
       @if ($past->isEmpty())

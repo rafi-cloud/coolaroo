@@ -10,10 +10,6 @@ use Stripe\Exception\InvalidRequestException;
 use Stripe\Refund as StripeRefund;
 use Stripe\StripeClient;
 
-/**
- * Test mode, no webhooks — every "is this paid"
- * question this app ever asks goes through retrieveSession().
- */
 class StripeService
 {
     private StripeClient $client;
@@ -23,7 +19,6 @@ class StripeService
         $this->client = new StripeClient(config('services.stripe.secret'));
     }
 
-    /** amount fixed here. 30-minute expiry (07.9, Stripe's own minimum). */
     public function createCheckoutSession(Order $order, Payment $payment): Session
     {
         $base = request()->hasSession() ? request()->getSchemeAndHttpHost() : '';
@@ -50,17 +45,11 @@ class StripeService
         ]);
     }
 
-    /** the only thing this app accepts as proof of payment. */
     public function retrieveSession(string $sessionId): Session
     {
         return $this->client->checkout->sessions->retrieve($sessionId);
     }
 
-    /**
-     * Stripe refunds attach to the PaymentIntent, not the Checkout
-     * Session, so the intent id is resolved from the session and cached in
-     * payment.provider_payment_id (06.4.21) on first use.
-     */
     public function createRefund(RefundModel $refund): StripeRefund
     {
         $payment = $refund->payment;
@@ -86,13 +75,11 @@ class StripeService
         return $this->client->refunds->retrieve($refundId);
     }
 
-    /** local half of order cancel and the daily cleanup job. */
     public function expireSession(string $sessionId): void
     {
         try {
             $this->client->checkout->sessions->expire($sessionId);
         } catch (InvalidRequestException) {
-            // Already expired or already completed on Stripe's side.
         }
     }
 }

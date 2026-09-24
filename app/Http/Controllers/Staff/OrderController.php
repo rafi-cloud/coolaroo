@@ -10,10 +10,6 @@ use App\Services\OrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 
-/**
- * Staff cancel and stock-conflict resolution, kept separate from
- * Staff\Floor\StaffOrderController.
- */
 class OrderController extends Controller
 {
     public function __construct(private OrderService $orders) {}

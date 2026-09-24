@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('setting', function (Blueprint $table) {
-            $table->string('setting_key', 60)->primary(); // e.g. table_idle_autoclear_minutes
-            $table->string('setting_value', 255); // stored as text, cast by value_type at read time
-            $table->string('value_type', 10)->default('string'); // int, decimal, bool, time, string
-            $table->string('description', 255)->nullable(); // help text on the settings screen
+            $table->string('setting_key', 60)->primary();
+            $table->string('setting_value', 255);
+            $table->string('value_type', 10)->default('string');
+            $table->string('description', 255)->nullable();
             $table->unsignedInteger('updated_by_staff_id')->nullable();
             $table->dateTime('updated_at')->nullable();
 

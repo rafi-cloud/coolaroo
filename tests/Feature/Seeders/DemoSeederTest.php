@@ -29,38 +29,44 @@ class DemoSeederTest extends TestCase
     {
         $this->seed(DemoSeeder::class);
 
-        // Core records
         $this->assertGreaterThanOrEqual(4, Staff::count());
         $this->assertGreaterThanOrEqual(10, Customer::count());
         $this->assertGreaterThanOrEqual(12, RestaurantTable::count());
 
-        // Catalogue
         $this->assertGreaterThanOrEqual(10, MenuCategory::count());
-        $this->assertGreaterThanOrEqual(12, MenuItem::count());
+        $this->assertGreaterThanOrEqual(45, MenuItem::count());
         $this->assertGreaterThanOrEqual(10, Allergen::count());
         $this->assertGreaterThanOrEqual(6, DietaryTag::count());
 
-        // Specials active
+        $this->assertSame(0, MenuCategory::doesntHave('menuItems')->count());
+
         $specials = app(SpecialsService::class);
         $topSpecial = $specials->topSpecial();
         $this->assertNotNull($topSpecial);
         $this->assertSame('Angus Ribeye 300g', $topSpecial['size']->menuItem->item_name);
 
-        // Bookings and visits
         $this->assertGreaterThanOrEqual(10, Reservation::count());
         $this->assertGreaterThanOrEqual(8, Visit::count());
 
-        // Orders, lines, payments
         $this->assertGreaterThanOrEqual(10, Order::count());
         $this->assertGreaterThanOrEqual(10, Payment::count());
         $this->assertGreaterThanOrEqual(1, Refund::count());
 
-        // Feedback
+        $this->assertSame(0, Order::query()
+            ->whereRaw('ROUND(total_amount, 2) != (SELECT ROUND(COALESCE(SUM(line_total), 0), 2) FROM order_item WHERE order_item.order_id = orders.order_id)')
+            ->count());
+        $this->assertSame(0, Order::doesntHave('statusHistory')->count());
+
+        $this->assertSame(14, Reservation::query()
+            ->whereDate('booking_date', '>=', today()->addDay())
+            ->whereDate('booking_date', '<=', today()->addDays(14))
+            ->distinct()
+            ->count('booking_date'));
+
         $this->assertGreaterThanOrEqual(10, Feedback::where('is_hidden', false)->count());
         $this->assertSame(3, Feedback::where('is_featured', true)->count());
         $this->assertGreaterThanOrEqual(1, Feedback::where('is_hidden', true)->count());
 
-        // Dashboard widgets evaluation
         $reports = app(ReportService::class);
         $dashboard = $reports->dashboard();
 

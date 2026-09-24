@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // behind Nginx the scheme arrives in X-Forwarded-Proto.
+
         $middleware->trustProxies(at: '*');
 
         $middleware->web(append: [
@@ -39,9 +39,6 @@ return Application::configure(basePath: dirname(__DIR__))
             ? route('staff.login')
             : route('customer.login'));
 
-        // A signed-in member asking for the login page again belongs back on
-        // their own screen, not stranded on the public site, which carries no
-        // navigation into the staff area.
         $middleware->redirectUsersTo(fn (Request $request) => $request->is('staff*', 'admin*')
             ? (Auth::guard('staff')->user()?->role?->landingUrl() ?? route('home'))
             : route('home'));

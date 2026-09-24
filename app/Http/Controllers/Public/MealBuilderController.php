@@ -7,10 +7,6 @@ use App\Models\DietaryTag;
 use App\Services\SettingService;
 use Illuminate\View\View;
 
-/**
- * The page only renders the brief form — suggestions come
- * from POST /ai/meal-builder once the guest submits it.
- */
 class MealBuilderController extends Controller
 {
     public function __construct(private readonly SettingService $settings) {}

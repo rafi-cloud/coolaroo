@@ -15,17 +15,6 @@ class BroadcastChannelTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * phpunit.xml sets BROADCAST_CONNECTION=null, and the null broadcaster
-     * authorises every channel without consulting routes/channels.php — so
-     * these tests would pass against no rules at all. Point this file at the
-     * real (pusher-protocol) broadcaster instead.
-     *
-     * Broadcast::channel() registers on whichever driver is default when
-     * routes/channels.php is loaded, which already happened at boot against
-     * the null driver — so the file has to be re-loaded after the switch, or
-     * the new driver starts with no channels and denies everything.
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -48,7 +37,6 @@ class BroadcastChannelTest extends TestCase
         ]);
     }
 
-    /** role.role_name is unique, so a role is reused once created. */
     private function staffWithRole(string $role): Staff
     {
         $roleModel = Role::firstWhere('role_name', $role) ?? Role::factory()->{$role}()->create();
@@ -74,7 +62,6 @@ class BroadcastChannelTest extends TestCase
         $this->actingAs($customer, 'customer')->authorise("order.{$other->order_id}")->assertForbidden();
     }
 
-    /** 07.8: "the owning customer or staff" — any staff, on the other guard. */
     public function test_staff_may_listen_to_any_order(): void
     {
         $order = $this->orderFor(Customer::factory()->create());

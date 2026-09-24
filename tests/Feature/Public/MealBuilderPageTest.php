@@ -40,10 +40,6 @@ class MealBuilderPageTest extends TestCase
             ->assertSee(AiMenuService::ALLERGEN_DISCLAIMER);
     }
 
-    /**
-     * A tag no available dish carries can only produce an empty suggestion
-     * list, so the brief form does not offer it.
-     */
     public function test_it_hides_a_dietary_tag_no_available_dish_carries(): void
     {
         $unused = DietaryTag::factory()->create(['tag_name' => 'Nut-Free', 'is_active' => true]);
@@ -58,7 +54,6 @@ class MealBuilderPageTest extends TestCase
             ->assertDontSee('meal-builder-diet-'.$unavailable->dietary_tag_id, false);
     }
 
-    /** BR49, FR98. */
     public function test_it_is_not_found_when_the_assistant_is_switched_off(): void
     {
         Setting::where('setting_key', 'ai_enabled')->update(['setting_value' => '0']);

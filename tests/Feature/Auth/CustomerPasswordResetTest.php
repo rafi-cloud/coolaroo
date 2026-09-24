@@ -37,15 +37,15 @@ class CustomerPasswordResetTest extends TestCase
         $response = $this->post('/reset-password', [
             'token' => $token,
             'email' => $customer->email,
-            'password' => 'new-password123',
-            'password_confirmation' => 'new-password123',
+            'password' => 'NewPass@123',
+            'password_confirmation' => 'NewPass@123',
         ]);
 
         $response->assertRedirect('/login');
 
         $this->post('/login', [
             'email' => $customer->email,
-            'password' => 'new-password123',
+            'password' => 'NewPass@123',
         ]);
 
         $this->assertAuthenticatedAs($customer->fresh(), 'customer');
@@ -58,8 +58,8 @@ class CustomerPasswordResetTest extends TestCase
         $response = $this->from('/reset-password/bad-token')->post('/reset-password', [
             'token' => 'bad-token',
             'email' => $customer->email,
-            'password' => 'new-password123',
-            'password_confirmation' => 'new-password123',
+            'password' => 'NewPass@123',
+            'password_confirmation' => 'NewPass@123',
         ]);
 
         $response->assertSessionHasErrors('email');

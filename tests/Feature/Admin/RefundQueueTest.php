@@ -66,7 +66,6 @@ class RefundQueueTest extends TestCase
         return Staff::factory()->create(['role_id' => Role::factory()->admin()->create()->role_id]);
     }
 
-    /** TC-UC33-01. */
     public function test_admin_approves_a_stripe_partial_refund_without_returning_stock(): void
     {
         $order = $this->paidOrder(2, dailyLimit: 20);
@@ -91,7 +90,6 @@ class RefundQueueTest extends TestCase
         $this->assertSame($soldBefore, $this->menuItem->fresh()->sold_today);
     }
 
-    /** TC-UC33-02. */
     public function test_a_manual_refund_completes_with_its_reference(): void
     {
         $order = $this->paidOrder(1);
@@ -111,7 +109,6 @@ class RefundQueueTest extends TestCase
         $this->assertSame('cancelled', $order->fresh()->status->value);
     }
 
-    /** BR13. */
     public function test_return_to_stock_reduces_sold_today_only_when_ticked(): void
     {
         $order = $this->paidOrder(2, dailyLimit: 20);

@@ -9,12 +9,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/**
- * Public on purpose — says this works from the
- * QR login page without login; the session check is what keeps it to people
- * who actually scanned this table ("from table ordering page or QR
- * login page").
- */
 class WaiterCallController extends Controller
 {
     public function __construct(private WaiterCallService $waiterCalls) {}

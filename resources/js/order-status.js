@@ -21,8 +21,15 @@ export function initOrderStatus() {
 
     const renderedStatus = page.dataset.status;
     const renderedPaymentStatus = page.dataset.paymentStatus;
+    const refundPanel = document.getElementById('request-refund');
     let timer = null;
     let reloading = false;
+
+    // My orders links straight here with #request-refund, so the panel has to
+    // open itself rather than just being scrolled to while still collapsed.
+    if (refundPanel && window.location.hash === '#request-refund') {
+        refundPanel.open = true;
+    }
 
     // The heading, the pay box, the ready alert and the feedback form are all
     // status-dependent Blade. Re-rendering them here would be a second copy of
@@ -33,6 +40,13 @@ export function initOrderStatus() {
         }
 
         if (state.status !== renderedStatus || state.payment_status !== renderedPaymentStatus) {
+            // Deferred while the refund form is open, as the floor view defers a
+            // table drawer: reloading would throw away a half-typed reason. The
+            // poll keeps running, so it reloads on the next tick after closing.
+            if (refundPanel && refundPanel.open) {
+                return;
+            }
+
             reloading = true;
             clearInterval(timer);
             window.location.reload();

@@ -5,9 +5,6 @@ namespace App\Console\Commands;
 use App\Services\ReservationService;
 use Illuminate\Console\Command;
 
-/**
- * Scheduled every minute.
- */
 class SwitchReservedTablesCommand extends Command
 {
     protected $signature = 'reservations:switch-reserved';

@@ -5,8 +5,7 @@
     </div>
 
     <ul class="pagination-links">
-      {{-- Previous Page Link --}}
-      @if ($paginator->onFirstPage())
+            @if ($paginator->onFirstPage())
         <li class="page-item disabled" aria-disabled="true" aria-label="Previous page">
           <span class="page-link" aria-hidden="true">&lsaquo;</span>
         </li>
@@ -16,15 +15,12 @@
         </li>
       @endif
 
-      {{-- Pagination Elements --}}
-      @foreach ($elements as $element)
-        {{-- "Three Dots" Separator --}}
-        @if (is_string($element))
+            @foreach ($elements as $element)
+                @if (is_string($element))
           <li class="page-item disabled" aria-disabled="true"><span class="page-link ellipsis">{{ $element }}</span></li>
         @endif
 
-        {{-- Array Of Links --}}
-        @if (is_array($element))
+                @if (is_array($element))
           @foreach ($element as $page => $url)
             @if ($page == $paginator->currentPage())
               <li class="page-item active" aria-current="page"><span class="page-link" data-testid="pagination-page-{{ $page }}">{{ $page }}</span></li>
@@ -35,8 +31,7 @@
         @endif
       @endforeach
 
-      {{-- Next Page Link --}}
-      @if ($paginator->hasMorePages())
+            @if ($paginator->hasMorePages())
         <li class="page-item">
           <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="Next page" data-testid="pagination-next">&rsaquo;</a>
         </li>

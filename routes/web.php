@@ -96,18 +96,18 @@ Route::middleware('guest:customer')->group(function () {
     Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
 });
 
+Route::get('/email/verify', EmailVerificationPromptController::class)->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
+    ->middleware('signed')
+    ->name('verification.verify');
+
+Route::post('/email/verification-notification', EmailVerificationNotificationController::class)
+    ->middleware('throttle:6,1')
+    ->name('verification.send');
+
 Route::middleware('auth:customer')->group(function () {
     Route::post('/logout', [AuthenticatedCustomerController::class, 'destroy'])->name('logout');
-
-    Route::get('/email/verify', EmailVerificationPromptController::class)->name('verification.notice');
-
-    Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
-        ->middleware('signed')
-        ->name('verification.verify');
-
-    Route::post('/email/verification-notification', EmailVerificationNotificationController::class)
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
 
     Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
@@ -154,8 +154,6 @@ Route::middleware(['auth:staff', 'staff.session'])->group(function () {
     Route::get('/staff/profile', [StaffProfileController::class, 'edit'])->name('staff.profile.edit');
     Route::patch('/staff/profile', [StaffProfileController::class, 'update'])->name('staff.profile.update');
 
-    // No role: restriction — the actor list (Waitstaff, Kitchen, Bar, Admin)
-    // is enforced by OrderPolicy::requestRefund() itself, not route middleware.
     Route::get('/staff/tables/{table}/refunds', [RefundRequestController::class, 'index'])->name('staff.tables.refunds');
     Route::post('/staff/orders/{order}/refund-requests', [RefundRequestController::class, 'store'])->name('staff.orders.refund-requests.store');
 });
@@ -280,7 +278,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:staff', 'staff.session
     Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
 });
 
-// have to delete this block when the real pages done.
 if (app()->isLocal()) {
     Route::prefix('_preview')->group(function () {
         Route::view('public', 'preview.public');

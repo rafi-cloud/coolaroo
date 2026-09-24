@@ -100,7 +100,6 @@ class TrustServiceTest extends TestCase
     {
         $customer = Customer::factory()->create();
 
-        // 5 completed visits
         for ($i = 1; $i <= 5; $i++) {
             Reservation::factory()->create([
                 'customer_id' => $customer->customer_id,
@@ -112,7 +111,6 @@ class TrustServiceTest extends TestCase
             ])->save();
         }
 
-        // 1 uncleared no-show
         Reservation::factory()->create([
             'customer_id' => $customer->customer_id,
             'slot_id' => $this->slot->slot_id,
@@ -171,7 +169,6 @@ class TrustServiceTest extends TestCase
             'phone' => '0499887766',
         ]);
 
-        // 1 completed visit
         Reservation::factory()->create([
             'customer_id' => $customer->customer_id,
             'slot_id' => $this->slot->slot_id,
@@ -181,7 +178,6 @@ class TrustServiceTest extends TestCase
             'completed_at' => '2026-08-01 20:00:00',
         ])->save();
 
-        // 1 late cancellation
         Reservation::factory()->create([
             'customer_id' => $customer->customer_id,
             'slot_id' => $this->slot->slot_id,

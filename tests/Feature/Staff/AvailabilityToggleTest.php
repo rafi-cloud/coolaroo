@@ -32,7 +32,6 @@ class AvailabilityToggleTest extends TestCase
         $this->assertFalse($item->fresh()->is_available);
     }
 
-    /** BR14: the rule this whole task exists for. */
     public function test_kitchen_staff_cannot_toggle_a_bar_items_availability(): void
     {
         $item = MenuItem::factory()->create(['category_id' => MenuCategory::factory(), 'destination' => Destination::Bar]);

@@ -4,7 +4,6 @@ namespace App\Http\Requests\Customer;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Authorization is OrderPolicy::requestRefundAsCustomer on the controller. */
 class RequestRefundRequest extends FormRequest
 {
     public function authorize(): bool
@@ -12,7 +11,9 @@ class RequestRefundRequest extends FormRequest
         return true;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -22,7 +23,9 @@ class RequestRefundRequest extends FormRequest
         ];
     }
 
-    /** @return array<string, string> */
+    /**
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [

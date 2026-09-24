@@ -11,10 +11,6 @@ use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Order>
- *
- * status and payment_status are $guarded on the model (they belong to the
- * transition maps), so the states below set them through forceFill after
- * creation rather than as attributes.
  */
 class OrderFactory extends Factory
 {

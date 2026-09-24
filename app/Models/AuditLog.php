@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class AuditLog extends Model
 {
-    /** @use HasFactory<AuditLogFactory> */
+    /**
+     * @use HasFactory<AuditLogFactory>
+     */
     use HasFactory;
 
     protected $table = 'audit_log';

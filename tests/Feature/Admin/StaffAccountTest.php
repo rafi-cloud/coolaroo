@@ -33,8 +33,8 @@ class StaffAccountTest extends TestCase
             'email' => 'new-waiter@coolaroo.test',
             'phone' => '0412345678',
             'role_id' => $role->role_id,
-            'password' => 'temporary123',
-            'password_confirmation' => 'temporary123',
+            'password' => 'Temp@12345',
+            'password_confirmation' => 'Temp@12345',
         ]);
 
         $response->assertRedirect('/admin/staff');
@@ -85,13 +85,6 @@ class StaffAccountTest extends TestCase
 
     public function test_the_last_active_admin_cannot_be_deactivated(): void
     {
-        // Exercises StaffAccountService directly, not the HTTP route: reaching
-        // /admin/staff/* at all requires an active admin actor distinct from
-        // the target, which by construction always leaves that actor's own
-        // admin account active — so this guard can never actually fire behind
-        // the real route given the self-deactivation check runs first. Kept
-        // as a service-level safety net (UC30 names it as a separate rule from
-        // "cannot deactivate self"), tested at the level where it's reachable.
         $adminRole = Role::factory()->admin()->create();
         $onlyAdmin = Staff::factory()->create(['role_id' => $adminRole->role_id]);
         $waitstaffRole = Role::factory()->waitstaff()->create();

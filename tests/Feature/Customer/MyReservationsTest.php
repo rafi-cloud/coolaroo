@@ -24,7 +24,6 @@ class MyReservationsTest extends TestCase
         parent::setUp();
         $this->seed(SettingSeeder::class);
 
-        // Fixed test time: Tuesday 22 Sep 2026 12:00:00 (Tuesday is an open day)
         Carbon::setTestNow(Carbon::parse('2026-09-22 12:00:00', 'Australia/Melbourne'));
 
         $this->slot = SlotCapacity::factory()->create([
@@ -129,12 +128,11 @@ class MyReservationsTest extends TestCase
 
         $reservation->refresh();
         $this->assertSame(4, $reservation->party_size);
-        $this->assertSame(ReservationStatus::Requested, $reservation->status); // BR36: reverted to requested
+        $this->assertSame(ReservationStatus::Requested, $reservation->status);
     }
 
     public function test_customer_cannot_update_core_details_within_2_hours(): void
     {
-        // Booking today at 13:00 (1 hour away from test now 12:00)
         $slot13 = SlotCapacity::factory()->create(['slot_time' => '13:00', 'max_covers' => 20]);
         $reservation = Reservation::factory()->confirmed()->create([
             'customer_id' => $this->customer->customer_id,
@@ -180,7 +178,6 @@ class MyReservationsTest extends TestCase
 
     public function test_customer_cancelling_within_2_hours_marks_late_cancellation(): void
     {
-        // 1 hour away
         $slot13 = SlotCapacity::factory()->create(['slot_time' => '13:00', 'max_covers' => 20]);
         $reservation = Reservation::factory()->confirmed()->create([
             'customer_id' => $this->customer->customer_id,

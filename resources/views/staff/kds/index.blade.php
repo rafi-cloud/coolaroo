@@ -134,8 +134,7 @@
 
           @php($stillCooking = $lineStatuses->contains('pending') || $lineStatuses->contains('preparing'))
 
-          {{-- Nothing left to cook at this station means nothing left to estimate. --}}
-          @if ($eta && $stillCooking)
+                    @if ($eta && $stillCooking)
             <form method="POST" action="{{ route('staff.kds.eta', [$order, $destination->value]) }}" class="kds-eta-form">
               @csrf
               @method('PATCH')

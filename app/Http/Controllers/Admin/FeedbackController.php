@@ -11,21 +11,12 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
-/**
- * Admin feedback moderation.
- * View and reply to feedback.
- * Hide abusive feedback with mandatory reason.
- * Feature/unfeature review on public site.
- */
 class FeedbackController extends Controller
 {
     public function __construct(
         private readonly FeedbackService $feedbackService,
     ) {}
 
-    /**
-     * Display paginated feedback list with filters and status breakdown.
-     */
     public function index(Request $request): View
     {
         $filters = [
@@ -44,16 +35,15 @@ class FeedbackController extends Controller
         ]);
     }
 
-    /**
-     * Reply to a customer review. Admin cannot edit the review itself.
-     */
     public function reply(Request $request, Feedback $feedback): RedirectResponse
     {
         $validated = $request->validate([
             'reply' => ['required', 'string', 'min:1', 'max:1000'],
         ]);
 
-        /** @var Staff $admin */
+        /**
+         * @var Staff $admin
+         */
         $admin = $request->user('staff');
 
         $this->feedbackService->reply($feedback, $admin, $validated['reply']);
@@ -61,16 +51,15 @@ class FeedbackController extends Controller
         return back()->with('status', 'Reply posted successfully.');
     }
 
-    /**
-     * Hide abusive review with mandatory justification reason.
-     */
     public function hide(Request $request, Feedback $feedback): RedirectResponse
     {
         $validated = $request->validate([
             'reason' => ['required', 'string', 'min:2', 'max:255'],
         ]);
 
-        /** @var Staff $admin */
+        /**
+         * @var Staff $admin
+         */
         $admin = $request->user('staff');
 
         $this->feedbackService->hide($feedback, $admin, $validated['reason']);
@@ -78,12 +67,11 @@ class FeedbackController extends Controller
         return back()->with('status', 'Review hidden from public site.');
     }
 
-    /**
-     * Restore hidden review to public visibility.
-     */
     public function unhide(Request $request, Feedback $feedback): RedirectResponse
     {
-        /** @var Staff $admin */
+        /**
+         * @var Staff $admin
+         */
         $admin = $request->user('staff');
 
         $this->feedbackService->unhide($feedback, $admin);
@@ -91,13 +79,11 @@ class FeedbackController extends Controller
         return back()->with('status', 'Review restored to public visibility.');
     }
 
-    /**
-     * Toggle featured testimonial status.
-     * Hidden reviews cannot be featured.
-     */
     public function toggleFeatured(Request $request, Feedback $feedback): RedirectResponse
     {
-        /** @var Staff $admin */
+        /**
+         * @var Staff $admin
+         */
         $admin = $request->user('staff');
 
         try {

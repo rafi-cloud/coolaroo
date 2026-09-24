@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class StockService
 {
-    /** the buffer. Public since the dashboard's low-stock widget measures against it. */
     public function bufferMultiplier(): int
     {
         return (int) (Setting::find('qr_stock_buffer_multiplier')?->setting_value ?? 5);
@@ -32,7 +31,6 @@ class StockService
         return ($item->daily_limit - $item->sold_today) >= $quantity;
     }
 
-    /** Raw remaining units before the limit, ignoring the QR buffer — used by exact (staff) contexts. */
     public function remaining(MenuItem $item): int
     {
         if ($item->daily_limit === null) {
@@ -60,10 +58,6 @@ class StockService
         return max(0, intdiv($item->daily_limit - $item->sold_today, $this->bufferMultiplier()));
     }
 
-    /**
-     * Atomically increments sold_today only if it stays within daily_limit.
-     * Returns false (not an exception —) if it would be exceeded.
-     */
     public function deduct(MenuItem $item, int $quantity): bool
     {
         $affected = DB::table('menu_item')

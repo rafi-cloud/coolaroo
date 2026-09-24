@@ -7,10 +7,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * the own wording: outside table context, show
- * "Scan the QR code on your table to order," don't just 403.
- */
 class EnsureTableContext
 {
     public function handle(Request $request, Closure $next): Response

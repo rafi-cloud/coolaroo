@@ -85,7 +85,7 @@ class SettingsManagementTest extends TestCase
             'social_whatsapp' => '',
             'opening_time' => '10:30',
             'closing_time' => '23:30',
-            'closed_weekdays' => [1, 2], // Mon & Tue closed
+            'closed_weekdays' => [1, 2],
             'reservation_max_days_ahead' => 90,
             'reservation_min_lead_hours' => 3,
             'reservation_max_party_online' => 12,
@@ -119,7 +119,6 @@ class SettingsManagementTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('status', 'Settings saved successfully.');
 
-        // Verify database updates
         $this->assertDatabaseHas('setting', [
             'setting_key' => 'venue_name',
             'setting_value' => 'Coolaroo Sports Bar & Grill',
@@ -136,7 +135,6 @@ class SettingsManagementTest extends TestCase
             'setting_value' => '90',
         ]);
 
-        // Audit log verified
         $this->assertDatabaseHas('audit_log', [
             'staff_id' => $this->admin->staff_id,
             'action_type' => 'setting_update',
@@ -144,8 +142,9 @@ class SettingsManagementTest extends TestCase
             'entity_id' => 'venue_name',
         ]);
 
-        // Cache was invalidated
-        /** @var SettingService $service */
+        /**
+         * @var SettingService $service
+         */
         $service = app(SettingService::class);
         $this->assertEquals('Coolaroo Sports Bar & Grill', $service->get('venue_name'));
         $this->assertEquals(90, $service->getInt('reservation_max_days_ahead'));
@@ -169,7 +168,6 @@ class SettingsManagementTest extends TestCase
             return $e->key === 'qr_ordering_enabled' && $e->value === '0';
         });
 
-        // Audit log verified
         $this->assertDatabaseHas('audit_log', [
             'staff_id' => $this->admin->staff_id,
             'action_type' => 'setting_update',

@@ -8,10 +8,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
-/**
- * return_to_stock is unticked by default, so an absent checkbox
- * is a real "no" rather than a missing field.
- */
 class ApproveRefundRequest extends FormRequest
 {
     public function authorize(): bool

@@ -47,7 +47,7 @@ class RefundRequestTest extends TestCase
                 'quantity' => 1,
                 'reason' => 'The parma arrived cold',
             ])
-            ->assertRedirect(route('orders.show', $order))
+            ->assertRedirect(route('orders.index'))
             ->assertSessionHas('status', 'refund-requested');
 
         $refund = Refund::where('order_id', $order->order_id)->firstOrFail();
@@ -58,20 +58,42 @@ class RefundRequestTest extends TestCase
         $this->assertSame('requested', $refund->status->value);
     }
 
-    public function test_the_form_is_offered_on_the_order_page_and_in_my_orders(): void
+    public function test_my_orders_carries_the_form_and_the_tracker_only_links_to_it(): void
     {
         $customer = Customer::factory()->create();
         $order = $this->paidOrderFor($customer);
 
         $this->actingAs($customer, 'customer')
+            ->get(route('orders.index'))
+            ->assertOk()
+            ->assertSee('refund-order-'.$order->order_id, false)
+            ->assertSee('refund-request-form', false);
+
+        $this->actingAs($customer, 'customer')
             ->get(route('orders.show', $order))
             ->assertOk()
-            ->assertSee('refund-request-form', false);
+            ->assertSee('refund-request-link', false)
+            ->assertDontSee('refund-request-form', false);
+    }
+
+    public function test_a_raised_refund_is_trackable_from_my_orders(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->paidOrderFor($customer);
+
+        $this->actingAs($customer, 'customer')->post(route('orders.refund-requests.store', $order), [
+            'order_item_id' => $order->items->first()->order_item_id,
+            'quantity' => 1,
+            'reason' => 'The parma arrived cold',
+        ]);
+
+        $refund = Refund::where('order_id', $order->order_id)->firstOrFail();
 
         $this->actingAs($customer, 'customer')
             ->get(route('orders.index'))
             ->assertOk()
-            ->assertSee('refund-order-'.$order->order_id, false);
+            ->assertSee('refund-status-'.$refund->refund_id, false)
+            ->assertSee('Requested', false);
     }
 
     public function test_a_customer_cannot_request_a_refund_on_someone_elses_order(): void
@@ -97,7 +119,7 @@ class RefundRequestTest extends TestCase
         $order->forceFill(['paid_at' => now()->subHours(25)])->save();
 
         $this->actingAs($customer, 'customer')
-            ->get(route('orders.show', $order))
+            ->get(route('orders.index'))
             ->assertOk()
             ->assertDontSee('refund-request-form', false);
 

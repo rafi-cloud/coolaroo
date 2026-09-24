@@ -7,19 +7,12 @@ use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/**
- * Historical data management snapshots.
- * View archived records (snapshots).
- */
 class ArchiveController extends Controller
 {
     public function __construct(
         private readonly AuditLogService $auditService,
     ) {}
 
-    /**
-     * Browse immutable entity snapshots with formatted JSON views.
-     */
     public function index(Request $request): View
     {
         $filters = [

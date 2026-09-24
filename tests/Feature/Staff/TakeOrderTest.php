@@ -51,7 +51,6 @@ class TakeOrderTest extends TestCase
         $this->assertSame('waitstaff', $order->statusHistory->first()->event_source);
     }
 
-    /** BR53: exact check, not the 5x QR buffer. */
     public function test_a_staff_order_uses_the_exact_stock_check_not_the_qr_buffer(): void
     {
         [$item, $size] = $this->orderableItem(dailyLimit: 3);

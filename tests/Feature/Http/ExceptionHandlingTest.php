@@ -9,10 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
-/**
- * 07.11: 409 (invalid transition), 422 (validation), 403 (unauthorised),
- * guest → correct login (unauthenticated), all via routes registered here.
- */
 class ExceptionHandlingTest extends TestCase
 {
     protected function setUp(): void

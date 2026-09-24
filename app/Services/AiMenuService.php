@@ -9,16 +9,10 @@ use App\Models\MenuItem;
 use App\Models\MenuItemSize;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-/**
- * GitHub Models' OpenAI-compatible chat completions endpoint.
- * chat() is the client; buildContext() is the live menu/venue
- * context; the system prompts, structured output schemas and
- * guardrails are The /ai/chat and meal-builder endpoints
- * that call chat() with them are separate tasks.
- */
 class AiMenuService
 {
     public function __construct(
@@ -27,15 +21,8 @@ class AiMenuService
     ) {}
 
     /**
-     * a missing key, a timeout, a 429, a 5xx, or any other failure all
-     * surface to the caller as the same AiUnavailableException — the real
-     * cause is logged to the `integrations` channel here, once, so
-     * nothing downstream needs to know GitHub Models' error shape.
-     *
      * @param  array<int, array{role:string, content:string}>  $messages
      * @param  array<string, mixed>|null  $responseFormat  Passed through as
-     *                                                     `response_format` (OpenAI-compatible structured output) —
-     *                                                     fills this in; optional here.
      * @return array<string, mixed> Decoded chat completion response body.
      */
     public function chat(array $messages, ?array $responseFormat = null): array
@@ -78,15 +65,41 @@ class AiMenuService
     }
 
     /**
-     * currently available items, sizes, options, prices, allergens,
-     * nutrition, plus venue name, address and hours. No customer personal
-     * data. `is_active && is_available` is the same "show this" signal the
-     * public menu already uses — not StockService's stricter,
-     * buffered QR-checkout check, a different question.
-     *
      * @return array<string, mixed>
      */
     public function buildContext(): array
+    {
+        return Cache::remember(
+            'ai:context:'.$this->contextFingerprint(),
+            now()->addDay(),
+            fn () => $this->freshContext(),
+        );
+    }
+
+    public function contextFingerprint(): string
+    {
+        $items = MenuItem::selectRaw('COUNT(*) as c, MAX(updated_at) as m')->first();
+
+        $sizes = MenuItemSize::selectRaw(
+            'COUNT(*) as c, MAX(size_id) as x, SUM(price) as p, SUM(COALESCE(sale_price, 0)) as s, SUM(is_active) as a'
+        )->first();
+
+        $onSale = MenuItemSize::whereNotNull('sale_price')
+            ->where(fn ($q) => $q->whereNull('sale_starts_at')->orWhere('sale_starts_at', '<=', now()))
+            ->where(fn ($q) => $q->whereNull('sale_ends_at')->orWhere('sale_ends_at', '>=', now()))
+            ->count();
+
+        return sha1(implode('|', [
+            $items->c, $items->m,
+            $sizes->c, $sizes->x, $sizes->p, $sizes->s, $sizes->a,
+            $onSale,
+        ]));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function freshContext(): array
     {
         $venue = $this->settings->venue();
 
@@ -116,18 +129,39 @@ class AiMenuService
         ];
     }
 
-    /** Turns of history sent back to the provider — a token guard, not a rule. */
     private const HISTORY_TURNS = 6;
 
     /**
-     * one question, one answer. The ids the model names are resolved
-     * against the same context it was given, so an invented id simply
-     * disappears.
-     *
+     * @param  array<int, array{role:string, content:string}>  $history
+     * @return array{answer:string, items:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}, cached:bool}
+     */
+    public function answerQuestion(string $message, array $history = []): array
+    {
+        if ($history !== []) {
+            return $this->freshAnswer($message, $history) + ['cached' => false];
+        }
+
+        $key = 'ai:chat:'.$this->contextFingerprint().':'.sha1(mb_strtolower(trim($message)));
+
+        if (is_array($hit = Cache::get($key))) {
+            return $hit + ['usage' => ['tokens_in' => 0, 'tokens_out' => 0], 'cached' => true];
+        }
+
+        $result = $this->freshAnswer($message, []);
+
+        Cache::put($key, [
+            'answer' => $result['answer'],
+            'items' => $result['items'],
+        ], config('services.ai.cache_ttl'));
+
+        return $result + ['cached' => false];
+    }
+
+    /**
      * @param  array<int, array{role:string, content:string}>  $history
      * @return array{answer:string, items:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}}
      */
-    public function answerQuestion(string $message, array $history = []): array
+    private function freshAnswer(string $message, array $history): array
     {
         $context = $this->buildContext();
 
@@ -150,15 +184,37 @@ class AiMenuService
     }
 
     /**
-     * The model picks ids; every price, line total and meal
-     * total below is calculated here from the live menu. A suggestion is
-     * returned only if the whole basket is orderable as it stands and
-     * still fits the budget once we have priced it ourselves.
-     *
+     * @param  array{budget:float|int|string, party_size:int, dietary?:array<int,string>, preferences?:?string}  $brief
+     * @return array{summary:string, suggestions:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}, cached:bool}
+     */
+    public function buildMeal(array $brief): array
+    {
+        $key = 'ai:meal:'.$this->contextFingerprint().':'.sha1((string) json_encode([
+            (float) $brief['budget'],
+            (int) $brief['party_size'],
+            array_values(array_map('strval', $brief['dietary'] ?? [])),
+            mb_strtolower(trim((string) ($brief['preferences'] ?? ''))),
+        ]));
+
+        if (is_array($hit = Cache::get($key))) {
+            return $hit + ['usage' => ['tokens_in' => 0, 'tokens_out' => 0], 'cached' => true];
+        }
+
+        $result = $this->freshMeal($brief);
+
+        Cache::put($key, [
+            'summary' => $result['summary'],
+            'suggestions' => $result['suggestions'],
+        ], config('services.ai.cache_ttl'));
+
+        return $result + ['cached' => false];
+    }
+
+    /**
      * @param  array{budget:float|int|string, party_size:int, dietary?:array<int,string>, preferences?:?string}  $brief
      * @return array{summary:string, suggestions:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}}
      */
-    public function buildMeal(array $brief): array
+    private function freshMeal(array $brief): array
     {
         $context = $this->buildContext();
 
@@ -189,7 +245,9 @@ class AiMenuService
         ];
     }
 
-    /** @param array<string, mixed> $brief */
+    /**
+     * @param  array<string, mixed>  $brief
+     */
     private function briefLine(array $brief): string
     {
         $parts = [
@@ -209,9 +267,6 @@ class AiMenuService
     }
 
     /**
-     * A suggestion survives only whole: one unorderable line and the meal
-     * goes, because a repriced remainder is no longer what was suggested.
-     *
      * @param  array<string, mixed>  $suggestion
      * @param  Collection<int, array<string, mixed>>  $byId
      * @return array<string, mixed>|null
@@ -247,10 +302,6 @@ class AiMenuService
     }
 
     /**
-     * The keys `item_id`, `size_id`, `add_on_option_ids` and `quantity` are
-     * exactly what `AddCartLineRequest` expects, so the Add to cart can
-     * post a line back unchanged.
-     *
      * @param  array<string, mixed>  $line
      * @param  Collection<int, array<string, mixed>>  $byId
      * @return array<string, mixed>|null
@@ -303,10 +354,6 @@ class AiMenuService
     }
 
     /**
-     * drops an id that does not belong to the item; a group left
-     * outside its min/max by that drop makes the whole line unorderable,
-     * because `AddCartLineRequest` would reject it too. Null says so.
-     *
      * @param  array<string, mixed>  $item
      * @param  array<int, mixed>  $optionIds
      * @return array<int, array<string, mixed>>|null
@@ -335,10 +382,6 @@ class AiMenuService
     }
 
     /**
-     * The provider returns the structured output as a JSON string inside
-     * the message content. Anything that is not decodable JSON is a failed
-     * request like any other — same log channel, same exception.
-     *
      * @param  array<string, mixed>  $response
      * @return array<string, mixed>
      */
@@ -357,9 +400,6 @@ class AiMenuService
     }
 
     /**
-     * 24's `tokens_in`/`tokens_out` — the provider's own measured
-     * counts, not an estimate.
-     *
      * @param  array<string, mixed>  $response
      * @return array{tokens_in:int, tokens_out:int}
      */
@@ -372,8 +412,6 @@ class AiMenuService
     }
 
     /**
-     * drop any id that is not in the live context.
-     *
      * @param  array<int, mixed>  $itemIds
      * @param  array<string, mixed>  $context
      * @return array<int, array<string, mixed>>
@@ -394,7 +432,9 @@ class AiMenuService
             ->all();
     }
 
-    /** @param array<string, mixed> $item */
+    /**
+     * @param  array<string, mixed>  $item
+     */
     private function lowestPrice(array $item): float
     {
         return isset($item['price'])
@@ -402,21 +442,22 @@ class AiMenuService
             : (float) min(array_column($item['sizes'], 'price'));
     }
 
-    /**
-     * the fixed allergy disclaimer. The app owns this wording (it
-     * matches the menu page's) and the model is told not to write its
-     * own — generated safety text would not be fixed text.
-     */
     public const ALLERGEN_DISCLAIMER = 'Allergen labels reflect the tags stored for each dish and its add-on options. Our kitchen handles nuts, seafood, gluten and dairy, and cross-contact may occur, so please tell our staff about any serious allergy before ordering.';
 
-    /** the fixed decline used whenever the model flags a question off-topic. */
     public const OFF_TOPIC_REPLY = 'I can only help with the Coolaroo menu — dishes, prices, dietary and allergen tags, and our address and hours.';
 
     /**
-     * System prompt for the chat widget.
-     *
+     * @var array<int, array{label:string, question:string}>
+     */
+    public const STARTER_QUESTIONS = [
+        ['label' => '🌱 Vegetarian options', 'question' => 'What are your vegetarian options?'],
+        ['label' => '🌾 Gluten-free dishes?', 'question' => 'Do you have gluten-free dishes?'],
+        ['label' => '🍽️ Popular bistro mains', 'question' => 'What are your most popular mains?'],
+        ['label' => '🍷 Drink recommendations', 'question' => 'What drinks or wines do you recommend?'],
+    ];
+
+    /**
      * @param  array<string, mixed>|null  $context  Pass an already-built
-     *                                              context to avoid a second set of queries.
      */
     public function chatSystemPrompt(?array $context = null): string
     {
@@ -428,9 +469,6 @@ class AiMenuService
     }
 
     /**
-     * System prompt for the meal builder. the model picks
-     * IDs, the server prices them — the prompt never asks for a number.
-     *
      * @param  array<string, mixed>|null  $context
      */
     public function mealBuilderSystemPrompt(?array $context = null): string
@@ -450,11 +488,6 @@ class AiMenuService
     }
 
     /**
-     * OpenAI-compatible structured output for a chat answer.
-     * Strict mode needs every property required and additionalProperties
-     * false, so an empty array carries the "none" case rather than an
-     * absent key.
-     *
      * @return array<string, mixed>
      */
     public function chatResponseFormat(): array
@@ -482,10 +515,6 @@ class AiMenuService
     }
 
     /**
-     * suggestions carry IDs and quantities only — no price, subtotal
-     * or total field exists for the model to fill, because calculates
-     * every total from the live menu.
-     *
      * @return array<string, mixed>
      */
     public function mealBuilderResponseFormat(): array
@@ -537,10 +566,6 @@ class AiMenuService
     }
 
     /**
-     * a flagged off-topic question is declined in this app's fixed
-     * words, not the model's, and anything it referenced is dropped. Shared
-     * by both response shapes.
-     *
      * @param  array<string, mixed>  $payload
      * @return array<string, mixed>
      */
@@ -566,9 +591,6 @@ class AiMenuService
     }
 
     /**
-     * The shared guardrails plus the live context; the task
-     * paragraph is all that differs between the two assistants.
-     *
      * @param  array<string, mixed>|null  $context
      */
     private function basePrompt(string $task, ?array $context): string
@@ -595,7 +617,9 @@ class AiMenuService
             PROMPT;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     private function itemContext(MenuItem $item): array
     {
         $sizes = $item->sizes->map(fn (MenuItemSize $size) => [

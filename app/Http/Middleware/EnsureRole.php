@@ -6,9 +6,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * role:admin,waitstaff etc. Admin passes every check.
- */
 class EnsureRole
 {
     public function handle(Request $request, Closure $next, string ...$roles): Response

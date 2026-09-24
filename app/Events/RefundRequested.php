@@ -10,14 +10,15 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** Admin's refund queue. */
 class RefundRequested implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public function __construct(public Refund $refund) {}
 
-    /** @return array<int, PrivateChannel> */
+    /**
+     * @return array<int, PrivateChannel>
+     */
     public function broadcastOn(): array
     {
         return [new PrivateChannel('admin')];

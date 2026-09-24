@@ -19,19 +19,40 @@ class RestaurantTableSeeder extends Seeder
             ['T6', 4, 'Dining'],
             ['T7', 6, 'Dining'],
             ['T8', 6, 'Dining'],
-            ['T9', 2, 'Bar'],
-            ['T10', 4, 'Bar'],
-            ['T11', 4, 'Outdoor'],
-            ['T12', 6, 'Outdoor'],
+            ['T9', 4, 'Dining'],
+            ['B1', 2, 'Bar'],
+            ['B2', 2, 'Bar'],
+            ['B3', 2, 'Bar'],
         ];
 
         foreach ($tables as [$number, $capacity, $section]) {
-            RestaurantTable::create([
-                'table_number' => $number,
-                'seat_capacity' => $capacity,
-                'section' => $section,
-                'qr_token' => Str::random(64),
-            ]);
+            $existing = RestaurantTable::where('table_number', $number)->first();
+            if ($existing) {
+                $existing->update([
+                    'seat_capacity' => $capacity,
+                    'section' => $section,
+                    'is_active' => true,
+                ]);
+            } else {
+                RestaurantTable::create([
+                    'table_number' => $number,
+                    'seat_capacity' => $capacity,
+                    'section' => $section,
+                    'qr_token' => Str::random(64),
+                    'is_active' => true,
+                ]);
+            }
+        }
+
+        $keepNumbers = collect($tables)->pluck(0)->all();
+        $t1 = RestaurantTable::where('table_number', 'T1')->first();
+        $extra = RestaurantTable::whereNotIn('table_number', $keepNumbers)->get();
+        foreach ($extra as $table) {
+            if ($t1) {
+                $table->visits()->update(['table_id' => $t1->table_id]);
+                $table->orders()->update(['table_id' => $t1->table_id]);
+            }
+            $table->delete();
         }
     }
 }

@@ -109,7 +109,6 @@ class FeedbackModerationTest extends TestCase
             'is_featured' => true,
         ]);
 
-        // Filter hidden
         $resHidden = $this->actingAs($this->admin, 'staff')
             ->get(route('admin.feedback.index', ['status' => 'hidden']));
 
@@ -117,7 +116,6 @@ class FeedbackModerationTest extends TestCase
         $resHidden->assertSee('Offensive comment');
         $resHidden->assertDontSee('Visible review');
 
-        // Filter featured
         $resFeatured = $this->actingAs($this->admin, 'staff')
             ->get(route('admin.feedback.index', ['status' => 'featured']));
 
@@ -156,7 +154,6 @@ class FeedbackModerationTest extends TestCase
         $this->assertEquals($this->admin->staff_id, $fb->replied_by_staff_id);
         $this->assertNotNull($fb->replied_at);
 
-        // Audit log verified
         $this->assertDatabaseHas('audit_log', [
             'staff_id' => $this->admin->staff_id,
             'action_type' => 'feedback_reply',
@@ -193,7 +190,6 @@ class FeedbackModerationTest extends TestCase
         $this->assertTrue($fb->is_hidden);
         $this->assertEquals('Inappropriate profanity', $fb->hidden_reason);
 
-        // Audit log verified
         $this->assertDatabaseHas('audit_log', [
             'staff_id' => $this->admin->staff_id,
             'action_type' => 'feedback_hide',
@@ -234,7 +230,6 @@ class FeedbackModerationTest extends TestCase
         $this->assertFalse($fb->is_hidden);
         $this->assertNull($fb->hidden_reason);
 
-        // Audit log verified
         $this->assertDatabaseHas('audit_log', [
             'staff_id' => $this->admin->staff_id,
             'action_type' => 'feedback_unhide',
@@ -247,7 +242,6 @@ class FeedbackModerationTest extends TestCase
     {
         $fb = $this->createFeedback(['is_featured' => false]);
 
-        // Feature review
         $resFeature = $this->actingAs($this->admin, 'staff')
             ->patch(route('admin.feedback.feature', $fb));
 
@@ -264,7 +258,6 @@ class FeedbackModerationTest extends TestCase
             'entity_id' => $fb->order_id,
         ]);
 
-        // Unfeature review
         $resUnfeature = $this->actingAs($this->admin, 'staff')
             ->patch(route('admin.feedback.feature', $fb));
 

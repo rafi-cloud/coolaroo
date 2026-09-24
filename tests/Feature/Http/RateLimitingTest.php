@@ -6,11 +6,6 @@ use App\Models\Customer;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
-/**
- * NFR05, 07.5: login 5/min per email+IP, checkout 10/min per customer.
- * Call waiter's cooldown is not a RateLimiter — see T216 guide/log — so it's
- * not tested here; T054 owns it.
- */
 class RateLimitingTest extends TestCase
 {
     protected function setUp(): void

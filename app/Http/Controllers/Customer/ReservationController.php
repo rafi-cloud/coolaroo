@@ -18,9 +18,6 @@ class ReservationController extends Controller
         private readonly ReservationService $reservationService,
     ) {}
 
-    /**
-     * Customer views their upcoming and past reservations.
-     */
     public function index(Request $request): View
     {
         $customer = $request->user('customer');
@@ -50,9 +47,6 @@ class ReservationController extends Controller
         ]);
     }
 
-    /**
-     * Submit online reservation request.
-     */
     public function store(Request $request): RedirectResponse
     {
         $customer = $request->user('customer');
@@ -72,11 +66,6 @@ class ReservationController extends Controller
             ->with('message', "Your reservation request {$reservation->reference_code} for {$reservation->party_size} guests on {$reservation->booking_date->format('d/m/Y')} at ".substr($reservation->booking_time, 0, 5).' has been received.');
     }
 
-    /**
-     * Customer updates their reservation.
-     * Core edits revert confirmed bookings to requested and unlink tables.
-     * Locked within 2 hours of booking time.
-     */
     public function update(Request $request, Reservation $reservation): RedirectResponse
     {
         Gate::authorize('update', $reservation);
@@ -101,10 +90,6 @@ class ReservationController extends Controller
             ->with('message', $statusMsg);
     }
 
-    /**
-     * Customer cancels their reservation.
-     * Flags late cancellation if within 2 hours of booking time; unlinks tables.
-     */
     public function cancel(Request $request, Reservation $reservation): RedirectResponse
     {
         Gate::authorize('cancel', $reservation);

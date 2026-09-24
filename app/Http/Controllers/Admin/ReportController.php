@@ -14,9 +14,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
-/**
- * Admin report pages for sales, items, operations, reservations, feedback, staff, and AI usage.
- */
 class ReportController extends Controller
 {
     public const VALID_TYPES = [
@@ -35,10 +32,6 @@ class ReportController extends Controller
     }
 
     /**
-     * Resolve the reporting window from the query string. Unparseable or
-     * non-scalar from/to values are discarded rather than thrown, so a
-     * mistyped URL still renders the default 30-day range.
-     *
      * @return array{0: Carbon, 1: Carbon}
      */
     private function resolveRange(Request $request): array
@@ -92,9 +85,6 @@ class ReportController extends Controller
         ]);
     }
 
-    /**
-     * Toggle AI Assistant on/off switch.
-     */
     public function toggleAi(Request $request, SettingService $settings, AuditLogger $audit): RedirectResponse
     {
         $current = $settings->getBool('ai_enabled', true);
@@ -113,9 +103,6 @@ class ReportController extends Controller
         return back()->with('status', sprintf('AI Assistant successfully %s.', $new ? 'enabled' : 'disabled'));
     }
 
-    /**
-     * Export report as PDF or CSV.
-     */
     public function export(string $type, Request $request, ReportService $reportService): Response
     {
         if (! array_key_exists($type, self::VALID_TYPES)) {

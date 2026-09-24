@@ -1,7 +1,6 @@
 <x-layouts.admin :title="'Reports · ' . $typeName" :page-title="'Reports · ' . $typeName" page-sub="Analytical Insights & Historic Performance">
   <div class="block">
-    {{-- Navigation Tabs between the 6 Report Types --}}
-    <nav class="report-nav" aria-label="Report Categories">
+        <nav class="report-nav" aria-label="Report Categories">
       @foreach ($types as $key => $label)
         <a class="report-nav-item {{ $type === $key ? 'is-active' : '' }}"
            href="{{ route('admin.reports.show', ['type' => $key, 'from' => $from, 'to' => $to]) }}"
@@ -11,8 +10,7 @@
       @endforeach
     </nav>
 
-    {{-- Date Filter Form & Presets --}}
-    <div class="report-filter-bar">
+        <div class="report-filter-bar">
       <form class="report-dates-form" method="GET" action="{{ route('admin.reports.show', $type) }}">
         <div class="date-input-group">
           <label for="report-from">From:</label>
@@ -45,8 +43,7 @@
       </div>
     </div>
 
-    {{-- REPORT 1: SALES REPORT --}}
-    @if ($type === 'sales')
+        @if ($type === 'sales')
       <div class="dashboard-grid" data-testid="admin-report-sales">
         <article class="card tile">
           <p class="tile-value">${{ number_format($data['gross_sales'], 2) }}</p>
@@ -74,8 +71,7 @@
       </div>
 
       <div class="dashboard-grid">
-        {{-- Payment Methods Split --}}
-        <article class="card" style="grid-column: span 6">
+                <article class="card" style="grid-column: span 6">
           <header class="card-head">
             <div>
               <h3>Payment method split</h3>
@@ -110,8 +106,7 @@
           </div>
         </article>
 
-        {{-- Order Source Split --}}
-        <article class="card" style="grid-column: span 6">
+                <article class="card" style="grid-column: span 6">
           <header class="card-head">
             <div>
               <h3>Order source breakdown</h3>
@@ -146,8 +141,7 @@
           </div>
         </article>
 
-        {{-- Cash by Staff --}}
-        <article class="card wide" data-testid="admin-report-cash-staff">
+                <article class="card wide" data-testid="admin-report-cash-staff">
           <header class="card-head">
             <div>
               <h3>Cash takings by staff member</h3>
@@ -182,8 +176,7 @@
           </div>
         </article>
 
-        {{-- Daily Breakdown --}}
-        <article class="card wide" data-testid="admin-report-daily">
+                <article class="card wide" data-testid="admin-report-daily">
           <header class="card-head">
             <div>
               <h3>Daily sales breakdown</h3>
@@ -220,8 +213,7 @@
       </div>
     @endif
 
-    {{-- REPORT 2: ITEMS & CATEGORIES --}}
-    @if ($type === 'items')
+        @if ($type === 'items')
       <div class="dashboard-grid" data-testid="admin-report-items">
         <article class="card tile">
           <p class="tile-value">{{ $data['total_items_sold'] }}</p>
@@ -243,8 +235,7 @@
       </div>
 
       <div class="dashboard-grid">
-        {{-- Top Sellers --}}
-        <article class="card" style="grid-column: span 6" data-testid="admin-report-top-items">
+                <article class="card" style="grid-column: span 6" data-testid="admin-report-top-items">
           <header class="card-head">
             <div>
               <h3>Top 10 selling items</h3>
@@ -279,8 +270,7 @@
           </div>
         </article>
 
-        {{-- Bottom Sellers --}}
-        <article class="card" style="grid-column: span 6" data-testid="admin-report-bottom-items">
+                <article class="card" style="grid-column: span 6" data-testid="admin-report-bottom-items">
           <header class="card-head">
             <div>
               <h3>Lowest performing active items</h3>
@@ -313,8 +303,7 @@
           </div>
         </article>
 
-        {{-- Category Sales Breakdown --}}
-        <article class="card" style="grid-column: span 7" data-testid="admin-report-category-sales">
+                <article class="card" style="grid-column: span 7" data-testid="admin-report-category-sales">
           <header class="card-head">
             <div>
               <h3>Category performance</h3>
@@ -350,8 +339,7 @@
           </div>
         </article>
 
-        {{-- Sold-Out Items Status --}}
-        <article class="card" style="grid-column: span 5" data-testid="admin-report-stock-status">
+                <article class="card" style="grid-column: span 5" data-testid="admin-report-stock-status">
           <header class="card-head">
             <div>
               <h3>Currently unavailable items</h3>
@@ -384,8 +372,7 @@
       </div>
     @endif
 
-    {{-- REPORT 3: OPERATIONS --}}
-    @if ($type === 'operations')
+        @if ($type === 'operations')
       <div class="dashboard-grid" data-testid="admin-report-operations">
         <article class="card tile">
           <p class="tile-value">{{ $data['kitchen_avg_prep'] !== null ? $data['kitchen_avg_prep'].'m' : '—' }}</p>
@@ -407,8 +394,7 @@
       </div>
 
       <div class="dashboard-grid">
-        {{-- Peak Hours Breakdown --}}
-        <article class="card wide" data-testid="admin-report-peak-hours">
+                <article class="card wide" data-testid="admin-report-peak-hours">
           <header class="card-head">
             <div>
               <h3>Peak operational hours</h3>
@@ -442,8 +428,7 @@
           </div>
         </article>
 
-        {{-- Table Turnover Details --}}
-        <article class="card wide" data-testid="admin-report-table-turnover">
+                <article class="card wide" data-testid="admin-report-table-turnover">
           <header class="card-head">
             <div>
               <h3>Table turnover & duration by party size</h3>
@@ -482,8 +467,7 @@
       </div>
     @endif
 
-    {{-- REPORT 4: RESERVATIONS --}}
-    @if ($type === 'reservations')
+        @if ($type === 'reservations')
       <div class="dashboard-grid" data-testid="admin-report-reservations">
         <article class="card tile">
           <p class="tile-value">{{ $data['total_bookings'] }}</p>
@@ -553,8 +537,7 @@
       </div>
     @endif
 
-    {{-- REPORT 5: FEEDBACK --}}
-    @if ($type === 'feedback')
+        @if ($type === 'feedback')
       <div class="dashboard-grid" data-testid="admin-report-feedback">
         <article class="card tile">
           <p class="tile-value">{{ $data['overall_avg'] !== null ? $data['overall_avg'] : '—' }}<span style="font-size:1rem;color:var(--cancelled)">/5</span></p>
@@ -582,8 +565,7 @@
       </div>
 
       <div class="dashboard-grid" data-testid="admin-report-feedback-dist">
-        {{-- Food Rating Distribution --}}
-        <article class="card" style="grid-column: span 6">
+                <article class="card" style="grid-column: span 6">
           <header class="card-head">
             <div>
               <h3>Food rating distribution</h3>
@@ -612,8 +594,7 @@
           </div>
         </article>
 
-        {{-- Service Rating Distribution --}}
-        <article class="card" style="grid-column: span 6">
+                <article class="card" style="grid-column: span 6">
           <header class="card-head">
             <div>
               <h3>Service rating distribution</h3>
@@ -642,8 +623,7 @@
           </div>
         </article>
 
-        {{-- Recent Customer Reviews --}}
-        <article class="card wide" data-testid="admin-report-feedback-recent">
+                <article class="card wide" data-testid="admin-report-feedback-recent">
           <header class="card-head">
             <div>
               <h3>Recent customer feedback</h3>
@@ -682,8 +662,7 @@
       </div>
     @endif
 
-    {{-- REPORT 6: STAFF ACTIVITY --}}
-    @if ($type === 'staff')
+        @if ($type === 'staff')
       <div class="dashboard-grid" data-testid="admin-report-staff-activity">
         <article class="card wide">
           <header class="card-head">
@@ -732,10 +711,8 @@
         </article>
       </div>
 
-    {{-- REPORT 7: AI USAGE REPORT --}}
-    @elseif ($type === 'ai')
-      {{-- Master On/Off Switch Card --}}
-      <article class="card wide" style="margin-bottom: 1.5rem;" data-testid="admin-ai-switch-card">
+        @elseif ($type === 'ai')
+            <article class="card wide" style="margin-bottom: 1.5rem;" data-testid="admin-ai-switch-card">
         <header class="card-head" style="align-items:center;">
           <div>
             <h3>AI Assistant Operational Control</h3>
@@ -786,8 +763,7 @@
       </div>
 
       <div class="dashboard-grid">
-        {{-- Feature Breakdown --}}
-        <article class="card wide" data-testid="admin-report-ai-features">
+                <article class="card wide" data-testid="admin-report-ai-features">
           <header class="card-head">
             <div>
               <h3>AI Usage by Feature</h3>
@@ -827,8 +803,7 @@
       </div>
 
       <div class="dashboard-grid">
-        {{-- Recent AI Requests --}}
-        <article class="card wide" data-testid="admin-report-ai-requests">
+                <article class="card wide" data-testid="admin-report-ai-requests">
           <header class="card-head">
             <div>
               <h3>Recent AI Invocations Log (Audit Trail)</h3>

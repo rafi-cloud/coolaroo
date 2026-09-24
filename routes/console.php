@@ -9,11 +9,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-/**
- * This file is evaluated by every artisan call, including the
- * first migrate on a fresh database, so the two trading times fall back to
- * their seeded defaults rather than letting a missing table break the console.
- */
 $tradingTime = function (string $key, string $fallback): string {
     try {
         $value = Setting::find($key)?->setting_value;
@@ -33,7 +28,5 @@ Schedule::command('reservations:expire-requests')->everyFiveMinutes()->withoutOv
 Schedule::command('reservations:send-reminders')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('reservations:suggest-no-shows')->everyMinute()->withoutOverlapping();
 
-// Housekeeping: the nightly dump (10.2 step 8) and the failed-job
-// table, pruned on the same two-week window so the two records expire together.
 Schedule::command('db:backup')->dailyAt('03:00')->withoutOverlapping();
 Schedule::command('queue:prune-failed --hours=336')->daily();

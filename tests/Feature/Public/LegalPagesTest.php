@@ -16,7 +16,6 @@ class LegalPagesTest extends TestCase
         $response->assertOk();
         $response->assertViewIs('public.privacy');
 
-        // NFR12 statutory requirements
         $response->assertSee('Privacy Policy');
         $response->assertSee('Australian Privacy Principles');
         $response->assertSee('Attendance History', false);
@@ -24,7 +23,6 @@ class LegalPagesTest extends TestCase
         $response->assertSee('No Personal Data Sent to AI', false);
         $response->assertSee('Chat Content Not Stored', false);
 
-        // UI selectors
         $response->assertSee('data-testid="privacy-page"', false);
         $response->assertSee('data-testid="privacy-compliance-callout"', false);
         $response->assertSee('data-testid="privacy-ai-callout"', false);
@@ -40,7 +38,6 @@ class LegalPagesTest extends TestCase
         $response->assertOk();
         $response->assertViewIs('public.terms');
 
-        // Operational rules & disclosures
         $response->assertSee('Terms &amp; Conditions', false);
         $response->assertSee('Arrival Grace Period', false);
         $response->assertSee('15 minutes', false);
@@ -49,7 +46,6 @@ class LegalPagesTest extends TestCase
         $response->assertSee('GST', false);
         $response->assertSee('Allergen Advisory', false);
 
-        // UI selectors
         $response->assertSee('data-testid="terms-page"', false);
         $response->assertSee('data-testid="terms-intro-callout"', false);
         $response->assertSee('data-testid="terms-allergen-callout"', false);

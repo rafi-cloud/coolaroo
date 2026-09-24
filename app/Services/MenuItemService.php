@@ -6,10 +6,6 @@ use App\Models\MenuItem;
 use App\Models\Staff;
 use Illuminate\Validation\ValidationException;
 
-/**
- * Sizes/add-ons/daily-limit/availability are other
- * tasks' jobs ('s guide) — this only owns the item's own fields.
- */
 class MenuItemService
 {
     private const MAX_FEATURED = 12;

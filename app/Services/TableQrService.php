@@ -11,10 +11,6 @@ use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
-/**
- * Regenerates qr_token and renders it as a signed-URL QR code
- * (PNG or, embedded in a printable page, PDF) — nothing here is stored.
- */
 class TableQrService
 {
     public function __construct(private AuditLogger $auditLogger) {}

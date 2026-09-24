@@ -17,8 +17,7 @@
       </div>
     @endif
 
-    {{-- Operational Switches Section --}}
-    <div style="margin-bottom:2rem; padding:1.5rem; background:var(--sand-light, #FAF5EE); border:1px solid var(--line); border-radius:10px;" data-testid="admin-settings-switches-card">
+        <div style="margin-bottom:2rem; padding:1.5rem; background:var(--sand-light, #FAF5EE); border:1px solid var(--line); border-radius:10px;" data-testid="admin-settings-switches-card">
       <div style="margin-bottom:1.2rem;">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .25rem 0;">Real-Time Operational Switches</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0;">
@@ -27,8 +26,7 @@
       </div>
 
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.2rem;">
-        {{-- Switch 1: QR Ordering --}}
-        @php
+                @php
           $qrEnabled = ($settings['qr_ordering_enabled'] ?? '1') === '1';
         @endphp
         <div style="background:var(--white); padding:1.2rem; border:1px solid {{ $qrEnabled ? 'var(--line)' : '#FCA5A5' }}; border-radius:8px; display:flex; flex-direction:column; justify-content:space-between;" data-testid="admin-switch-card-qr">
@@ -52,8 +50,7 @@
           </form>
         </div>
 
-        {{-- Switch 2: Online Reservations --}}
-        @php
+                @php
           $resEnabled = ($settings['reservations_online_enabled'] ?? '1') === '1';
         @endphp
         <div style="background:var(--white); padding:1.2rem; border:1px solid {{ $resEnabled ? 'var(--line)' : '#FCA5A5' }}; border-radius:8px; display:flex; flex-direction:column; justify-content:space-between;" data-testid="admin-switch-card-reservations">
@@ -77,8 +74,7 @@
           </form>
         </div>
 
-        {{-- Switch 3: AI Assistant --}}
-        @php
+                @php
           $aiEnabled = ($settings['ai_enabled'] ?? '1') === '1';
         @endphp
         <div style="background:var(--white); padding:1.2rem; border:1px solid {{ $aiEnabled ? 'var(--line)' : '#FCA5A5' }}; border-radius:8px; display:flex; flex-direction:column; justify-content:space-between;" data-testid="admin-switch-card-ai">
@@ -104,18 +100,15 @@
       </div>
     </div>
 
-    {{-- Main Settings Form --}}
-    <form method="POST" action="{{ route('admin.settings.update') }}" data-testid="admin-settings-form">
+        <form method="POST" action="{{ route('admin.settings.update') }}" data-testid="admin-settings-form">
       @csrf
       @method('PATCH')
 
-      {{-- Hidden switch fields to preserve state if not altered in bulk --}}
-      <input type="hidden" name="qr_ordering_enabled" value="{{ $qrEnabled ? '1' : '0' }}">
+            <input type="hidden" name="qr_ordering_enabled" value="{{ $qrEnabled ? '1' : '0' }}">
       <input type="hidden" name="reservations_online_enabled" value="{{ $resEnabled ? '1' : '0' }}">
       <input type="hidden" name="ai_enabled" value="{{ $aiEnabled ? '1' : '0' }}">
 
-      {{-- Section 1: Venue Details & Public Contacts --}}
-      <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
+            <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .3rem 0;">1. Venue Identity &amp; Contact Details</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0 0 1.2rem 0;">
           Displayed in website headers, footers, customer confirmation emails, and provided in AI context.
@@ -168,8 +161,7 @@
         </div>
       </div>
 
-      {{-- Section 2: Trading Hours & Closed Days --}}
-      <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
+            <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .3rem 0;">2. Operating Hours &amp; Closed Days</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0 0 1.2rem 0;">
           Defines daily schedule, automated daily stock resets, unpaid order expiration at close, and closed weekdays for booking availability.
@@ -211,8 +203,7 @@
         </div>
       </div>
 
-      {{-- Section 3: Reservation Rules & Turn Durations --}}
-      <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
+            <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .3rem 0;">3. Reservation Rules &amp; Dining Durations</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0 0 1.2rem 0;">
           Governs booking wizard lead times, party size restrictions, turnover durations, customer edit locks, and arrival grace periods.
@@ -300,8 +291,7 @@
         </div>
       </div>
 
-      {{-- Section 4: Service, Stock & Operational Timers --}}
-      <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
+            <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .3rem 0;">4. Service, Stock &amp; Operational Timers</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0 0 1.2rem 0;">
           Buffers for live QR ordering, kitchen/bar ETA calculations, waiter calling cooldowns, and trust badges.
@@ -364,8 +354,7 @@
         </div>
       </div>
 
-      {{-- Action Bar --}}
-      <div style="display:flex; justify-content:flex-end; gap:.8rem; align-items:center;">
+            <div style="display:flex; justify-content:flex-end; gap:.8rem; align-items:center;">
         <button type="submit" class="btn btn-primary" style="padding:.65rem 1.8rem; font-size:.95rem;" data-testid="admin-settings-save-button">
           Save All Settings
         </button>

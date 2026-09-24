@@ -7,9 +7,6 @@ use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/**
- * Admin live dashboard with 15 widgets.
- */
 class DashboardController extends Controller
 {
     public function index(Request $request, ReportService $reportService): View

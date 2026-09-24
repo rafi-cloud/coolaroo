@@ -47,8 +47,7 @@
       </div>
     @else
       <div class="wizard-container" id="reserve-wizard" data-testid="reserve-wizard-container">
-        <!-- Step Indicators -->
-        <div class="wizard-steps-indicator" aria-label="Booking steps">
+                <div class="wizard-steps-indicator" aria-label="Booking steps">
           <div class="wizard-step-node active" id="step-node-1" data-testid="wizard-step-node-1">
             <span class="step-num">1</span>
             <span class="step-label">Party &amp; Date</span>
@@ -81,8 +80,7 @@
           <input type="hidden" name="booking_date" id="wizard-booking-date-hidden" value="{{ old('booking_date', now()->toDateString()) }}" required>
           <input type="hidden" name="party_size" id="wizard-party-size-hidden" value="{{ old('party_size', 2) }}" required>
 
-          <!-- Step 1: Party & Date -->
-          <div class="wizard-step" id="wizard-step-1" data-testid="wizard-step-1">
+                    <div class="wizard-step" id="wizard-step-1" data-testid="wizard-step-1">
             <div class="wizard-grid-2">
               <div class="form-group">
                 <label for="wizard-party-size-select">Number of guests</label>
@@ -114,8 +112,7 @@
             </div>
           </div>
 
-          <!-- Step 2: Select Time -->
-          <div class="wizard-step" id="wizard-step-2" data-testid="wizard-step-2" style="display:none">
+                    <div class="wizard-step" id="wizard-step-2" data-testid="wizard-step-2" style="display:none">
             <div class="wizard-chip" data-testid="reserve-step2-chip">
               <span id="chip-date-display">Date</span> &bull;
               <span id="chip-party-display">Guests</span> &bull;
@@ -135,8 +132,7 @@
                 Select an available time slot:
               </label>
               <div id="wizard-slots-grid" class="slots-grid" data-testid="reserve-slots-container">
-                <!-- Injected dynamically via JS from /reservations/availability -->
-              </div>
+                              </div>
             </div>
 
             <div class="wizard-actions" style="margin-top:1.5rem">
@@ -149,8 +145,7 @@
             </div>
           </div>
 
-          <!-- Step 3: Guest Details & Notes -->
-          <div class="wizard-step" id="wizard-step-3" data-testid="wizard-step-3" style="display:none">
+                    <div class="wizard-step" id="wizard-step-3" data-testid="wizard-step-3" style="display:none">
             <div class="wizard-summary-box" data-testid="reserve-step3-summary">
               <strong>Selected booking:</strong>
               <span id="summary-booking-text">Party of 2 on 2026-09-25 at 18:00</span>
@@ -279,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function () {
       chipParty.textContent = party + (party === 1 ? ' guest' : ' guests');
       chipDuration.textContent = dur + ' min table booking';
 
-      // Load availability
       loadAvailability(date, party);
       setStep(2);
     });

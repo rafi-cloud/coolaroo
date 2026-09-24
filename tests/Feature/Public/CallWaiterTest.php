@@ -36,7 +36,6 @@ class CallWaiterTest extends TestCase
         Event::assertDispatched(WaiterCalled::class);
     }
 
-    /** BR50. */
     public function test_a_second_call_within_the_cooldown_is_refused_politely(): void
     {
         Event::fake([WaiterCalled::class]);
@@ -52,7 +51,6 @@ class CallWaiterTest extends TestCase
         Event::assertDispatchedTimes(WaiterCalled::class, 1);
     }
 
-    /** BR50: the cooldown is per table, not global. */
     public function test_another_table_is_not_blocked_by_the_first_ones_cooldown(): void
     {
         $this->setting(120);
@@ -66,7 +64,6 @@ class CallWaiterTest extends TestCase
             ->assertSessionHas('status', 'waiter-called');
     }
 
-    /** BR07, UC02. */
     public function test_an_inactive_table_shows_the_unavailable_page(): void
     {
         $table = RestaurantTable::factory()->create(['is_active' => false]);

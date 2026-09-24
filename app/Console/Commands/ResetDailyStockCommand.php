@@ -5,9 +5,6 @@ namespace App\Console\Commands;
 use App\Services\StockService;
 use Illuminate\Console\Command;
 
-/**
- * Scheduled daily at opening_time (Australia/Melbourne).
- */
 class ResetDailyStockCommand extends Command
 {
     protected $signature = 'stock:reset-daily';

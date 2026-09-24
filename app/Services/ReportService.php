@@ -24,18 +24,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-/**
- * One method per dashboard widget, in the order 08.5 lists them.
- * Every figure comes from a paid order (`paid_at`), never a placed one — an
- * unpaid order is not revenue. Dates use the app timezone
- * (Australia/Melbourne), so "today" is the venue's day, not UTC's.
- */
 class ReportService
 {
-    /** Widget 14's threshold: "remaining < 2× buffer". */
     private const LOW_STOCK_BUFFER_MULTIPLE = 2;
 
-    /** Widget 12: a cash payment waiting longer than this needs someone. */
     private const CASH_WAITING_MINUTES = 10;
 
     public function __construct(
@@ -44,8 +36,6 @@ class ReportService
     ) {}
 
     /**
-     * All 15 widgets in one call, so the controller stays a single line.
-     *
      * @return array<string, mixed>
      */
     public function dashboard(int $trendDays = 7): array
@@ -70,9 +60,6 @@ class ReportService
     }
 
     /**
-     * Widget 1. Gross takings today against the same weekday last week —
-     * a Saturday only means anything next to another Saturday.
-     *
      * @return array{amount:float, previous:float, change_pct:?float}
      */
     public function salesToday(): array
@@ -87,13 +74,11 @@ class ReportService
         ];
     }
 
-    /** Widget 2. Paid orders only — a pending_payment order is not a sale. */
     public function ordersToday(): int
     {
         return $this->paidToday()->count();
     }
 
-    /** Widget 3. */
     public function averageOrderValue(): float
     {
         $orders = $this->ordersToday();
@@ -102,10 +87,6 @@ class ReportService
     }
 
     /**
-     * Widget 4. Share of today's paid amount by method, from the payment
-     * rows rather than the orders, because cash rounding and staff
-     * adjustments live there.
-     *
      * @return array{cash:float, stripe:float, cash_pct:?float}
      */
     public function cashVsStripe(): array
@@ -127,7 +108,6 @@ class ReportService
         ];
     }
 
-    /** Widget 5. Confirmed and seated party sizes — a request is not a cover yet. */
     public function coversBookedToday(): int
     {
         return (int) Reservation::whereDate('booking_date', today())
@@ -135,23 +115,17 @@ class ReportService
             ->sum('party_size');
     }
 
-    /** Widget 6. Links to */
     public function pendingReservationRequests(): int
     {
         return Reservation::where('status', ReservationStatus::Requested)->count();
     }
 
-    /** Widget 7. Open = not yet resolved either way, so requested and processing both count. */
     public function openRefundRequests(): int
     {
         return Refund::whereIn('status', [RefundStatus::Requested, RefundStatus::Processing])->count();
     }
 
     /**
-     * Widget 8. Hidden feedback is left out: it is hidden because it was
-     * abusive or spam, and counting it would distort the venue's own
-     * quality signal. the report carries the hidden count separately.
-     *
      * @return array{food:?float, service:?float, count:int}
      */
     public function averageRating(int $days = 30): array
@@ -174,11 +148,6 @@ class ReportService
     }
 
     /**
-     * Widget 9. Every hour of today, zero-filled, so the bar chart has no
-     * gaps where nothing sold. Grouped in PHP rather than with `HOUR()`:
-     * that function does not exist on SQLite, which the test suite runs on,
-     * and a day of orders is a small enough set to group in memory.
-     *
      * @return array<int, array{hour:int, amount:float}>
      */
     public function salesByHourToday(): array
@@ -197,10 +166,6 @@ class ReportService
     }
 
     /**
-     * Widget 10. Zero-filled again — a closed day is a real zero, not a
-     * missing point the chart should interpolate over. Grouped in PHP for
-     * the same portability reason as widget 9 (`DATE()` vs SQLite).
-     *
      * @return array<int, array{date:string, amount:float}>
      */
     public function salesTrend(int $days = 7): array
@@ -223,9 +188,6 @@ class ReportService
     }
 
     /**
-     * Widget 11. Today's orders by status, every status present so the bars
-     * keep their order and colour between refreshes.
-     *
      * @return array<string, int>
      */
     public function ordersByStatusToday(): array
@@ -243,12 +205,6 @@ class ReportService
     }
 
     /**
-     * Widget 12. The five signals 08.5 names, each as a count plus the rows
-     * behind it. Definitions are borrowed from the screens that already own
-     * them so the dashboard and the floor never disagree: cash waiting is
-     * `FloorController`'s pending cash payment, T−30 is
-     * `Staff\Floor\ReservationController`'s window.
-     *
      * @return array<string, mixed>
      */
     public function needsAttention(): array
@@ -299,10 +255,6 @@ class ReportService
     }
 
     /**
-     * Widget 13. Quantity and revenue from the line snapshots, not
-     * from today's menu prices — a sale price that ended at noon must not
-     * repost the morning's takings.
-     *
      * @return array<int, array<string, mixed>>
      */
     public function topItemsToday(int $limit = 5): array
@@ -330,10 +282,6 @@ class ReportService
     }
 
     /**
-     * Widget 14. Two different problems in one list: switched off by hand,
-     * or close enough to the daily limit that QR checkout is about
-     * to start refusing it (the buffer, doubled).
-     *
      * @return array<int, array<string, mixed>>
      */
     public function lowStock(): array
@@ -355,7 +303,6 @@ class ReportService
             ->all();
     }
 
-    /** Widget 15. */
     public function latestFeedback(int $limit = 5): Collection
     {
         return Feedback::with(['customer', 'order'])
@@ -364,7 +311,9 @@ class ReportService
             ->get();
     }
 
-    /** @return Builder<Order> */
+    /**
+     * @return Builder<Order>
+     */
     private function paidToday()
     {
         return Order::whereNotNull('paid_at')
@@ -388,9 +337,6 @@ class ReportService
     }
 
     /**
-     * the window, as `Staff\Floor\ReservationController` defines it: a
-     * booking with no open visit, between 30 minutes before and 15 after.
-     *
      * @return Collection<int, Reservation>
      */
     private function unassignedBookingsInsideT30(): Collection
@@ -409,8 +355,6 @@ class ReportService
     }
 
     /**
-     * Sales Report: Gross, GST, sale discounts, cash adjustments, refunds, net, method split, order source, cash by staff.
-     *
      * @return array<string, mixed>
      */
     public function salesReport(Carbon $from, Carbon $to): array
@@ -443,19 +387,16 @@ class ReportService
 
         $net = round($gross - $refunds, 2);
 
-        // Payment method split
         $cashPayments = $payments->where('method', PaymentMethod::Cash);
         $stripePayments = $payments->where('method', PaymentMethod::Stripe);
         $cashTotal = round((float) $cashPayments->sum('amount'), 2);
         $stripeTotal = round((float) $stripePayments->sum('amount'), 2);
 
-        // Order sources (QR / online vs waitstaff taken)
         $qrOrders = $paidOrders->whereNull('taken_by_staff_id');
         $staffOrders = $paidOrders->whereNotNull('taken_by_staff_id');
         $qrTotal = round((float) $qrOrders->sum('total_amount'), 2);
         $staffTotal = round((float) $staffOrders->sum('total_amount'), 2);
 
-        // Cash collected by staff
         $cashByStaff = $cashPayments->groupBy('recorded_by_staff_id')
             ->map(function (Collection $group, $staffId) {
                 $staff = $group->first()?->recordedBy;
@@ -471,7 +412,6 @@ class ReportService
             ->sortByDesc('total')
             ->values();
 
-        // Daily breakdown
         $daily = $payments->groupBy(fn (Payment $p) => $p->paid_at->toDateString())
             ->map(function (Collection $group, string $date) {
                 $dayGross = round((float) $group->sum('amount'), 2);
@@ -518,8 +458,6 @@ class ReportService
     }
 
     /**
-     * Item and Category Report: top/bottom sellers, category sales, sold-out occurrences.
-     *
      * @return array<string, mixed>
      */
     public function itemsReport(Carbon $from, Carbon $to): array
@@ -547,7 +485,6 @@ class ReportService
 
         $topSellers = $byItem->sortByDesc('quantity')->take(10)->values();
 
-        // Bottom sellers among active items
         $activeItems = MenuItem::where('is_active', true)->with('category')->get();
         $bottomSellers = $activeItems->map(function (MenuItem $item) use ($byItem) {
             $sold = $byItem->get($item->item_id);
@@ -564,7 +501,6 @@ class ReportService
             ->take(10)
             ->values();
 
-        // Category breakdown
         $categorySales = $paidOrderItems->groupBy(fn (OrderItem $i) => $i->menuItem?->category?->category_name ?? 'Uncategorised')
             ->map(function (Collection $lines, string $catName) {
                 return [
@@ -576,7 +512,6 @@ class ReportService
             ->sortByDesc('revenue')
             ->values();
 
-        // Sold-out occurrences
         $soldOutItems = MenuItem::where('is_active', true)
             ->where('is_available', false)
             ->with('category')
@@ -603,8 +538,6 @@ class ReportService
     }
 
     /**
-     * Operations Report: peak hours, station prep times, ETA accuracy, table turnover.
-     *
      * @return array<string, mixed>
      */
     public function operationsReport(Carbon $from, Carbon $to): array
@@ -614,7 +547,6 @@ class ReportService
             ->with('items')
             ->get();
 
-        // Peak hours (0 to 23)
         $byHour = $orders->groupBy(fn (Order $o) => (int) $o->placed_at->format('G'));
         $peakHours = collect(range(0, 23))->map(function (int $h) use ($byHour) {
             $group = $byHour->get($h, collect());
@@ -626,7 +558,6 @@ class ReportService
             ];
         })->all();
 
-        // Average prep time per station
         $preparedLines = OrderItem::whereHas('order', fn ($q) => $q
             ->whereNotNull('paid_at')
             ->whereBetween('paid_at', [$from, $to]))
@@ -645,7 +576,6 @@ class ReportService
             ? round((float) $barLines->avg(fn (OrderItem $i) => $i->prepared_at->diffInMinutes($i->order->paid_at)), 1)
             : null;
 
-        // ETA Accuracy
         $kitchenEtaOrders = $orders->filter(fn (Order $o) => $o->kitchen_eta_at !== null && $o->ready_at !== null);
         $kitchenOnTime = $kitchenEtaOrders->isNotEmpty()
             ? round(($kitchenEtaOrders->filter(fn (Order $o) => $o->ready_at <= $o->kitchen_eta_at)->count() / $kitchenEtaOrders->count()) * 100, 1)
@@ -656,7 +586,6 @@ class ReportService
             ? round(($barEtaOrders->filter(fn (Order $o) => $o->ready_at <= $o->bar_eta_at)->count() / $barEtaOrders->count()) * 100, 1)
             : null;
 
-        // Table turnover (completed visits)
         $visits = Visit::whereBetween('created_at', [$from, $to])
             ->whereNotNull('opened_at')
             ->whereNotNull('closed_at')
@@ -691,8 +620,6 @@ class ReportService
     }
 
     /**
-     * Reservation Report: bookings, covers, approval/decline rate, no-show rate, late cancellations, walk-in visits.
-     *
      * @return array<string, mixed>
      */
     public function reservationsReport(Carbon $from, Carbon $to): array
@@ -761,8 +688,6 @@ class ReportService
     }
 
     /**
-     * Feedback Report: averages, trends, distribution, hidden count.
-     *
      * @return array<string, mixed>
      */
     public function feedbackReport(Carbon $from, Carbon $to): array
@@ -813,8 +738,6 @@ class ReportService
     }
 
     /**
-     * Staff Activity Report: cash payments, adjustments, refund requests, toggles, overrides per staff.
-     *
      * @return array<string, mixed>
      */
     public function staffActivityReport(Carbon $from, Carbon $to): array
@@ -864,9 +787,6 @@ class ReportService
         ];
     }
 
-    /**
-     * Export report as formatted CSV string.
-     */
     public function exportCsv(string $type, Carbon $from, Carbon $to): string
     {
         $handle = fopen('php://temp', 'r+');
@@ -914,9 +834,6 @@ class ReportService
         return (string) $content;
     }
 
-    /**
-     * Export report as PDF binary string.
-     */
     public function exportPdf(string $type, Carbon $from, Carbon $to): string
     {
         $data = match ($type) {
@@ -1114,8 +1031,6 @@ class ReportService
     }
 
     /**
-     * AI Usage Report: requests, tokens, and success/busy rate from audit_log ai_request entries.
-     *
      * @return array<string, mixed>
      */
     public function aiReport(Carbon $from, Carbon $to): array
@@ -1137,7 +1052,6 @@ class ReportService
         $successCount = $totalRequests - $busyCount;
         $successRate = $totalRequests > 0 ? round(($successCount / $totalRequests) * 100, 1) : 100.0;
 
-        // By feature (chat vs meal_builder)
         $chatLogs = $logs->filter(fn (AuditLog $l) => ($l->details['feature'] ?? 'chat') === 'chat');
         $mealLogs = $logs->filter(fn (AuditLog $l) => ($l->details['feature'] ?? '') === 'meal_builder');
 

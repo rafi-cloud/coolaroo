@@ -33,7 +33,7 @@ class SettingSeeder extends Seeder
             ['public_rating_min_count', 'int', '10'],
             ['call_waiter_cooldown_seconds', 'int', '120'],
             ['staff_session_timeout_minutes', 'int', '30'],
-            ['closed_weekdays', 'string', '1'],
+            ['closed_weekdays', 'string', ''],
             ['reservation_max_days_ahead', 'int', '60'],
             ['venue_name', 'string', 'Coolaroo Restaurant & Bistro'],
             ['venue_address', 'string', 'xxx Sydney Road, Coolaroo VIC 3048'],
@@ -50,11 +50,10 @@ class SettingSeeder extends Seeder
         ];
 
         foreach ($settings as [$key, $type, $value]) {
-            Setting::create([
-                'setting_key' => $key,
-                'setting_value' => $value,
-                'value_type' => $type,
-            ]);
+            Setting::updateOrCreate(
+                ['setting_key' => $key],
+                ['setting_value' => $value, 'value_type' => $type],
+            );
         }
     }
 }

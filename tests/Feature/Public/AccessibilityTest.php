@@ -88,19 +88,15 @@ class AccessibilityTest extends TestCase
         $styleCss = file_get_contents(public_path('css/style.css'));
         $dashboardCss = file_get_contents(public_path('css/dashboard.css'));
 
-        // High contrast focus-visible outlines (WCAG 2.1 AA Non-text Contrast)
         $this->assertStringContainsString(':focus-visible{outline:2.5px solid var(--orange-dark)', $styleCss);
         $this->assertStringContainsString(':focus-visible{outline:2.5px solid var(--orange-dark)', $dashboardCss);
 
-        // Skip link styling
         $this->assertStringContainsString('.skip-link', $styleCss);
         $this->assertStringContainsString('.skip-link:focus', $styleCss);
 
-        // Touch targets (min 44px)
         $this->assertStringContainsString('min-height:44px', $styleCss);
         $this->assertStringContainsString('min-height:44px', $dashboardCss);
 
-        // Reduced motion support
         $this->assertStringContainsString('prefers-reduced-motion:reduce', $styleCss);
         $this->assertStringContainsString('prefers-reduced-motion:reduce', $dashboardCss);
     }

@@ -37,7 +37,6 @@ class ReservationEmailsTest extends TestCase
         parent::setUp();
         $this->seed(SettingSeeder::class);
 
-        // Fixed test time: Tuesday 22 Sep 2026 12:00:00 (Tuesday is an open day)
         Carbon::setTestNow(Carbon::parse('2026-09-22 12:00:00', 'Australia/Melbourne'));
 
         $this->service = app(ReservationService::class);
@@ -225,7 +224,6 @@ class ReservationEmailsTest extends TestCase
             return $mail->hasTo('john.wick@example.com');
         });
 
-        // Calling a second time should not duplicate
         $second = $this->service->sendReminder($reservation);
         $this->assertFalse($second);
     }

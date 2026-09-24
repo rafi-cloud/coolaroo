@@ -8,11 +8,6 @@ use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * T219, NFR08. Proof that the strict-loading guard in AppServiceProvider is on
- * outside production — without this, a passing suite says nothing about N+1,
- * because a silently disabled guard also passes.
- */
 class LazyLoadingGuardTest extends TestCase
 {
     use RefreshDatabase;
@@ -23,8 +18,6 @@ class LazyLoadingGuardTest extends TestCase
 
         Order::factory()->count(2)->create();
 
-        // The guard only arms models hydrated from a multi-row result, because
-        // one model loading one relation is one extra query, not an N+1.
         $orders = Order::query()->get();
 
         $this->expectException(LazyLoadingViolationException::class);

@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Visit extends Model
 {
-    /** @use HasFactory<VisitFactory> */
+    /**
+     * @use HasFactory<VisitFactory>
+     */
     use HasFactory;
 
     const UPDATED_AT = null;

@@ -6,9 +6,6 @@ use DateTime;
 use Illuminate\Support\Facades\Blade;
 use Tests\TestCase;
 
-/**
- * NFR13: timezone, AUD currency helper, Australian date format.
- */
 class LocalisationTest extends TestCase
 {
     public function test_app_timezone_is_australia_melbourne(): void

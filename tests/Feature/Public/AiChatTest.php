@@ -24,7 +24,9 @@ class AiChatTest extends TestCase
         $this->seed(SettingSeeder::class);
     }
 
-    /** @param array<string, mixed> $payload */
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     private function fakeAnswer(array $payload): void
     {
         Http::fake([
@@ -61,7 +63,6 @@ class AiChatTest extends TestCase
         $this->assertNull($log->customer_id);
     }
 
-    /** BR47: an id the live menu does not have never reaches the guest. */
     public function test_it_drops_item_ids_that_are_not_on_the_live_menu(): void
     {
         $item = MenuItem::factory()->create(['item_name' => 'Garden Salad']);
@@ -90,7 +91,6 @@ class AiChatTest extends TestCase
         Http::assertNothingSent();
     }
 
-    /** BR49: ai_enabled = 0 hides the assistant, endpoint included. */
     public function test_it_is_not_found_when_the_assistant_is_switched_off(): void
     {
         Setting::where('setting_key', 'ai_enabled')->update(['setting_value' => '0']);
@@ -102,7 +102,6 @@ class AiChatTest extends TestCase
         Http::assertNothingSent();
     }
 
-    /** BR49: a provider limit surfaces as 'assistant busy', not a stack trace. */
     public function test_a_provider_rate_limit_returns_the_busy_response(): void
     {
         Http::fake(['*' => Http::response([], 429)]);
@@ -110,5 +109,63 @@ class AiChatTest extends TestCase
         $this->postJson(route('ai.chat'), ['message' => 'Hi'])->assertStatus(503);
 
         $this->assertSame(0, AuditLog::where('action_type', 'ai_request')->count());
+    }
+
+    public function test_a_repeated_question_is_served_from_cache_without_a_second_call(): void
+    {
+        MenuItem::factory()->create(['item_name' => 'Garden Salad']);
+
+        $this->fakeAnswer(['answer' => 'Yes, several.', 'off_topic' => false, 'item_ids' => []]);
+
+        $this->postJson(route('ai.chat'), ['message' => 'Do you have gluten-free dishes?'])->assertOk();
+        Http::assertSentCount(1);
+
+        $this->postJson(route('ai.chat'), ['message' => '  Do you have GLUTEN-FREE dishes?  '])
+            ->assertOk()
+            ->assertJson(['answer' => 'Yes, several.']);
+
+        Http::assertSentCount(1);
+    }
+
+    public function test_a_cached_answer_records_zero_token_usage(): void
+    {
+        $this->fakeAnswer(['answer' => 'Yes, several.', 'off_topic' => false, 'item_ids' => []]);
+
+        $this->postJson(route('ai.chat'), ['message' => 'Do you have gluten-free dishes?'])->assertOk();
+        $this->postJson(route('ai.chat'), ['message' => 'Do you have gluten-free dishes?'])->assertOk();
+
+        $logs = AuditLog::where('action_type', 'ai_request')->orderBy('log_id')->get();
+
+        $this->assertSame(1200, $logs[0]->details['tokens_in']);
+        $this->assertSame(0, $logs[1]->details['tokens_in']);
+        $this->assertSame(0, $logs[1]->details['tokens_out']);
+    }
+
+    public function test_a_menu_change_invalidates_the_cached_answer(): void
+    {
+        $this->fakeAnswer(['answer' => 'Yes, several.', 'off_topic' => false, 'item_ids' => []]);
+
+        $this->postJson(route('ai.chat'), ['message' => 'Do you have gluten-free dishes?'])->assertOk();
+        Http::assertSentCount(1);
+
+        MenuItem::factory()->create(['item_name' => 'New Dish']);
+
+        $this->postJson(route('ai.chat'), ['message' => 'Do you have gluten-free dishes?'])->assertOk();
+        Http::assertSentCount(2);
+    }
+
+    public function test_a_follow_up_with_history_is_never_served_from_cache(): void
+    {
+        $this->fakeAnswer(['answer' => 'Yes, several.', 'off_topic' => false, 'item_ids' => []]);
+
+        $history = [
+            ['role' => 'user', 'content' => 'Tell me about the salad'],
+            ['role' => 'assistant', 'content' => 'It is vegetarian.'],
+        ];
+
+        $this->postJson(route('ai.chat'), ['message' => 'Is it vegan?', 'history' => $history])->assertOk();
+        $this->postJson(route('ai.chat'), ['message' => 'Is it vegan?', 'history' => $history])->assertOk();
+
+        Http::assertSentCount(2);
     }
 }

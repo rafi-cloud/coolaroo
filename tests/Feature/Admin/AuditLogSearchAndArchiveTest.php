@@ -115,7 +115,6 @@ class AuditLogSearchAndArchiveTest extends TestCase
             'logged_at' => now(),
         ]);
 
-        // Filter by action type
         $resAction = $this->actingAs($this->admin, 'staff')
             ->get(route('admin.audit-log.index', ['action_type' => 'feedback_hide']));
 
@@ -123,7 +122,6 @@ class AuditLogSearchAndArchiveTest extends TestCase
         $resAction->assertSee('Profanity in review');
         $resAction->assertDontSee('Price increase on Steak');
 
-        // Filter by entity name
         $resEntity = $this->actingAs($this->admin, 'staff')
             ->get(route('admin.audit-log.index', ['entity_name' => 'menu_item']));
 
@@ -131,7 +129,6 @@ class AuditLogSearchAndArchiveTest extends TestCase
         $resEntity->assertSee('Price increase on Steak');
         $resEntity->assertDontSee('Profanity in review');
 
-        // Search filter
         $resSearch = $this->actingAs($this->admin, 'staff')
             ->get(route('admin.audit-log.index', ['search' => 'Steak']));
 
@@ -213,7 +210,6 @@ class AuditLogSearchAndArchiveTest extends TestCase
             'archived_at' => now(),
         ]);
 
-        // Filter by entity
         $resEntity = $this->actingAs($this->admin, 'staff')
             ->get(route('admin.archive.index', ['entity_name' => 'staff']));
 
@@ -221,7 +217,6 @@ class AuditLogSearchAndArchiveTest extends TestCase
         $resEntity->assertSee('Former Employee');
         $resEntity->assertDontSee('Classic Margherita');
 
-        // Search by query
         $resSearch = $this->actingAs($this->admin, 'staff')
             ->get(route('admin.archive.index', ['search' => 'Margherita']));
 

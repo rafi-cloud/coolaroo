@@ -15,7 +15,6 @@ class StockServiceTest extends TestCase
     {
         $item = MenuItem::factory()->create(['daily_limit' => 100, 'sold_today' => 50]);
 
-        // 100 - 50 = 50 remaining, buffer 5 x qty 2 = 10 needed.
         $this->assertTrue(app(StockService::class)->hasQrStock($item, 2));
     }
 
@@ -23,7 +22,6 @@ class StockServiceTest extends TestCase
     {
         $item = MenuItem::factory()->create(['daily_limit' => 100, 'sold_today' => 97]);
 
-        // 100 - 97 = 3 remaining, buffer 5 x qty 1 = 5 needed.
         $this->assertFalse(app(StockService::class)->hasQrStock($item, 1));
     }
 

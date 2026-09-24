@@ -135,7 +135,6 @@ class AiMenuServiceTest extends TestCase
         $this->assertSame(15.0, $context['items'][0]['price']);
     }
 
-    /** BR47: the model can only return ids it was given. */
     public function test_build_context_exposes_size_and_option_ids(): void
     {
         $this->seed(SettingSeeder::class);
@@ -177,7 +176,6 @@ class AiMenuServiceTest extends TestCase
         $this->assertStringContainsString('cannot place, change, pay for or cancel an order', $prompt);
     }
 
-    /** BR47: the schemas are strict, and no line carries a price the server should own. */
     public function test_response_formats_are_strict_json_schemas_without_price_fields(): void
     {
         $service = app(AiMenuService::class);
@@ -201,7 +199,6 @@ class AiMenuServiceTest extends TestCase
         $this->assertStringNotContainsString('total', json_encode($builder));
     }
 
-    /** BR48: the decline is this app's fixed wording, not the model's. */
     public function test_off_topic_guard_replaces_the_answer_and_drops_referenced_items(): void
     {
         $service = app(AiMenuService::class);
@@ -229,11 +226,6 @@ class AiMenuServiceTest extends TestCase
         $this->assertSame($onTopic, $service->applyOffTopicGuard($onTopic));
     }
 
-    /**
-     * 07.9's "under 8K tokens" budget, checked with the commonly-cited
-     * ~4 characters/token approximation — no real tokenizer is installed,
-     * and this is not an exact count.
-     */
     public function test_build_context_stays_under_the_token_budget_for_a_realistic_menu(): void
     {
         $this->seed(SettingSeeder::class);

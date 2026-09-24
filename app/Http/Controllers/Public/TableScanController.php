@@ -12,11 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
-/**
- * The 'signed' middleware
- * proves we issued the URL; the qr_token comparison below is what makes
- * the "regenerating invalidates the old QR" actually true.
- */
 class TableScanController extends Controller
 {
     public function __construct(
@@ -44,11 +39,6 @@ class TableScanController extends Controller
 
         $reservation = $this->reservations->assignedReservation($table);
 
-        // BR03/FR69: the holder's own scan seats them. This is deliberately not
-        // gated on the table already reading Reserved — that only happens once
-        // the T-30 sweep has run, and a holder arriving before it would
-        // otherwise walk in as an anonymous diner and leave their booking
-        // Confirmed with the floor none the wiser.
         if ($reservation !== null && $this->reservations->isHolderWithinWindow($reservation, $customer)) {
             $this->reservations->seatOnHolderScan($table, $reservation);
         } elseif ($table->status === TableStatus::Reserved) {
@@ -75,7 +65,6 @@ class TableScanController extends Controller
         return $this->enterOrdering($request, $table);
     }
 
-    /** the cart belongs to one table; switching clears it. */
     public function switchTable(Request $request, RestaurantTable $table): RedirectResponse
     {
         abort_unless(

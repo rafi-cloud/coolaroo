@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Refund extends Model
 {
-    /** @use HasFactory<RefundFactory> */
+    /**
+     * @use HasFactory<RefundFactory>
+     */
     use HasFactory;
 
     protected $table = 'refund';
@@ -59,7 +61,6 @@ class Refund extends Model
         return $this->belongsTo(Customer::class, 'requested_by_customer_id', 'customer_id');
     }
 
-    /** BR27: exactly one of the two requesters is set, so screens can name whoever asked. */
     public function requesterName(): string
     {
         return $this->requestedBy?->full_name

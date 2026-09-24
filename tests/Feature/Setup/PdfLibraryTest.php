@@ -5,10 +5,6 @@ namespace Tests\Feature\Setup;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Tests\TestCase;
 
-/**
- * T214: proves dompdf renders a real PDF in this environment (no GD needed —
- * default pdf_backend is dompdf's own CPDF renderer, confirmed in the guide).
- */
 class PdfLibraryTest extends TestCase
 {
     public function test_dompdf_renders_html_to_a_real_pdf(): void

@@ -21,7 +21,9 @@ class AiMealBuilderTest extends TestCase
         $this->seed(SettingSeeder::class);
     }
 
-    /** @param array<string, mixed> $payload */
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     private function fakeSuggestions(array $payload): void
     {
         Http::fake([
@@ -72,7 +74,6 @@ class AiMealBuilderTest extends TestCase
         $this->assertSame(1500, $log->details['tokens_in']);
     }
 
-    /** FR44, TC-UC09-02: the budget is enforced against our own arithmetic. */
     public function test_it_drops_a_suggestion_that_busts_the_budget_once_repriced(): void
     {
         $item = MenuItem::factory()->create();
@@ -93,7 +94,6 @@ class AiMealBuilderTest extends TestCase
             ->assertJsonCount(0, 'suggestions');
     }
 
-    /** BR47: a size that belongs to another item makes the meal unorderable. */
     public function test_it_drops_a_suggestion_whose_line_uses_a_size_from_another_item(): void
     {
         $item = MenuItem::factory()->create();
@@ -117,7 +117,6 @@ class AiMealBuilderTest extends TestCase
             ->assertJsonCount(0, 'suggestions');
     }
 
-    /** BR49: Add to cart only in table context. */
     public function test_add_to_cart_is_offered_only_in_table_context(): void
     {
         $item = MenuItem::factory()->create();

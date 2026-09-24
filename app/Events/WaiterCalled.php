@@ -10,14 +10,15 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** Floor alert — live only, nothing is persisted. */
 class WaiterCalled implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public function __construct(public RestaurantTable $table) {}
 
-    /** @return array<int, PrivateChannel> */
+    /**
+     * @return array<int, PrivateChannel>
+     */
     public function broadcastOn(): array
     {
         return [new PrivateChannel('floor')];

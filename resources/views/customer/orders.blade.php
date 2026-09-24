@@ -2,6 +2,16 @@
   <div class="wrap customer-container" data-testid="orders-page">
     <x-customer.nav-tabs active="orders" />
 
+    @if (session('status') === 'refund-requested')
+      <div class="auth-error auth-success" role="status" data-testid="refund-requested-notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
+        <div>
+          <strong>Refund requested</strong>
+          <span>A manager will review it and be in touch. You can follow it below.</span>
+        </div>
+      </div>
+    @endif
+
     <div class="customer-page-header">
       <div>
         <h1>My orders</h1>
@@ -32,8 +42,17 @@
               </div>
               <div class="order-badges">
                 <x-site.order-status-badge :status="$order->status" />
-                @if ($order->refunds->isNotEmpty())
+                @php
+                  $refundPending = $order->refunds
+                    ->whereIn('status', [\App\Enums\RefundStatus::Requested, \App\Enums\RefundStatus::Processing])
+                    ->isNotEmpty();
+                @endphp
+                @if ($order->payment_status === \App\Enums\PaymentStatus::Refunded)
                   <span class="order-badge-refund" data-testid="order-refund-badge-{{ $order->order_id }}">Refunded</span>
+                @elseif ($order->payment_status === \App\Enums\PaymentStatus::PartiallyRefunded)
+                  <span class="order-badge-refund" data-testid="order-refund-badge-{{ $order->order_id }}">Partly refunded</span>
+                @elseif ($refundPending)
+                  <span class="order-badge-refund-pending" data-testid="order-refund-badge-{{ $order->order_id }}">Refund requested</span>
                 @endif
               </div>
             </div>
@@ -53,6 +72,15 @@
               </div>
             </div>
 
+            @if ($order->refunds->isNotEmpty())
+              <div class="order-refunds" data-testid="order-refunds-{{ $order->order_id }}">
+                <h3 class="order-refunds-title">Refund requests</h3>
+                @foreach ($order->refunds as $refund)
+                  <x-customer.refund-status :refund="$refund" />
+                @endforeach
+              </div>
+            @endif
+
             <div class="order-card-actions">
               <a href="{{ route('orders.show', $order) }}" class="btn btn-outline btn-sm" data-testid="view-order-{{ $order->order_id }}">
                 View order status &rarr;
@@ -63,13 +91,17 @@
                   Download receipt (PDF)
                 </a>
               @endif
-              @if (($refundable[$order->order_id] ?? false))
-                <a href="{{ route('orders.show', $order) }}#request-refund" class="btn btn-sm btn-subtle" data-testid="refund-order-{{ $order->order_id }}">
+              @if ($refundableLines[$order->order_id]->isNotEmpty())
+                <button type="button" class="btn btn-sm btn-subtle" data-open-modal="refund-modal-{{ $order->order_id }}" data-testid="refund-order-{{ $order->order_id }}">
                   Request a refund
-                </a>
+                </button>
               @endif
             </div>
           </div>
+
+          @if ($refundableLines[$order->order_id]->isNotEmpty())
+            <x-refund-request :order="$order" :lines="$refundableLines[$order->order_id]" />
+          @endif
         @endforeach
       </div>
 

@@ -6,10 +6,6 @@ use App\Models\AddOnGroup;
 use App\Models\AddOnOption;
 use App\Models\MenuItem;
 
-/**
- * Groups/options are tightly coupled and each method is a thin
- * passthrough — one service, not one per entity ('s guide).
- */
 class AddOnService
 {
     public function __construct(private AuditLogger $auditLogger) {}

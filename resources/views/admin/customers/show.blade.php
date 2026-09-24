@@ -32,8 +32,7 @@
         </div>
       </div>
 
-      <!-- Trust Profile Box -->
-      @php
+            @php
         $badgeClass = match ($profile['badge']) {
             'Flagged' => 'badge-flagged',
             'Regular' => 'badge-regular',
@@ -71,8 +70,7 @@
       </div>
     </div>
 
-    <!-- Reservation history -->
-    <h3 style="margin-bottom:0.8rem">Reservation history</h3>
+        <h3 style="margin-bottom:0.8rem">Reservation history</h3>
     <div class="table-scroll">
       <table class="table" data-testid="admin-customer-reservations-table">
         <thead>

@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Payment extends Model
 {
-    /** @use HasFactory<PaymentFactory> */
+    /**
+     * @use HasFactory<PaymentFactory>
+     */
     use HasFactory;
 
     const UPDATED_AT = null;

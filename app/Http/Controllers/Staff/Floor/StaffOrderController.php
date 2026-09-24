@@ -27,10 +27,6 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Stripe\Exception\ApiErrorException;
 
-/**
- * the Stripe-QR half, the staff Check-payment button, and
- * the table/cart/checkout half (index/store).
- */
 class StaffOrderController extends Controller
 {
     public function __construct(
@@ -40,7 +36,6 @@ class StaffOrderController extends Controller
         private CashPaymentService $cashPayments,
     ) {}
 
-    /** One route, two states — 07.6 lists no separate "order created" URI. */
     public function index(RestaurantTable $table): View
     {
         Gate::authorize('take', Order::class);
@@ -62,7 +57,6 @@ class StaffOrderController extends Controller
         ]);
     }
 
-    /** exact stock check, taken_by_staff_id, no customer account. */
     public function store(StaffOrderRequest $request, RestaurantTable $table): RedirectResponse
     {
         Gate::authorize('take', Order::class);
@@ -167,7 +161,6 @@ class StaffOrderController extends Controller
             ->first();
     }
 
-    /** active, available items with at least one active size. */
     private function orderableItems(): Collection
     {
         return MenuItem::where('is_active', true)

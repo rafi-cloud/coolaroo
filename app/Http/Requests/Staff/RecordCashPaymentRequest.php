@@ -13,7 +13,9 @@ class RecordCashPaymentRequest extends FormRequest
         return true;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -24,7 +26,6 @@ class RecordCashPaymentRequest extends FormRequest
         ];
     }
 
-    /** category and note become mandatory only once an adjustment is actually given. */
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {

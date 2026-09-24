@@ -8,6 +8,8 @@ use Illuminate\Database\Seeder;
 
 class StaffSeeder extends Seeder
 {
+    public const PASSWORD = 'Hello@123';
+
     public function run(): void
     {
         $accounts = [
@@ -18,12 +20,14 @@ class StaffSeeder extends Seeder
         ];
 
         foreach ($accounts as $account) {
-            Staff::create([
-                'role_id' => Role::where('role_name', $account['role_name'])->value('role_id'),
-                'email' => $account['email'],
-                'password_hash' => 'password',
-                'full_name' => $account['full_name'],
-            ]);
+            Staff::updateOrCreate(
+                ['email' => $account['email']],
+                [
+                    'role_id' => Role::where('role_name', $account['role_name'])->value('role_id'),
+                    'password_hash' => self::PASSWORD,
+                    'full_name' => $account['full_name'],
+                ]
+            );
         }
     }
 }

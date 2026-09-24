@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('password_hash', 255);
             $table->string('full_name', 100);
             $table->string('phone', 20)->nullable();
-            $table->boolean('is_active')->default(true); // false = deactivated, login refused
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->dateTime('last_login_at')->nullable();
             $table->dateTime('created_at')->useCurrent();

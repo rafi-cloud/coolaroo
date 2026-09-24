@@ -9,10 +9,6 @@ use App\Models\Payment;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Collection;
 
-/**
- * Assembles the receipt data (lines, sale discounts, the succeeded
- * payment's method/rounding/adjustment, completed refunds) and renders it.
- */
 class ReceiptService
 {
     public function pdf(Order $order): string
@@ -20,7 +16,9 @@ class ReceiptService
         return Pdf::loadView('pdf.receipt', $this->data($order))->output();
     }
 
-    /** @return array{order: Order, lines: Collection, payment: ?Payment, refunds: Collection} */
+    /**
+     * @return array{order: Order, lines: Collection, payment: ?Payment, refunds: Collection}
+     */
     public function data(Order $order): array
     {
         $order->loadMissing(['items', 'restaurantTable']);

@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class MenuItemDietaryTag extends Pivot
 {
-    /** @use HasFactory<MenuItemDietaryTagFactory> */
+    /**
+     * @use HasFactory<MenuItemDietaryTagFactory>
+     */
     use HasFactory;
 
     protected $table = 'menu_item_dietary_tag';

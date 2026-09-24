@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Feedback extends Model
 {
-    /** @use HasFactory<FeedbackFactory> */
+    /**
+     * @use HasFactory<FeedbackFactory>
+     */
     use HasFactory;
 
     protected $table = 'feedback';
@@ -37,10 +39,6 @@ class Feedback extends Model
         return $this->belongsTo(Order::class, 'order_id', 'order_id');
     }
 
-    /**
-     * How a reviewer is named in public: first name and last initial, never
-     * the full name (BR45). Falls back to "Diner" when no account is linked.
-     */
     public function publicAuthor(): string
     {
         $parts = preg_split('/\s+/', trim((string) $this->customer?->full_name), -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -55,7 +53,6 @@ class Feedback extends Model
         return trim($first.' '.$last);
     }
 
-    /** The two ratings as one 1–5 figure, for a single star row. */
     public function averageRating(): int
     {
         return (int) round(((int) $this->food_rating + (int) $this->service_rating) / 2);

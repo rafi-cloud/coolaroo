@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AddOnOption extends Model
 {
-    /** @use HasFactory<AddOnOptionFactory> */
+    /**
+     * @use HasFactory<AddOnOptionFactory>
+     */
     use HasFactory;
 
     protected $table = 'add_on_option';

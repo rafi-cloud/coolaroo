@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DietaryTag extends Model
 {
-    /** @use HasFactory<DietaryTagFactory> */
+    /**
+     * @use HasFactory<DietaryTagFactory>
+     */
     use HasFactory;
 
     protected $table = 'dietary_tag';

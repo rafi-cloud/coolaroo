@@ -78,7 +78,6 @@ class FeedbackTest extends TestCase
             ->assertForbidden();
     }
 
-    /** BR53: staff-taken orders are not eligible for feedback. */
     public function test_staff_taken_orders_are_not_eligible_for_feedback(): void
     {
         $order = Order::factory()->served()->create([
@@ -98,7 +97,6 @@ class FeedbackTest extends TestCase
             ->assertForbidden();
     }
 
-    /** BR43: one feedback per order. */
     public function test_feedback_cannot_be_submitted_twice(): void
     {
         $order = Order::factory()->served()->create(['customer_id' => $this->customer->customer_id]);

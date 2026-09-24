@@ -9,9 +9,6 @@ use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\ImageManager;
 
-/**
- * Stores and resizes menu item photos.
- */
 class MenuImageService
 {
     private const MAX_WIDTH = 1200;
@@ -40,7 +37,9 @@ class MenuImageService
         }
     }
 
-    /** @return array<int, string> */
+    /**
+     * @return array<int, string>
+     */
     public static function rules(bool $required = true): array
     {
         return [

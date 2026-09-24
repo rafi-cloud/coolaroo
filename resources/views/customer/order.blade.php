@@ -21,14 +21,6 @@
         <span>A staff member will come to collect payment.</span>
       </div>
     </div>
-  @elseif (session('status') === 'refund-requested')
-    <div class="auth-error auth-success" role="status" data-testid="refund-requested-notice">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
-      <div>
-        <strong>Refund requested</strong>
-        <span>A manager will review it and be in touch.</span>
-      </div>
-    </div>
   @elseif (session('status') === 'feedback-submitted')
     <div class="auth-error auth-success" role="status" data-testid="feedback-submitted-notice">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
@@ -64,8 +56,7 @@
   </div>
 
   <div class="order-layout">
-    {{-- Left Column: Tracking Hero Card --}}
-    <div class="order-main-col">
+        <div class="order-main-col">
       <div class="order-track-card">
         <div class="order-track-head">
           <div>
@@ -92,8 +83,7 @@
           </div>
         </div>
 
-        {{-- Status narrative message --}}
-        <div class="order-status-narrative">
+                <div class="order-status-narrative">
           @if ($order->status->value === 'pending_payment')
             @if ($order->hasPendingCashRequest())
               <p class="order-narrative-p" data-testid="order-waiting-cash">Waiting for a staff member to collect your cash payment.</p>
@@ -109,8 +99,7 @@
           @endif
         </div>
 
-        {{-- The Tracking Bar (Timeline) --}}
-        <div class="order-timeline-wrapper">
+                <div class="order-timeline-wrapper">
           <ol class="order-timeline" data-testid="order-timeline">
             @foreach ($timeline as $step)
               <li data-step="{{ $step['step'] }}" class="order-timeline-step @if($step['done']) is-done @endif @if($step['current']) is-current @endif">
@@ -140,8 +129,7 @@
           </ol>
         </div>
 
-        {{-- Order Ready Alert --}}
-        <div class="order-ready-alert" @if($order->status->value !== 'ready') hidden @endif data-ready-alert data-testid="order-ready-alert">
+                <div class="order-ready-alert" @if($order->status->value !== 'ready') hidden @endif data-ready-alert data-testid="order-ready-alert">
           <svg class="order-ready-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="width:24px;height:24px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           <div class="order-ready-text">
             <strong>Your order is ready!</strong>
@@ -149,14 +137,12 @@
           </div>
         </div>
 
-        {{-- Kitchen & Bar Live ETAs --}}
-        <div class="order-etas-grid" data-eta-grid @if (! $kitchenEta && ! $barEta) hidden @endif>
+                <div class="order-etas-grid" data-eta-grid @if (! $kitchenEta && ! $barEta) hidden @endif>
           <div class="order-eta-card" data-testid="order-eta-kitchen" @if (! $kitchenEta) hidden @endif>@if ($kitchenEta)Kitchen: ready between @auTime($kitchenEta['from']) and @auTime($kitchenEta['to'])@endif</div>
           <div class="order-eta-card" data-testid="order-eta-bar" @if (! $barEta) hidden @endif>@if ($barEta)Bar: ready between @auTime($barEta['from']) and @auTime($barEta['to'])@endif</div>
         </div>
 
-        {{-- Pending Payment Action Box --}}
-        @if ($order->status->value === 'pending_payment')
+                @if ($order->status->value === 'pending_payment')
           @if ($order->hasPendingCashRequest())
             <div class="order-pay-actions-box" data-testid="order-cash-waiting">
               <div class="order-pay-actions-prompt">
@@ -194,13 +180,14 @@
           @endif
         @endif
 
-        {{-- FR51: raise a refund request on a paid order, inside the 24-hour window --}}
         @if ($refundableLines->isNotEmpty())
-          <x-refund-request :order="$order" :lines="$refundableLines" />
+          <p class="order-refund-link">
+            Something wrong with this order?
+            <a href="{{ route('orders.index') }}#order-card-{{ $order->order_id }}" data-testid="refund-request-link">Request a refund from My orders &rarr;</a>
+          </p>
         @endif
 
-        {{-- Feedback Section when served --}}
-        @if ($order->status->value === 'served')
+                @if ($order->status->value === 'served')
           <div class="order-feedback-section">
             @if ($order->feedback)
               <div class="order-feedback-done" data-testid="feedback-thanks">
@@ -219,8 +206,7 @@
       </div>
     </div>
 
-    {{-- Right Column: Order Details & Receipt Summary --}}
-    <div class="order-sidebar-col">
+        <div class="order-sidebar-col">
       <div class="order-details-card">
         <div class="order-details-head">
           <h2 class="order-details-title">Items</h2>

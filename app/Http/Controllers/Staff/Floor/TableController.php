@@ -28,10 +28,6 @@ class TableController extends Controller
         return back()->with('status', 'table-seated');
     }
 
-    /**
-     * FR69 from the floor: the same service call S27's Seat button makes, so a
-     * booking seated here opens every table it was assigned, not just this one.
-     */
     public function seatReservation(SeatReservationRequest $request, RestaurantTable $table): RedirectResponse
     {
         $reservation = Reservation::findOrFail($request->validated('reservation_id'));
@@ -43,13 +39,6 @@ class TableController extends Controller
             ->with('message', "Reservation {$reservation->reference_code} seated successfully.");
     }
 
-    /**
-     * FR65 from the floor: pick the table first, then the booking. The table is
-     * added to whatever the booking already holds rather than replacing it, so
-     * a party too big for one table is assigned by repeating this on a second
-     * table — `assignTables()` still applies BR04 and its seats/overlap checks
-     * across the whole set.
-     */
     public function assignReservation(AssignReservationRequest $request, RestaurantTable $table): RedirectResponse
     {
         $reservation = Reservation::findOrFail($request->validated('reservation_id'));
@@ -66,7 +55,6 @@ class TableController extends Controller
             ->with('message', "Table {$table->table_number} given to {$reservation->reference_code}.");
     }
 
-    /** The undo for the above: drop this table, keeping any others the booking holds. */
     public function releaseReservation(AssignReservationRequest $request, RestaurantTable $table): RedirectResponse
     {
         $reservation = Reservation::findOrFail($request->validated('reservation_id'));
@@ -86,7 +74,9 @@ class TableController extends Controller
             ->with('message', "Table {$table->table_number} released from {$reservation->reference_code}.");
     }
 
-    /** @return Collection<int, int> */
+    /**
+     * @return Collection<int, int>
+     */
     private function assignedTableIds(Reservation $reservation): Collection
     {
         return $reservation->visits()

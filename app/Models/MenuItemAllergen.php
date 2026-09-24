@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class MenuItemAllergen extends Pivot
 {
-    /** @use HasFactory<MenuItemAllergenFactory> */
+    /**
+     * @use HasFactory<MenuItemAllergenFactory>
+     */
     use HasFactory;
 
     protected $table = 'menu_item_allergen';

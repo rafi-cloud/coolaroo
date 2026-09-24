@@ -45,8 +45,8 @@ class StaffProfileTest extends TestCase
             'full_name' => $staff->full_name,
             'phone' => $staff->phone,
             'current_password' => 'wrong-password',
-            'password' => 'new-password123',
-            'password_confirmation' => 'new-password123',
+            'password' => 'NewPass@123',
+            'password_confirmation' => 'NewPass@123',
         ]);
 
         $response->assertRedirect('/staff/profile');

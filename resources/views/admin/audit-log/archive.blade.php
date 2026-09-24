@@ -1,7 +1,6 @@
 <x-layouts.admin title="Archived Records" page-title="Historical Data Archives" page-sub="Read-only repository of archived entity snapshots and deactivation audits">
   <div class="card" data-testid="admin-archive-page">
-    {{-- Navigation Tabs: Events vs Archive --}}
-    <nav class="report-nav" aria-label="Audit navigation" style="margin-bottom:1.5rem;" data-testid="admin-audit-tabs">
+        <nav class="report-nav" aria-label="Audit navigation" style="margin-bottom:1.5rem;" data-testid="admin-audit-tabs">
       <a href="{{ route('admin.audit-log.index') }}" class="report-tab" data-testid="admin-audit-tab-events">
         Audit Events
       </a>
@@ -10,10 +9,8 @@
       </a>
     </nav>
 
-    {{-- Filter Form --}}
-    <form method="GET" action="{{ route('admin.archive.index') }}" class="kds-filters" style="margin-bottom:1.5rem; gap:.6rem; flex-wrap:wrap;" data-testid="admin-archive-filter-form">
-      {{-- Entity Dropdown --}}
-      <div>
+        <form method="GET" action="{{ route('admin.archive.index') }}" class="kds-filters" style="margin-bottom:1.5rem; gap:.6rem; flex-wrap:wrap;" data-testid="admin-archive-filter-form">
+            <div>
         <label for="archive-entity-filter" class="sr-only">Entity Type</label>
         <select id="archive-entity-filter" name="entity_name" data-testid="admin-archive-filter-entity" style="padding:.45rem .8rem; font-size:.84rem; border:1px solid var(--line); border-radius:6px; background:var(--white); color:var(--ink);">
           <option value="">All Archived Entities</option>
@@ -25,8 +22,7 @@
         </select>
       </div>
 
-      {{-- Search Input --}}
-      <div style="flex:1; min-width:240px;">
+            <div style="flex:1; min-width:240px;">
         <label for="archive-search-input" class="sr-only">Search</label>
         <input type="text" id="archive-search-input" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search record key or snapshot content..." style="width:100%; padding:.45rem .8rem; font-size:.84rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-archive-search-input">
       </div>
@@ -37,8 +33,7 @@
       @endif
     </form>
 
-    {{-- Archived Records Table --}}
-    <div class="table-scroll">
+        <div class="table-scroll">
       <table class="table" data-testid="admin-archive-table">
         <thead>
           <tr>
@@ -107,8 +102,7 @@
       </table>
     </div>
 
-    {{-- Pagination --}}
-    @if ($archives->hasPages())
+        @if ($archives->hasPages())
       <div style="margin-top:1.5rem;" data-testid="admin-archive-pagination">
         {{ $archives->links() }}
       </div>

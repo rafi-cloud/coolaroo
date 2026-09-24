@@ -6,9 +6,6 @@ use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\Staff;
 
-/**
- * 3.3: reservation rows. Admin passes every method via Gate::before.
- */
 class ReservationPolicy
 {
     public function manage(Staff $staff): bool

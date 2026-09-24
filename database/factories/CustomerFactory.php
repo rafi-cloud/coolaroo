@@ -21,7 +21,7 @@ class CustomerFactory extends Factory
             'full_name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->unique()->numerify('04########'),
-            'password_hash' => 'password',
+            'password_hash' => 'Hello@123',
             'email_verified_at' => now(),
             'is_active' => true,
         ];

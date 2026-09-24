@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-/** provider limit errors and any other AI integration failure. */
 class AiUnavailableException extends HttpException
 {
     public function __construct()

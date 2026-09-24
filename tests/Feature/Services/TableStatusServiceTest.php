@@ -35,7 +35,6 @@ class TableStatusServiceTest extends TestCase
 
         $this->expectException(InvalidTransitionException::class);
 
-        // Available -> Available isn't in TableStatus::transitions() for Available.
         app(TableStatusService::class)->transition($table, TableStatus::Available);
     }
 
@@ -70,7 +69,6 @@ class TableStatusServiceTest extends TestCase
         app(TableStatusService::class)->clearTable($table);
     }
 
-    /** UC17's own alternate: a walk-in never takes a Reserved table. */
     public function test_a_reserved_table_cannot_be_seated_as_a_walk_in(): void
     {
         $table = RestaurantTable::factory()->create(['status' => TableStatus::Reserved]);
@@ -80,7 +78,6 @@ class TableStatusServiceTest extends TestCase
         app(TableStatusService::class)->seatWalkIn($table, Staff::factory()->create());
     }
 
-    /** BR06: one table with an active order blocks the whole group. */
     public function test_clearing_a_group_is_blocked_if_any_table_has_active_orders(): void
     {
         $clean = RestaurantTable::factory()->create(['status' => TableStatus::Occupied]);
@@ -96,7 +93,6 @@ class TableStatusServiceTest extends TestCase
         }
     }
 
-    /** BR05: a party seated a minute ago has no orders yet and must not be swept. */
     public function test_auto_clear_leaves_a_table_that_was_only_just_occupied(): void
     {
         $justSeated = RestaurantTable::factory()->create(['status' => TableStatus::Occupied]);

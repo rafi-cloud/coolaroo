@@ -16,7 +16,7 @@ class StaffFactory extends Factory
         return [
             'role_id' => Role::factory(),
             'email' => fake()->unique()->safeEmail(),
-            'password_hash' => 'password',
+            'password_hash' => 'Hello@123',
             'full_name' => fake()->name(),
             'phone' => fake()->unique()->numerify('04########'),
             'is_active' => true,

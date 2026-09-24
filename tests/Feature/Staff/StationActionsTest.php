@@ -165,7 +165,6 @@ class StationActionsTest extends TestCase
         Event::assertDispatched(OrderLinesUpdated::class);
     }
 
-    /** FR58: a station may only move its own lines — role:kitchen,bar alone does not enforce that. */
     public function test_bar_staff_cannot_start_kitchen_lines(): void
     {
         $order = $this->kitchenOrder();

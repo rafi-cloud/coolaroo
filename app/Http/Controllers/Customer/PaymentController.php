@@ -17,11 +17,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Stripe\Exception\ApiErrorException;
 
-/**
- * show()/stripe()/return()/check() are
- * the "pay by card" half; cash is the "request cash" half — the
- * actual "record cash payment" is Staff\Floor\CashPaymentController.
- */
 class PaymentController extends Controller
 {
     public function __construct(private StripeService $stripe, private PaymentService $payments) {}
@@ -72,7 +67,6 @@ class PaymentController extends Controller
         return redirect()->away($session->url);
     }
 
-    /** order stays pending_payment; the floor's cash-waiting list is told. */
     public function cash(Order $order): RedirectResponse
     {
         Gate::authorize('pay', $order);
@@ -115,7 +109,6 @@ class PaymentController extends Controller
         return $this->verify($payment, $order);
     }
 
-    /** delegates to PaymentService::verifyStripePayment() — the one shared implementation. */
     private function verify(Payment $payment, Order $order): RedirectResponse
     {
         try {

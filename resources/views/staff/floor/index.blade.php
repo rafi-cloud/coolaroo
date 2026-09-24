@@ -35,61 +35,94 @@
     </ul>
   </section>
 
-  <div class="kds-grid" data-testid="floor-grid">
-    @foreach ($tables as $table)
-      @php($alert = $attention[$table->table_id] ?? null)
-      <article @class([
-                 'kds-card',
-                 'floor-table-card',
-                 'needs-'.($alert['kind'] ?? '') => $alert,
-                 'is-'.$table->status->value => ! $alert,
-               ])
-               data-table-row="{{ $table->table_id }}"
-               data-table-card="{{ $table->table_id }}"
-               data-rendered-status="{{ $table->status->value }}"
-               data-testid="floor-table-{{ $table->table_id }}">
-        <header class="kds-card-head">
-          <div>
-            <strong>Table {{ $table->table_number }}</strong>
-            <span class="muted">{{ $table->section }} &middot; seats {{ $table->seat_capacity }}</span>
+  @php($sections = $tables->groupBy(fn ($t) => $t->section ?: 'Dining'))
+  <div class="floor-sections-container" data-testid="floor-grid">
+    @foreach ($sections as $sectionName => $sectionTables)
+      <section class="floor-section-group" data-section="{{ strtolower($sectionName) }}">
+        <header class="floor-section-header">
+          <div class="floor-section-title-wrap">
+            <h2 class="floor-section-title">
+              @if ($sectionName === 'Dining')
+                <span class="floor-section-icon" aria-hidden="true">🍽️</span>
+                <span>Dining Room</span>
+              @elseif ($sectionName === 'Bar')
+                <span class="floor-section-icon" aria-hidden="true">🍸</span>
+                <span>Bar Tables</span>
+              @else
+                <span class="floor-section-icon" aria-hidden="true">📍</span>
+                <span>{{ $sectionName }}</span>
+              @endif
+            </h2>
+            <span class="floor-section-badge">{{ $sectionTables->count() }} {{ \Illuminate\Support\Str::plural('table', $sectionTables->count()) }}</span>
           </div>
-          <span class="badge b-{{ $table->status->value }}" data-table-status="{{ $table->table_id }}" data-testid="floor-table-status-{{ $table->table_id }}">
-            {{ ucfirst($table->status->value) }}
-          </span>
         </header>
 
-        <p class="floor-table-attention" data-table-attention="{{ $table->table_id }}"
-           data-testid="floor-table-attention-{{ $table->table_id }}" @unless ($alert) hidden @endunless>
-          {{ $alert['label'] ?? '' }}
-        </p>
+        <div class="kds-grid floor-grid">
+          @foreach ($sectionTables as $table)
+            @php($alert = $attention[$table->table_id] ?? null)
+            <article @class([
+                       'kds-card',
+                       'floor-table-card',
+                       'needs-'.($alert['kind'] ?? '') => $alert,
+                       'is-'.$table->status->value => ! $alert,
+                     ])
+                     data-table-row="{{ $table->table_id }}"
+                     data-table-card="{{ $table->table_id }}"
+                     data-rendered-status="{{ $table->status->value }}"
+                     data-testid="floor-table-{{ $table->table_id }}">
+              <header class="floor-card-head">
+                <div class="floor-card-title-group">
+                  <strong class="floor-table-title">Table {{ $table->table_number }}</strong>
+                  <span class="muted floor-table-sub">{{ $table->section }} &middot; {{ $table->seat_capacity }} seats</span>
+                </div>
+                <span class="badge b-{{ $table->status->value }}" data-table-status="{{ $table->table_id }}" data-testid="floor-table-status-{{ $table->table_id }}">
+                  {{ ucfirst($table->status->value) }}
+                </span>
+              </header>
 
-        <p data-table-orders="{{ $table->table_id }}" data-testid="floor-table-orders-{{ $table->table_id }}">
-          {{ $table->active_order_count }} active order(s)
-        </p>
+              <p class="floor-table-attention" data-table-attention="{{ $table->table_id }}"
+                 data-testid="floor-table-attention-{{ $table->table_id }}" @unless ($alert) hidden @endunless>
+                {{ $alert['label'] ?? '' }}
+              </p>
 
-        <div class="floor-table-links">
-          <a href="{{ route('staff.tables.order', $table) }}" class="btn btn-ghost" data-testid="floor-table-order-link-{{ $table->table_id }}">
-            Take order
-          </a>
-          <a href="{{ route('staff.tables.refunds', $table) }}" class="btn btn-ghost" data-testid="floor-table-refund-link-{{ $table->table_id }}">
-            Request a refund
-          </a>
+              <div class="floor-card-meta">
+                <div class="floor-meta-row">
+                  <span class="floor-meta-icon" aria-hidden="true">🧾</span>
+                  <span class="floor-orders-count {{ $table->active_order_count > 0 ? 'has-active' : '' }}" data-table-orders="{{ $table->table_id }}" data-testid="floor-table-orders-{{ $table->table_id }}">
+                    {{ $table->active_order_count }} active order(s)
+                  </span>
+                </div>
+
+                @php($nextVisit = $table->visits->first())
+                @php($nextReservation = $nextVisit?->reservation)
+                <div class="floor-meta-row floor-res-row">
+                  <span class="floor-meta-icon" aria-hidden="true">📅</span>
+                  <span class="floor-reservation-text" data-table-reservation="{{ $table->table_id }}" data-testid="floor-table-reservation-{{ $table->table_id }}">
+                    @if ($nextReservation && $nextVisit->opened_at !== null)
+                      Seated: {{ $nextReservation->reference_code }}, {{ $nextReservation->party_size }} guests
+                    @elseif ($nextReservation)
+                      Next: {{ $nextReservation->reference_code }}, {{ $nextReservation->party_size }} guests, {{ $nextReservation->slot->slot_time }}
+                    @else
+                      No upcoming reservation
+                    @endif
+                  </span>
+                </div>
+              </div>
+
+              <div class="floor-table-links">
+                <a href="{{ route('staff.tables.order', $table) }}" class="btn btn-outline floor-btn-order" data-testid="floor-table-order-link-{{ $table->table_id }}">
+                  Take order
+                </a>
+                <a href="{{ route('staff.tables.refunds', $table) }}" class="btn btn-ghost floor-btn-refund" data-testid="floor-table-refund-link-{{ $table->table_id }}">
+                  Request a refund
+                </a>
+              </div>
+
+              <x-floor.table-drawer :table="$table" :tables="$tables" :assignable="$assignableReservations" />
+            </article>
+          @endforeach
         </div>
-
-        @php($nextVisit = $table->visits->first())
-        @php($nextReservation = $nextVisit?->reservation)
-        <p data-table-reservation="{{ $table->table_id }}" data-testid="floor-table-reservation-{{ $table->table_id }}">
-          @if ($nextReservation && $nextVisit->opened_at !== null)
-            Seated: {{ $nextReservation->reference_code }}, {{ $nextReservation->party_size }} guests
-          @elseif ($nextReservation)
-            Next: {{ $nextReservation->reference_code }}, {{ $nextReservation->party_size }} guests, {{ $nextReservation->slot->slot_time }}
-          @else
-            No upcoming reservation
-          @endif
-        </p>
-
-        <x-floor.table-drawer :table="$table" :tables="$tables" :assignable="$assignableReservations" />
-      </article>
+      </section>
     @endforeach
   </div>
 
@@ -141,11 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Each drawer offers Seat or Clear based on the status the page was rendered
-  // with, and lists the tables that were free or occupied at that moment. None
-  // of that can be patched from the state payload without rebuilding the form,
-  // so a table status change re-renders the page — deferred while a drawer is
-  // open so a waiter is never reloaded mid-action.
   let pendingReload = false;
 
   const reloadWhenIdle = () => {
@@ -210,8 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Rebuild only the derived rows; the ephemeral "waiter called" alerts
-    // floor.js prepends are not in the payload and must survive a refresh.
     const alertList = page.querySelector('[data-floor-alerts]');
     if (alertList) {
       alertList.querySelectorAll('[data-derived-alert]').forEach((row) => row.remove());

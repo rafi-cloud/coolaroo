@@ -12,6 +12,7 @@ import { initFloor } from './floor';
 import { initKds } from './kds';
 import { initMenuLive } from './menu';
 import { initOrderStatus } from './order-status';
+import { initRefundModals } from './refund-modal';
 
 document.addEventListener('DOMContentLoaded', () => {
     initOrderStatus();
@@ -19,4 +20,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initKds();
     initDashboard();
     initMenuLive();
+    initRefundModals();
 });

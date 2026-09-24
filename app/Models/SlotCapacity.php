@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SlotCapacity extends Model
 {
-    /** @use HasFactory<SlotCapacityFactory> */
+    /**
+     * @use HasFactory<SlotCapacityFactory>
+     */
     use HasFactory;
 
     protected $table = 'slot_capacity';

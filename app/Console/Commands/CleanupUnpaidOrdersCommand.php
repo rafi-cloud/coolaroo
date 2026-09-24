@@ -5,10 +5,6 @@ namespace App\Console\Commands;
 use App\Services\OrderService;
 use Illuminate\Console\Command;
 
-/**
- * Scheduled daily at closing_time. Orders carry no timed
- * expiry of their own — this is the only job that cancels them.
- */
 class CleanupUnpaidOrdersCommand extends Command
 {
     protected $signature = 'orders:cleanup-unpaid';

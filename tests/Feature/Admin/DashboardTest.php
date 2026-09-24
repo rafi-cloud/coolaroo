@@ -52,7 +52,6 @@ class DashboardTest extends TestCase
             ->get(route('admin.dashboard'))
             ->assertOk();
 
-        // Check 8 KPI Tiles
         $response->assertSee('data-testid="admin-tile-sales"', false)
             ->assertSee('data-testid="admin-tile-orders"', false)
             ->assertSee('data-testid="admin-tile-aov"', false)
@@ -62,12 +61,10 @@ class DashboardTest extends TestCase
             ->assertSee('data-testid="admin-tile-refunds"', false)
             ->assertSee('data-testid="admin-tile-rating"', false);
 
-        // Check 3 Charts
         $response->assertSee('data-testid="admin-chart-hourly"', false)
             ->assertSee('data-testid="admin-chart-trend"', false)
             ->assertSee('data-testid="admin-chart-status"', false);
 
-        // Check 4 Lists
         $response->assertSee('data-testid="admin-list-attention"', false)
             ->assertSee('data-testid="admin-list-top-items"', false)
             ->assertSee('data-testid="admin-list-low-stock"', false)
@@ -78,7 +75,6 @@ class DashboardTest extends TestCase
     {
         $admin = $this->admin();
 
-        // 1. Paid order with lines
         $table = RestaurantTable::factory()->create(['table_number' => 'T10']);
         $item = MenuItem::factory()->create(['item_name' => 'Signature Burger']);
         $size = $item->sizes()->create(['size_name' => 'Regular', 'price' => 27.00]);
@@ -107,7 +103,6 @@ class DashboardTest extends TestCase
             'paid_at' => now(),
         ]);
 
-        // 2. Reservation today
         $slot = SlotCapacity::factory()->create(['slot_time' => '19:00']);
         Reservation::factory()->create([
             'slot_id' => $slot->slot_id,
@@ -117,7 +112,6 @@ class DashboardTest extends TestCase
             'status' => ReservationStatus::Confirmed,
         ]);
 
-        // 3. Feedback
         Feedback::factory()->create([
             'order_id' => $order->order_id,
             'food_rating' => 5,
@@ -127,7 +121,6 @@ class DashboardTest extends TestCase
             'is_hidden' => false,
         ]);
 
-        // 4. Low stock item
         MenuItem::factory()->create([
             'item_name' => 'Limited Truffle Pasta',
             'is_active' => true,
@@ -138,7 +131,6 @@ class DashboardTest extends TestCase
             ->get(route('admin.dashboard'))
             ->assertOk();
 
-        // Verify dynamic values rendered
         $response->assertSee('$54.00')
             ->assertSee('Signature Burger')
             ->assertSee('Fantastic service!')

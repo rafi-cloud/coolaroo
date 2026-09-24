@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\Auth\RegisterCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class RegisteredCustomerController extends Controller
@@ -29,10 +28,7 @@ class RegisteredCustomerController extends Controller
 
         $customer->sendEmailVerificationNotification();
 
-        Auth::guard('customer')->login($customer);
-
-        $request->session()->regenerate();
-
-        return redirect()->intended('/');
+        return redirect()->route('verification.notice')
+            ->with('verification.email', $customer->email);
     }
 }

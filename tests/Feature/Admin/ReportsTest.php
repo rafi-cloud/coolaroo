@@ -92,7 +92,7 @@ class ReportsTest extends TestCase
 
         $response->assertSee('data-testid="admin-report-sales"', false)
             ->assertSee('$110.00')
-            ->assertSee('$10.00') // GST 110 / 11 = 10
+            ->assertSee('$10.00')
             ->assertSee($admin->name);
     }
 
@@ -156,8 +156,8 @@ class ReportsTest extends TestCase
             ->assertOk();
 
         $response->assertSee('data-testid="admin-report-operations"', false)
-            ->assertSee('80m') // 80 min turnover
-            ->assertSee('100%'); // on time rate
+            ->assertSee('80m')
+            ->assertSee('100%');
     }
 
     public function test_admin_can_view_reservations_report_fr85(): void

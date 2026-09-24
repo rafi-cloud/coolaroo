@@ -159,7 +159,6 @@ class FloorViewTest extends TestCase
         $ready = Order::factory()->create();
         $ready->forceFill(['status' => OrderStatus::Ready])->save();
 
-        // an order awaiting cash is still pending_payment, per FR48
         $cashOrder = Order::factory()->create();
         $cashOrder->forceFill(['status' => OrderStatus::PendingPayment])->save();
         Payment::factory()->create(['order_id' => $cashOrder->order_id, 'method' => PaymentMethod::Cash]);
@@ -181,7 +180,6 @@ class FloorViewTest extends TestCase
             ->assertJsonPath('qr_ordering_paused', true);
     }
 
-    /** N+1 guard for FR16's own "active orders" count. */
     public function test_a_tables_active_order_count_only_counts_active_statuses(): void
     {
         $table = RestaurantTable::factory()->create();

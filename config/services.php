@@ -42,9 +42,10 @@ return [
 
     'ai' => [
         'base_url' => env('AI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta/openai'),
-        'model' => env('AI_MODEL', 'gemini-flash-lite-latest'),
+        'model' => env('AI_MODEL', 'models/gemini-3.5-flash-lite'),
         'api_key' => env('AI_API_KEY'),
-        'timeout' => 20,
+        'timeout' => (int) env('AI_TIMEOUT', 30),
+        'cache_ttl' => (int) env('AI_CACHE_TTL', 86400),
     ],
 
 ];

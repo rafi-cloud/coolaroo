@@ -41,7 +41,6 @@ class HomeTest extends TestCase
         $response->assertSee('data-testid="site-nav-sign-in"', false);
         $response->assertSee('data-testid="site-book-table"', false);
 
-        // The search icon was dropped so the nav fits on one line at 1024px.
         $response->assertDontSee('data-testid="site-search"', false);
     }
 

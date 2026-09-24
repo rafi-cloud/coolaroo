@@ -10,7 +10,9 @@ use Illuminate\Notifications\Notifiable;
 
 class Staff extends Authenticatable
 {
-    /** @use HasFactory<StaffFactory> */
+    /**
+     * @use HasFactory<StaffFactory>
+     */
     use HasFactory, Notifiable;
 
     const UPDATED_AT = null;
@@ -39,10 +41,6 @@ class Staff extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
 
-    /**
-     * Admin clears every role check, so admin sees the shared
-     * staff screens with admin navigation around them.
-     */
     public function isAdmin(): bool
     {
         return $this->role?->role_name === 'admin';

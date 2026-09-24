@@ -13,9 +13,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-/**
- * FR45, FR98, UC35, UC37. AI usage telemetry report and master on/off toggle.
- */
 class AiUsageAndToggleTest extends TestCase
 {
     use RefreshDatabase;
@@ -75,7 +72,6 @@ class AiUsageAndToggleTest extends TestCase
             'full_name' => 'Gordon Ramsay',
         ]);
 
-        // Seed AI request logs
         AuditLog::create([
             'customer_id' => $customer->customer_id,
             'action_type' => 'ai_request',
@@ -114,7 +110,7 @@ class AiUsageAndToggleTest extends TestCase
             ->assertSee('data-testid="admin-report-ai-requests"', false)
             ->assertSee('Gordon Ramsay')
             ->assertSee('500 total tokens billed')
-            ->assertSee('50%'); // 1 success out of 2 requests = 50%
+            ->assertSee('50%');
     }
 
     public function test_admin_can_toggle_ai_on_and_off_fr98(): void
@@ -132,7 +128,6 @@ class AiUsageAndToggleTest extends TestCase
         $settingService->clearCache();
         $this->assertTrue($settingService->getBool('ai_enabled'));
 
-        // Toggle OFF
         $response = $this->actingAs($admin, 'staff')
             ->patch(route('admin.reports.ai.toggle'));
 
@@ -149,7 +144,6 @@ class AiUsageAndToggleTest extends TestCase
             'entity_name' => 'setting',
         ]);
 
-        // Toggle back ON
         $this->actingAs($admin, 'staff')
             ->patch(route('admin.reports.ai.toggle'))
             ->assertRedirect();
@@ -179,7 +173,6 @@ class AiUsageAndToggleTest extends TestCase
             'logged_at' => now(),
         ]);
 
-        // CSV Export
         $csvResponse = $this->actingAs($admin, 'staff')
             ->get(route('admin.reports.export', ['type' => 'ai', 'format' => 'csv']))
             ->assertOk();
@@ -188,7 +181,6 @@ class AiUsageAndToggleTest extends TestCase
         $this->assertStringContainsString('AI Usage Report', $csvResponse->getContent());
         $this->assertStringContainsString('Total AI Requests', $csvResponse->getContent());
 
-        // PDF Export
         $pdfResponse = $this->actingAs($admin, 'staff')
             ->get(route('admin.reports.export', ['type' => 'ai', 'format' => 'pdf']))
             ->assertOk();

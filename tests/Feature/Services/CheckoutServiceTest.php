@@ -46,7 +46,6 @@ class CheckoutServiceTest extends TestCase
         $this->assertEmpty($result['removed']);
     }
 
-    /** BR01: the table is taken when the order is placed, not when it is paid. */
     public function test_placing_an_order_occupies_the_table_and_opens_a_visit(): void
     {
         [$item, $size] = $this->itemWithSize();

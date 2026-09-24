@@ -11,11 +11,6 @@ use App\Services\SettingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * Public on purpose — "available to
- * everyone including visitors, with no app rate limit", so there is no
- * auth middleware and deliberately no throttle on these routes.
- */
 class AiController extends Controller
 {
     public function __construct(

@@ -10,7 +10,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-/** Waitstaff delivers; KitchenService derives whether the whole order is now served. */
 class ServeController extends Controller
 {
     public function __construct(private KitchenService $kitchen) {}

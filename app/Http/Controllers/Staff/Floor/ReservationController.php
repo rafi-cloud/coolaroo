@@ -16,9 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
-/**
- * Staff Floor Reservations Board & Review.
- */
 class ReservationController extends Controller
 {
     public function __construct(
@@ -49,7 +46,6 @@ class ReservationController extends Controller
 
         $reservations = $query->get();
 
-        // Calculate counts for tab filters
         $allDayReservations = Reservation::whereDate('booking_date', $date)->get();
         $counts = [
             'all' => $allDayReservations->count(),
@@ -67,17 +63,14 @@ class ReservationController extends Controller
 
         $isToday = Carbon::parse($date)->isToday();
 
-        // Process each reservation with trust badges and unassigned T-30 alerts
         $reservations->each(function (Reservation $reservation) use ($isToday) {
             $reservation->trust_badge = $this->trustService->badge($reservation->customer);
             $reservation->trust_profile = $this->trustService->profile($reservation->customer);
 
-            // Active (unclosed) assigned tables
             $activeVisits = $reservation->visits->whereNull('closed_at');
             $reservation->assigned_tables = $activeVisits->map(fn ($v) => $v->restaurantTable)->filter();
             $reservation->is_unassigned = $activeVisits->isEmpty();
 
-            // unassigned bookings inside T-30 highlighted
             $bookedAt = $this->reservationService->bookedAt($reservation);
             $insideT30 = now()->betweenIncluded(
                 $bookedAt->copy()->subMinutes(30),
@@ -89,7 +82,6 @@ class ReservationController extends Controller
                 && $insideT30
                 && in_array($reservation->status, [ReservationStatus::Confirmed, ReservationStatus::Requested], true);
 
-            // grace elapsed check
             $graceMinutes = (int) (Setting::find('reservation_grace_minutes')?->setting_value ?? 15);
             $graceCutoff = $bookedAt->copy()->addMinutes($graceMinutes);
             $reservation->is_grace_elapsed = $reservation->status === ReservationStatus::Confirmed && now()->gte($graceCutoff);

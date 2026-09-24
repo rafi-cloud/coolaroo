@@ -36,7 +36,6 @@ class ReservationServiceTest extends TestCase
     {
         parent::setUp();
 
-        // Fix reference time: Tuesday 12:00 Melbourne time
         Carbon::setTestNow(Carbon::parse('2026-09-22 12:00:00', 'Australia/Melbourne'));
 
         $this->service = app(ReservationService::class);
@@ -71,7 +70,7 @@ class ReservationServiceTest extends TestCase
     public function test_customer_can_request_reservation_with_valid_details_and_capacity(): void
     {
         $reservation = $this->service->request($this->customer, [
-            'booking_date' => '2026-09-25', // Friday
+            'booking_date' => '2026-09-25',
             'booking_time' => '18:00',
             'party_size' => 4,
             'special_requests' => 'Window seat please',
@@ -146,7 +145,6 @@ class ReservationServiceTest extends TestCase
 
     public function test_request_blocked_on_closed_weekday(): void
     {
-        // 2026-09-28 is Monday (closed by default)
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('venue is closed on this day');
 
@@ -159,9 +157,8 @@ class ReservationServiceTest extends TestCase
 
     public function test_request_blocked_with_less_than_2_hours_lead_time(): void
     {
-        // Current test time is 12:00 today (2026-09-22)
         $earlySlot = SlotCapacity::factory()->create([
-            'slot_time' => '13:00', // 1 hour away (< 2h min lead time)
+            'slot_time' => '13:00',
             'max_covers' => 20,
             'is_active' => true,
         ]);
@@ -190,7 +187,6 @@ class ReservationServiceTest extends TestCase
 
     public function test_request_blocked_when_slot_has_no_capacity(): void
     {
-        // Slot has max_covers = 20. Fill 18 covers.
         Reservation::factory()->create([
             'slot_id' => $this->slot->slot_id,
             'booking_date' => '2026-09-25',
@@ -201,7 +197,6 @@ class ReservationServiceTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('No availability for the selected time slot');
 
-        // Requesting 4 covers (18 + 4 = 22 > 20)
         $this->service->request($this->customer, [
             'booking_date' => '2026-09-25',
             'slot_id' => $this->slot->slot_id,
@@ -258,7 +253,6 @@ class ReservationServiceTest extends TestCase
 
     public function test_customer_can_cancel_early_without_late_flag(): void
     {
-        // Booking is for Friday 2026-09-25 18:00 (test now is 2026-09-22 12:00, > 2h away)
         $reservation = Reservation::factory()->confirmed()->create([
             'customer_id' => $this->customer->customer_id,
             'slot_id' => $this->slot->slot_id,
@@ -277,7 +271,6 @@ class ReservationServiceTest extends TestCase
 
     public function test_customer_cancelling_within_2_hours_marks_late_cancellation_and_unlinks_tables(): void
     {
-        // Booking is today 2026-09-22 at 13:00 (test now is 12:00, 1 hour away -> late cancellation)
         $slot13 = SlotCapacity::factory()->create(['slot_time' => '13:00', 'max_covers' => 20]);
         $reservation = Reservation::factory()->confirmed()->create([
             'customer_id' => $this->customer->customer_id,
@@ -287,7 +280,6 @@ class ReservationServiceTest extends TestCase
             'party_size' => 2,
         ]);
 
-        // Assign a table to the reservation
         $table = RestaurantTable::factory()->create();
         $table->forceFill(['status' => TableStatus::Reserved])->save();
         $visit = $table->visits()->create([
@@ -301,7 +293,6 @@ class ReservationServiceTest extends TestCase
         $this->assertTrue($cancelled->is_late_cancellation);
         $this->assertSame('customer', $cancelled->cancelled_by);
 
-        // Verify table unlinked and returned to Available per BR64
         $table->refresh();
         $this->assertSame(TableStatus::Available, $table->status);
 
@@ -329,7 +320,6 @@ class ReservationServiceTest extends TestCase
 
     public function test_customer_can_update_special_requests_within_2_hours(): void
     {
-        // Booking today at 13:00 (1h away, locked for core edits)
         $slot13 = SlotCapacity::factory()->create(['slot_time' => '13:00', 'max_covers' => 20]);
         $reservation = Reservation::factory()->confirmed()->create([
             'customer_id' => $this->customer->customer_id,
@@ -345,12 +335,11 @@ class ReservationServiceTest extends TestCase
         ]);
 
         $this->assertSame('Quiet corner, bringing birthday cake', $updated->special_requests);
-        $this->assertSame(ReservationStatus::Confirmed, $updated->status); // Status unchanged
+        $this->assertSame(ReservationStatus::Confirmed, $updated->status);
     }
 
     public function test_customer_core_change_blocked_within_2_hours(): void
     {
-        // Booking today at 13:00 (1h away)
         $slot13 = SlotCapacity::factory()->create(['slot_time' => '13:00', 'max_covers' => 20]);
         $reservation = Reservation::factory()->confirmed()->create([
             'customer_id' => $this->customer->customer_id,
@@ -370,7 +359,6 @@ class ReservationServiceTest extends TestCase
 
     public function test_customer_core_change_reverts_confirmed_to_requested_and_unlinks_tables(): void
     {
-        // Booking for Friday 2026-09-25 (> 2h away)
         $reservation = Reservation::factory()->confirmed()->create([
             'customer_id' => $this->customer->customer_id,
             'slot_id' => $this->slot->slot_id,
@@ -390,11 +378,9 @@ class ReservationServiceTest extends TestCase
             'party_size' => 4,
         ]);
 
-        // Status reverted to requested per BR36
         $this->assertSame(ReservationStatus::Requested, $updated->status);
         $this->assertSame(4, $updated->party_size);
 
-        // Tables unlinked per BR36, BR64
         $table->refresh();
         $this->assertSame(TableStatus::Available, $table->status);
 
@@ -419,7 +405,7 @@ class ReservationServiceTest extends TestCase
         ]);
 
         $this->assertSame(3, $updated->party_size);
-        $this->assertSame(ReservationStatus::Confirmed, $updated->status); // Status preserved for staff
+        $this->assertSame(ReservationStatus::Confirmed, $updated->status);
     }
 
     public function test_invalid_status_transition_throws_exception(): void
@@ -432,10 +418,8 @@ class ReservationServiceTest extends TestCase
             'party_size' => 2,
         ]);
 
-        // Decline it first
         $this->service->decline($reservation, $this->staff, 'No room');
 
-        // Attempting to approve an already declined reservation is illegal per 05.8
         $this->expectException(InvalidTransitionException::class);
         $this->service->approve($reservation, $this->staff);
     }

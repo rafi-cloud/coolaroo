@@ -5,9 +5,6 @@ namespace App\Console\Commands;
 use App\Services\ReservationService;
 use Illuminate\Console\Command;
 
-/**
- * Scheduled every fifteen minutes; the mail itself is queued.
- */
 class SendReservationRemindersCommand extends Command
 {
     protected $signature = 'reservations:send-reminders';

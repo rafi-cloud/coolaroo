@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Setting extends Model
 {
-    /** @use HasFactory<SettingFactory> */
+    /**
+     * @use HasFactory<SettingFactory>
+     */
     use HasFactory;
 
     const CREATED_AT = null;

@@ -7,10 +7,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * qr_ordering_enabled = 0 blocks customer cart/checkout (staff orders
- * are unaffected — this middleware never runs on a staff route).
- */
 class EnsureQrOrderingEnabled
 {
     public function handle(Request $request, Closure $next): Response

@@ -51,8 +51,6 @@ class PaymentServiceTest extends TestCase
         $table = RestaurantTable::factory()->create();
         $order = $this->orderFor($table, ['daily_limit' => 20, 'sold_today' => 0]);
         $item = MenuItem::find($order->items->first()->item_id);
-        // Simulates another order consuming the remaining stock between this
-        // checkout and payment — passed the buffered check, fails the exact one.
         $item->update(['sold_today' => 20]);
         $payment = Payment::factory()->create(['order_id' => $order->order_id, 'amount' => $order->total_amount]);
 

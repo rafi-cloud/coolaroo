@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
-/** Read-only search and detail. */
 class OrderController extends Controller
 {
     public function __construct(private RefundService $refunds) {}

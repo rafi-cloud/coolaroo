@@ -10,9 +10,6 @@ use App\Services\SettingService;
 use App\Services\SpecialsService;
 use Illuminate\View\View;
 
-/**
- * Public homepage.
- */
 class HomeController extends Controller
 {
     public function __construct(
@@ -39,7 +36,6 @@ class HomeController extends Controller
             ->orderBy('display_order')
             ->get();
 
-        // Public ratings section
         $minReviews = $this->settingService->getInt('public_rating_min_count', 10);
         $nonHidden = Feedback::where('is_hidden', false);
         $reviewCount = (clone $nonHidden)->count();

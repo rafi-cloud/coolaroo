@@ -14,10 +14,18 @@
       </div>
     @endif
 
+    @php
+      $statusMessages = [
+        'verification-link-sent' => 'Check your inbox — we have sent a link to verify your email address. You can sign in once you have clicked it.',
+        'already-verified' => 'That email address is already verified. You can sign in below.',
+        'verified' => 'Your email address is verified.',
+      ];
+    @endphp
+
     @if (session('status'))
-      <div class="auth-error auth-success" role="status">
+      <div class="auth-error auth-success" role="status" data-testid="login-status">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
-        <span>{{ session('status') }}</span>
+        <span>{{ $statusMessages[session('status')] ?? session('status') }}</span>
       </div>
     @endif
 

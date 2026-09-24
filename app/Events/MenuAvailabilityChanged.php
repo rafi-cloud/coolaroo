@@ -11,18 +11,15 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/**
- * Public 'menu' channel — a plain Channel, not PrivateChannel:
- * routes/channels.php has no 'menu' callback because visitors are not
- * authenticated.
- */
 class MenuAvailabilityChanged implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public function __construct(public MenuItem|AddOnOption $entity) {}
 
-    /** @return array<int, Channel> */
+    /**
+     * @return array<int, Channel>
+     */
     public function broadcastOn(): array
     {
         return [new Channel('menu')];

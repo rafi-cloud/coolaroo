@@ -16,9 +16,6 @@ use App\Services\CartService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * Task 67: Item detail modal (S03) — sizes, add-ons, nutrition (FR34, FR35, BR16, BR17, BR20, BR57, BR58).
- */
 class ItemDetailModalTest extends TestCase
 {
     use RefreshDatabase;
@@ -274,7 +271,7 @@ class ItemDetailModalTest extends TestCase
         $this->assertCount(1, $lines);
         $this->assertSame(2, $lines[0]['quantity']);
         $this->assertSame('Crispy bun please', $lines[0]['special_request']);
-        $this->assertSame(23.50, $lines[0]['unit_price']); // 22 + 1.50
-        $this->assertSame(47.00, $lines[0]['line_total']); // 23.50 * 2
+        $this->assertSame(23.50, $lines[0]['unit_price']);
+        $this->assertSame(47.00, $lines[0]['line_total']);
     }
 }

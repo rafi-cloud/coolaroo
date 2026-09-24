@@ -57,7 +57,9 @@ class EtaServiceTest extends TestCase
         app(EtaService::class)->adjust($order, Destination::Kitchen, 5, $this->staffWithRole('kitchen'));
     }
 
-    /** @param  'pending_payment'|'paid'|'served'|'cancelled'  $status */
+    /**
+     * @param  'pending_payment'|'paid'|'served'|'cancelled'  $status
+     */
     private function kitchenOrder(string $status, string $lineStatus = 'pending'): Order
     {
         $item = MenuItem::factory()->create([
@@ -88,11 +90,6 @@ class EtaServiceTest extends TestCase
         return $order->fresh();
     }
 
-    /**
-     * BR30's "orders ahead" is the station queue, which is paid orders only.
-     * A cancelled or served order whose lines were never moved off pending is
-     * not work anyone is doing.
-     */
     public function test_only_orders_still_in_the_station_queue_count_as_ahead(): void
     {
         $this->kitchenOrder('cancelled');
@@ -104,7 +101,6 @@ class EtaServiceTest extends TestCase
 
         $eta = app(EtaService::class)->estimate($subject, $items, Destination::Kitchen);
 
-        // 10 minutes prep + one genuine ticket ahead x 8 minutes
         $this->assertSame(18, (int) round(now()->diffInMinutes($eta)));
     }
 

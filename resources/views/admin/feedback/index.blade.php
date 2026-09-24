@@ -16,8 +16,7 @@
       </div>
     @endif
 
-    {{-- Metric Overview Cards --}}
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-bottom:1.5rem;" data-testid="admin-feedback-metrics">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-bottom:1.5rem;" data-testid="admin-feedback-metrics">
       <div style="padding:1rem; background:var(--sand-light, #FAF5EE); border:1px solid var(--line); border-radius:8px;">
         <div style="font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--cancelled);">Total Reviews</div>
         <div style="font-size:1.6rem; font-weight:700; color:var(--ink); margin-top:.2rem;">{{ number_format($counts['total']) }}</div>
@@ -40,10 +39,8 @@
       </div>
     </div>
 
-    {{-- Filter Navigation and Search Bar --}}
-    <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:1.2rem; border-bottom:1px solid var(--line); margin-bottom:1.5rem;" data-testid="admin-feedback-filter-bar">
-      {{-- Status Filter Tabs --}}
-      <nav class="report-nav" aria-label="Feedback status filter" style="margin:0;">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:1.2rem; border-bottom:1px solid var(--line); margin-bottom:1.5rem;" data-testid="admin-feedback-filter-bar">
+            <nav class="report-nav" aria-label="Feedback status filter" style="margin:0;">
         @php
           $currentStatus = $filters['status'] ?? 'all';
         @endphp
@@ -55,8 +52,7 @@
         <a href="{{ route('admin.feedback.index', array_merge($filters, ['status' => 'hidden', 'page' => 1])) }}" class="report-tab {{ $currentStatus === 'hidden' ? 'is-active' : '' }}" data-testid="admin-feedback-tab-hidden">Hidden</a>
       </nav>
 
-      {{-- Search & Rating Form --}}
-      <form method="GET" action="{{ route('admin.feedback.index') }}" class="kds-filters" style="margin:0; gap:.6rem;" data-testid="admin-feedback-search-form">
+            <form method="GET" action="{{ route('admin.feedback.index') }}" class="kds-filters" style="margin:0; gap:.6rem;" data-testid="admin-feedback-search-form">
         <input type="hidden" name="status" value="{{ $currentStatus }}">
 
         <label for="feedback-rating-filter" class="sr-only">Rating Filter</label>
@@ -79,13 +75,11 @@
       </form>
     </div>
 
-    {{-- Reviews List --}}
-    <ul class="reviews" data-testid="admin-feedback-list" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:1.2rem;">
+        <ul class="reviews" data-testid="admin-feedback-list" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:1.2rem;">
       @forelse ($feedbackList as $f)
         <li class="review {{ $f->is_hidden ? 'is-hidden' : '' }} {{ ! $f->admin_reply ? 'is-pending' : '' }}" data-testid="admin-feedback-item-{{ $f->order_id }}" style="background:var(--white); border:1px solid {{ $f->is_hidden ? '#FCA5A5' : ($f->is_featured ? '#FDE68A' : 'var(--line)') }}; border-radius:10px; padding:1.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
           <div class="review-body">
-            {{-- Review Header Row --}}
-            <div class="review-top" style="display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; margin-bottom:.6rem;">
+                        <div class="review-top" style="display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; margin-bottom:.6rem;">
               <strong style="font-size:1.05rem; color:var(--ink);" data-testid="admin-feedback-customer-{{ $f->order_id }}">
                 {{ $f->customer ? $f->customer->full_name : 'Guest Diner' }}
               </strong>
@@ -100,8 +94,7 @@
                 Order #{{ $f->order_id }}
               </a>
 
-              {{-- Status Badges --}}
-              @if ($f->is_featured)
+                            @if ($f->is_featured)
                 <span class="badge" style="background:#FEF3C7; color:#92400E; font-weight:700; font-size:.72rem; padding:.2rem .6rem; border-radius:100px;" data-testid="admin-feedback-featured-badge-{{ $f->order_id }}">
                   ★ Featured Testimonial
                 </span>
@@ -128,8 +121,7 @@
               </span>
             </div>
 
-            {{-- Ratings Breakdown --}}
-            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; font-size:.85rem; margin-bottom:.6rem; color:var(--ink);">
+                        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:1.2rem; font-size:.85rem; margin-bottom:.6rem; color:var(--ink);">
               <div>
                 <span style="color:var(--cancelled); margin-right:.3rem;">Food Quality:</span>
                 <strong style="color:var(--amber, #D97706);" data-testid="admin-feedback-food-rating-{{ $f->order_id }}">
@@ -144,8 +136,7 @@
               </div>
             </div>
 
-            {{-- Comment --}}
-            @if ($f->comment)
+                        @if ($f->comment)
               <div class="review-text" style="font-size:.95rem; font-family:var(--serif); line-height:1.6; color:var(--ink); background:#FAF8F5; padding:.8rem 1rem; border-radius:6px; border-left:3px solid var(--line);" data-testid="admin-feedback-comment-{{ $f->order_id }}">
                 &ldquo;{{ $f->comment }}&rdquo;
               </div>
@@ -155,15 +146,13 @@
               </div>
             @endif
 
-            {{-- Hidden Reason Alert --}}
-            @if ($f->is_hidden)
+                        @if ($f->is_hidden)
               <div style="margin-top:.75rem; padding:.6rem .9rem; background:#FFFBEB; border-left:3px solid #F59E0B; border-radius:4px; font-size:.82rem; color:#92400E;" data-testid="admin-feedback-hidden-reason-{{ $f->order_id }}">
                 <strong>Moderation Reason:</strong> {{ $f->hidden_reason }}
               </div>
             @endif
 
-            {{-- Existing Admin Reply Box --}}
-            @if ($f->admin_reply)
+                        @if ($f->admin_reply)
               <div style="margin-top:.75rem; padding:.8rem 1rem; background:#F8FAFC; border-left:3px solid var(--orange); border-radius:0 6px 6px 0;" data-testid="admin-feedback-reply-box-{{ $f->order_id }}">
                 <div style="display:flex; justify-content:space-between; font-size:.78rem; font-weight:600; color:var(--ink); margin-bottom:.35rem;">
                   <span>Management Response &middot; {{ $f->repliedBy?->full_name ?? 'Admin' }}</span>
@@ -175,10 +164,8 @@
               </div>
             @endif
 
-            {{-- Moderation Action Bar --}}
-            <div class="review-actions" style="display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin-top:1rem; padding-top:.8rem; border-top:1px solid var(--line);">
-              {{-- Feature / Unfeature Button --}}
-              @if (! $f->is_hidden)
+                        <div class="review-actions" style="display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin-top:1rem; padding-top:.8rem; border-top:1px solid var(--line);">
+                            @if (! $f->is_hidden)
                 <form method="POST" action="{{ route('admin.feedback.feature', $f) }}" style="display:inline;">
                   @csrf
                   @method('PATCH')
@@ -192,8 +179,7 @@
                 </button>
               @endif
 
-              {{-- Hide / Unhide Toggle --}}
-              @if ($f->is_hidden)
+                            @if ($f->is_hidden)
                 <form method="POST" action="{{ route('admin.feedback.unhide', $f) }}" style="display:inline;">
                   @csrf
                   @method('PATCH')
@@ -226,8 +212,7 @@
                 </details>
               @endif
 
-              {{-- Reply Button & Accordion --}}
-              <details style="position:relative; display:inline-block;">
+                            <details style="position:relative; display:inline-block;">
                 <summary class="btn btn-xs btn-primary" style="cursor:pointer; display:inline-block;" data-testid="admin-feedback-reply-toggle-{{ $f->order_id }}">
                   {{ $f->admin_reply ? 'Edit Response' : 'Reply to Review' }}
                 </summary>
@@ -260,8 +245,7 @@
       @endforelse
     </ul>
 
-    {{-- Pagination --}}
-    @if ($feedbackList->hasPages())
+        @if ($feedbackList->hasPages())
       <div style="margin-top:1.5rem;" data-testid="admin-feedback-pagination">
         {{ $feedbackList->links() }}
       </div>

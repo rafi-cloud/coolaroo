@@ -12,7 +12,7 @@ class CustomerRegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_a_visitor_can_register_is_logged_in_and_sent_a_verification_email(): void
+    public function test_a_visitor_can_register_and_is_sent_a_verification_email_without_being_logged_in(): void
     {
         Notification::fake();
 
@@ -20,14 +20,15 @@ class CustomerRegistrationTest extends TestCase
             'full_name' => 'Jamie Nguyen',
             'email' => 'jamie@example.test',
             'phone' => '0412345678',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Hello@123',
+            'password_confirmation' => 'Hello@123',
         ]);
 
         $customer = Customer::where('email', 'jamie@example.test')->firstOrFail();
 
-        $response->assertRedirect('/');
-        $this->assertAuthenticatedAs($customer, 'customer');
+        $response->assertRedirect(route('verification.notice'));
+        $response->assertSessionHas('verification.email', 'jamie@example.test');
+        $this->assertGuest('customer');
         $this->assertNull($customer->email_verified_at);
         Notification::assertSentTo($customer, VerifyEmail::class);
     }
@@ -40,13 +41,28 @@ class CustomerRegistrationTest extends TestCase
             'full_name' => 'Jamie Nguyen',
             'email' => 'taken@example.test',
             'phone' => '0412345678',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Hello@123',
+            'password_confirmation' => 'Hello@123',
         ]);
 
         $response->assertRedirect('/register');
         $response->assertSessionHasErrors('email');
         $this->assertGuest('customer');
+    }
+
+    public function test_registration_rejects_a_password_without_mixed_case_a_number_and_a_symbol(): void
+    {
+        $response = $this->from('/register')->post('/register', [
+            'full_name' => 'Jamie Nguyen',
+            'email' => 'jamie@example.test',
+            'phone' => '0412345678',
+            'password' => 'passwordpassword',
+            'password_confirmation' => 'passwordpassword',
+        ]);
+
+        $response->assertRedirect('/register');
+        $response->assertSessionHasErrors('password');
+        $this->assertDatabaseMissing('customer', ['email' => 'jamie@example.test']);
     }
 
     public function test_a_logged_in_customer_cannot_reach_the_registration_page(): void

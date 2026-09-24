@@ -17,10 +17,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
-/**
- * Read-only. Seat/clear, take order and mark served are all separate
- * controllers in this same namespace.
- */
 class FloorController extends Controller
 {
     private const ACTIVE_ORDER_STATUSES = [
@@ -46,9 +42,6 @@ class FloorController extends Controller
     }
 
     /**
-     * FR65 moved onto S23: today's bookings that can still be given a table.
-     * Loaded once for the whole grid rather than per drawer.
-     *
      * @return Collection<int, Reservation>
      */
     private function assignableReservations(): Collection
@@ -62,12 +55,6 @@ class FloorController extends Controller
     }
 
     /**
-     * What needs a waiter right now, keyed by table so the grid can colour
-     * the table itself and the alert list can name it. Derived from the same
-     * two queries the lists use, so it survives a page load rather than
-     * depending on a broadcast arriving — WaiterCalled and ReservationAlert
-     * are still pushed live on top of this, and are not stored anywhere.
-     *
      * @return array<int, array{kind: string, label: string, order_number: string}>
      */
     private function attention(Collection $readyToServe, Collection $cashWaiting): array
@@ -86,7 +73,6 @@ class FloorController extends Controller
             ];
         }
 
-        // cash outranks food: the diner is waiting to leave, not to eat
         foreach ($cashWaiting as $payment) {
             if ($payment->order->table_id === null) {
                 continue;
@@ -102,7 +88,6 @@ class FloorController extends Controller
         return $attention;
     }
 
-    /** what floor.js re-fetches on every broadcast and on reconnect. */
     public function state(): JsonResponse
     {
         $readyToServe = $this->readyToServe();
@@ -131,7 +116,6 @@ class FloorController extends Controller
                 'payment_id' => $payment->payment_id,
                 'order_number' => $payment->order->order_number,
                 'table_number' => $payment->order->restaurantTable?->table_number,
-                // the floor needs somewhere to send the waiter, not just a row to read
                 'table_id' => $payment->order->table_id,
                 'settle_url' => $payment->order->table_id
                     ? route('staff.tables.order', $payment->order->table_id)
@@ -143,7 +127,6 @@ class FloorController extends Controller
         ]);
     }
 
-    /** "next assigned reservation" = an open visit that already has one. */
     private function tables(): Collection
     {
         return RestaurantTable::query()
@@ -154,8 +137,24 @@ class FloorController extends Controller
                 ->whereNotNull('reservation_id')
                 ->with(['reservation.slot', 'reservation.visits'])
                 ->oldest('created_at')])
-            ->orderBy('table_number')
-            ->get();
+            ->orderByRaw("CASE WHEN section = 'Dining' THEN 1 WHEN section = 'Bar' THEN 2 ELSE 3 END")
+            ->orderByRaw('LENGTH(table_number) ASC, table_number ASC')
+            ->get()
+            ->sort(function (RestaurantTable $a, RestaurantTable $b) {
+                $sectionWeight = fn (?string $s) => match ($s) {
+                    'Dining' => 1,
+                    'Bar' => 2,
+                    default => 3,
+                };
+
+                $weightDiff = $sectionWeight($a->section) <=> $sectionWeight($b->section);
+                if ($weightDiff !== 0) {
+                    return $weightDiff;
+                }
+
+                return strnatcasecmp($a->table_number, $b->table_number);
+            })
+            ->values();
     }
 
     private function nextReservationPayload(RestaurantTable $table): ?array
@@ -177,7 +176,6 @@ class FloorController extends Controller
         ];
     }
 
-    /** the own list: orders whose derived status is ready. */
     private function readyToServe(): Collection
     {
         return Order::where('status', OrderStatus::Ready)
@@ -189,13 +187,10 @@ class FloorController extends Controller
             ->get();
     }
 
-    /** the queue: cash requested, not yet collected. */
     private function cashWaiting(): Collection
     {
         return Payment::where('method', PaymentMethod::Cash)
             ->where('status', PaymentAttemptStatus::Pending)
-            // a cancelled or already-paid order can never be settled, so its
-            // stale request must not sit here forever offering a dead action
             ->whereHas('order', fn ($query) => $query->where('status', OrderStatus::PendingPayment))
             ->with('order.restaurantTable')
             ->orderBy('created_at')

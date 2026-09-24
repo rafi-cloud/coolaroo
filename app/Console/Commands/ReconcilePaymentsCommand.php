@@ -5,11 +5,6 @@ namespace App\Console\Commands;
 use App\Services\PaymentService;
 use Illuminate\Console\Command;
 
-/**
- * Scheduled every two minutes. Stripe runs in test mode
- * with no webhooks, so this job is what catches a payment whose customer
- * never came back to the return URL.
- */
 class ReconcilePaymentsCommand extends Command
 {
     protected $signature = 'payments:reconcile';

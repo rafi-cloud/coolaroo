@@ -10,14 +10,15 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** New paid lines for the station displays and admin dashboard. */
 class OrderPaid implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;
 
     public function __construct(public Order $order) {}
 
-    /** @return array<int, PrivateChannel> */
+    /**
+     * @return array<int, PrivateChannel>
+     */
     public function broadcastOn(): array
     {
         $channels = [new PrivateChannel('admin')];

@@ -11,9 +11,6 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * Task 68: Public Availability API endpoint tests (FR61, BR32-BR35, BR58, TC-UC13-02, TC-UC13-03).
- */
 class AvailabilityTest extends TestCase
 {
     use RefreshDatabase;
@@ -39,7 +36,7 @@ class AvailabilityTest extends TestCase
             ->assertJsonPath('availability.status', 'available')
             ->assertJsonPath('availability.date', $futureTuesday)
             ->assertJsonPath('availability.party_size', 4)
-            ->assertJsonPath('availability.duration_minutes', 120); // 4 guests -> 120 min
+            ->assertJsonPath('availability.duration_minutes', 120);
 
         $slots = $response->json('availability.slots');
         $this->assertCount(2, $slots);
@@ -87,7 +84,7 @@ class AvailabilityTest extends TestCase
 
         $response = $this->getJson(route('reservations.availability', [
             'date' => $futureDate,
-            'party_size' => 15, // default online max is 10
+            'party_size' => 15,
         ]));
 
         $response->assertOk()
@@ -100,7 +97,6 @@ class AvailabilityTest extends TestCase
         $customer = Customer::factory()->create();
         $date = Carbon::now('Australia/Melbourne')->addDays(8)->next(Carbon::THURSDAY)->toDateString();
 
-        // 8 covers booked out of 10
         Reservation::create([
             'customer_id' => $customer->customer_id,
             'slot_id' => $slot->slot_id,
@@ -110,7 +106,6 @@ class AvailabilityTest extends TestCase
             'party_size' => 8,
         ]);
 
-        // Party of 2 should still fit (10 - 8 = 2 remaining)
         $response = $this->getJson(route('reservations.availability', [
             'date' => $date,
             'party_size' => 2,
@@ -121,7 +116,6 @@ class AvailabilityTest extends TestCase
         $this->assertSame(2, $slotData['remaining_covers']);
         $this->assertTrue($slotData['is_available']);
 
-        // Party of 3 should NOT fit
         $response3 = $this->getJson(route('reservations.availability', [
             'date' => $date,
             'party_size' => 3,

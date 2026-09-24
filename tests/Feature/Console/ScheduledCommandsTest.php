@@ -25,11 +25,6 @@ use Illuminate\Support\Facades\Mail;
 use Stripe\Checkout\Session;
 use Tests\TestCase;
 
-/**
- * T160, UC38, 07.10. One test per scheduled command, plus the two rules most
- * likely to break: BR26's "verify before you cancel" and BR39's once-only
- * suggestion.
- */
 class ScheduledCommandsTest extends TestCase
 {
     use RefreshDatabase;

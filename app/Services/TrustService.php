@@ -6,9 +6,6 @@ use App\Enums\ReservationStatus;
 use App\Models\Customer;
 use App\Models\Reservation;
 
-/**
- * Customer Trust Profile & Badge calculation on read.
- */
 class TrustService
 {
     public const BADGE_FLAGGED = 'Flagged';
@@ -17,12 +14,6 @@ class TrustService
 
     public const BADGE_NEW = 'New';
 
-    /**
-     * Badge calculated on read:
-     * - Flagged if >= 1 uncleared no-show in last 12 months.
-     * - Regular if >= 3 completed visits and not Flagged.
-     * - Else New.
-     */
     public function badge(?Customer $customer): string
     {
         if ($customer === null) {
@@ -51,8 +42,6 @@ class TrustService
     }
 
     /**
-     * Full trust profile with badge and historical counts.
-     *
      * @return array<string, mixed>
      */
     public function profile(?Customer $customer): array

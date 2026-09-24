@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrderItem extends Model
 {
-    /** @use HasFactory<OrderItemFactory> */
+    /**
+     * @use HasFactory<OrderItemFactory>
+     */
     use HasFactory;
 
     protected $table = 'order_item';

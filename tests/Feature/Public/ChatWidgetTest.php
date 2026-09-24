@@ -20,7 +20,6 @@ class ChatWidgetTest extends TestCase
         $this->seed(SettingSeeder::class);
     }
 
-    /** S17 sits on the homepage and the menu, for visitors as well as customers. */
     public function test_the_widget_renders_for_a_visitor_with_the_disclaimer_and_build_a_meal_link(): void
     {
         $this->get(route('home'))
@@ -32,7 +31,6 @@ class ChatWidgetTest extends TestCase
         $this->get(route('menu.index'))->assertOk()->assertSee('chat-panel', false);
     }
 
-    /** BR49, FR98: ai_enabled = 0 hides the widget. */
     public function test_the_widget_is_hidden_when_the_assistant_is_switched_off(): void
     {
         Setting::where('setting_key', 'ai_enabled')->update(['setting_value' => '0']);
@@ -44,7 +42,6 @@ class ChatWidgetTest extends TestCase
             ->assertDontSee('chat-panel', false);
     }
 
-    /** FR43, NFR11: Chat widget is mounted globally on public and customer layouts. */
     public function test_the_widget_renders_globally_on_public_and_customer_layouts(): void
     {
         $this->get(route('privacy'))

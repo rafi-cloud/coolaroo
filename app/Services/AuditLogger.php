@@ -23,12 +23,6 @@ class AuditLogger
     }
 
     /**
-     * 24: AI usage rides on audit_log as action `ai_request`, with
-     * `{feature, tokens_in, tokens_out}` in details. No table row is
-     * affected, so `entity_name` carries the logical feature and
-     * `entity_id` stays null. The IP is kept because gives the
-     * assistant no app rate limit — it is the only abuse signal there is.
-     *
      * @param  array{tokens_in:int, tokens_out:int}  $usage
      */
     public function logAi(?Customer $actor, string $feature, array $usage, ?string $ipAddress = null): AuditLog

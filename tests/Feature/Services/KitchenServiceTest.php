@@ -52,7 +52,6 @@ class KitchenServiceTest extends TestCase
         return Staff::factory()->create(['role_id' => $roleModel->role_id]);
     }
 
-    /** BR28: any active line preparing → order preparing. */
     public function test_start_moves_only_this_stations_lines_and_derives_preparing(): void
     {
         $order = $this->orderWithLines([
@@ -69,7 +68,6 @@ class KitchenServiceTest extends TestCase
         $this->assertNotNull($order->started_at);
     }
 
-    /** BR28: ready only when ALL active lines are ready or served. */
     public function test_the_order_is_ready_only_once_every_station_is_ready(): void
     {
         $order = $this->orderWithLines([
@@ -86,7 +84,6 @@ class KitchenServiceTest extends TestCase
         $this->assertNotNull($order->fresh()->ready_at);
     }
 
-    /** BR28's "active": a refund-cancelled line must not hold the order back. */
     public function test_cancelled_lines_are_ignored_when_deriving(): void
     {
         $order = $this->orderWithLines([
@@ -99,7 +96,6 @@ class KitchenServiceTest extends TestCase
         $this->assertSame(OrderStatus::Ready, $order->fresh()->status);
     }
 
-    /** 5.1 is walked one legal step at a time, so the history stays truthful. */
     public function test_the_status_ladder_is_climbed_one_legal_step_at_a_time(): void
     {
         $order = $this->orderWithLines([[Destination::Kitchen, 'preparing']]);
@@ -112,7 +108,6 @@ class KitchenServiceTest extends TestCase
         );
     }
 
-    /** FR60, BR28: the order climbs to served once every station's ready lines are served. */
     public function test_serving_the_last_stations_lines_completes_the_order(): void
     {
         $order = $this->orderWithLines([[Destination::Kitchen, 'ready']]);
@@ -125,7 +120,6 @@ class KitchenServiceTest extends TestCase
         $this->assertNotNull($order->served_at);
     }
 
-    /** A two-station order isn't served until both are delivered. */
     public function test_serving_one_station_does_not_complete_a_two_station_order(): void
     {
         $order = $this->orderWithLines([

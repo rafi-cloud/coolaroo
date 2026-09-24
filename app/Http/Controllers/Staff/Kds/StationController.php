@@ -20,11 +20,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
-/**
- * The station queue and its filters, Start/Ready, and ETA adjustment.
- * The order status behind Start/Ready is derived by KitchenService,
- * never set here.
- */
 class StationController extends Controller
 {
     public function __construct(
@@ -58,7 +53,6 @@ class StationController extends Controller
         ]);
     }
 
-    /** what kds.js re-fetches on every broadcast and on reconnect. */
     public function state(Request $request, Destination $destination): JsonResponse
     {
         $orders = $this->queue($request, $destination);
@@ -88,7 +82,6 @@ class StationController extends Controller
         ]);
     }
 
-    /** No Form Request: the order and the station both come from the URL. */
     public function start(Request $request, Order $order, Destination $destination): RedirectResponse
     {
         Gate::authorize('updateStation', [Order::class, $destination]);
@@ -98,10 +91,6 @@ class StationController extends Controller
         return back()->with('status', 'lines-started');
     }
 
-    /**
-     * Mark every still-preparing line at this station ready in one press, for
-     * a ticket that plates together. Lines already ticked are left alone.
-     */
     public function ready(Request $request, Order $order, Destination $destination): RedirectResponse
     {
         Gate::authorize('updateStation', [Order::class, $destination]);
@@ -111,10 +100,6 @@ class StationController extends Controller
         return back()->with('status', 'lines-ready');
     }
 
-    /**
-     * Tick one prepared line. The station is taken from the line, so a bar
-     * cook cannot tick a kitchen line by posting its id.
-     */
     public function readyLine(Request $request, OrderItem $line): RedirectResponse
     {
         Gate::authorize('updateStation', [Order::class, $line->destination]);
@@ -124,7 +109,6 @@ class StationController extends Controller
         return back()->with('status', 'line-ready');
     }
 
-    /** Same station-scoped ability as start()/ready(). */
     public function adjustEta(AdjustEtaRequest $request, Order $order, Destination $destination): RedirectResponse
     {
         Gate::authorize('updateStation', [Order::class, $destination]);
@@ -134,7 +118,6 @@ class StationController extends Controller
         return back()->with('status', 'eta-adjusted');
     }
 
-    /** this station's active items with their add-on options, for the drawer. */
     private function availabilityItems(Destination $destination): Collection
     {
         return MenuItem::where('destination', $destination)
@@ -144,7 +127,6 @@ class StationController extends Controller
             ->get();
     }
 
-    /** oldest first, this station's active lines only. */
     private function queue(Request $request, Destination $destination): Collection
     {
         $lineStatuses = $this->requestedLineStatuses($request);
@@ -165,12 +147,6 @@ class StationController extends Controller
             ->get();
     }
 
-    /**
-     * One string for "is the board showing something different now". The page
-     * carries the value it was rendered with, the poll and every station
-     * broadcast compare against it, and a difference re-renders the page —
-     * cheaper than keeping a second copy of the ticket markup in JavaScript.
-     */
     private function signature(Collection $orders, Destination $destination): string
     {
         return md5($orders->map(fn (Order $order) => implode(':', [
@@ -182,7 +158,6 @@ class StationController extends Controller
         ]))->implode('|'));
     }
 
-    /** the status filter applies to the line, not the order. */
     private function requestedLineStatuses(Request $request): array
     {
         $requested = OrderItemStatus::tryFrom((string) $request->query('status'));

@@ -58,7 +58,6 @@ class StationQueueTest extends TestCase
             ->assertSeeInOrder([$older->order_number, $newer->order_number]);
     }
 
-    /** The scoping that matters: a bar line must never reach the kitchen screen. */
     public function test_the_eta_steppers_are_offered_while_there_is_still_cooking_to_do(): void
     {
         $order = $this->orderWithLine(Destination::Kitchen, 'preparing', [
@@ -96,7 +95,6 @@ class StationQueueTest extends TestCase
             ->assertDontSee($bar->order_number);
     }
 
-    /** FR57. */
     public function test_the_status_filter_narrows_the_queue(): void
     {
         $pending = $this->orderWithLine(Destination::Kitchen, 'pending');
@@ -121,7 +119,6 @@ class StationQueueTest extends TestCase
             ->assertJsonPath('orders.0.lines.0.quantity', 2);
     }
 
-    /** The board re-renders when this stops matching the page's own value. */
     public function test_the_state_signature_changes_when_a_line_moves_on(): void
     {
         $order = $this->orderWithLine(Destination::Kitchen);

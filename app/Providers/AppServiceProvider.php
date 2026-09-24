@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,13 +24,17 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultView('components.pagination');
         Paginator::defaultSimpleView('components.pagination-simple');
 
-        // https for every generated URL, including Vite assets and
-        // the Reverb endpoint, once the app is served over TLS (10.2 step 7).
         if (config('app.force_https')) {
             URL::forceScheme('https');
         }
 
         Model::preventLazyLoading(! $this->app->isProduction());
+
+        Password::defaults(fn () => Password::min(8)
+            ->letters()
+            ->mixedCase()
+            ->numbers()
+            ->symbols());
 
         Gate::before(function ($user, string $ability) {
             return $user instanceof Staff && $user->role->role_name === 'admin' ? true : null;

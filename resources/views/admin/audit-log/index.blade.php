@@ -1,7 +1,6 @@
 <x-layouts.admin title="Audit Log" page-title="Audit Log &amp; Compliance" page-sub="Immutable log of system modifications, administrative actions, and security events">
   <div class="card" data-testid="admin-audit-log-page">
-    {{-- Navigation Tabs: Events vs Archive --}}
-    <nav class="report-nav" aria-label="Audit navigation" style="margin-bottom:1.5rem;" data-testid="admin-audit-tabs">
+        <nav class="report-nav" aria-label="Audit navigation" style="margin-bottom:1.5rem;" data-testid="admin-audit-tabs">
       <a href="{{ route('admin.audit-log.index') }}" class="report-tab is-active" data-testid="admin-audit-tab-events">
         Audit Events
       </a>
@@ -10,10 +9,8 @@
       </a>
     </nav>
 
-    {{-- Filter Form --}}
-    <form method="GET" action="{{ route('admin.audit-log.index') }}" class="kds-filters" style="margin-bottom:1.5rem; gap:.6rem; flex-wrap:wrap;" data-testid="admin-audit-filter-form">
-      {{-- Action Type Dropdown --}}
-      <div>
+        <form method="GET" action="{{ route('admin.audit-log.index') }}" class="kds-filters" style="margin-bottom:1.5rem; gap:.6rem; flex-wrap:wrap;" data-testid="admin-audit-filter-form">
+            <div>
         <label for="audit-action-type" class="sr-only">Action Type</label>
         <select id="audit-action-type" name="action_type" data-testid="admin-audit-filter-action" style="padding:.45rem .8rem; font-size:.84rem; border:1px solid var(--line); border-radius:6px; background:var(--white); color:var(--ink);">
           <option value="">All Action Types</option>
@@ -25,8 +22,7 @@
         </select>
       </div>
 
-      {{-- Entity Name Dropdown --}}
-      <div>
+            <div>
         <label for="audit-entity-name" class="sr-only">Entity Name</label>
         <select id="audit-entity-name" name="entity_name" data-testid="admin-audit-filter-entity" style="padding:.45rem .8rem; font-size:.84rem; border:1px solid var(--line); border-radius:6px; background:var(--white); color:var(--ink);">
           <option value="">All Entities</option>
@@ -38,8 +34,7 @@
         </select>
       </div>
 
-      {{-- Staff Actor Dropdown --}}
-      <div>
+            <div>
         <label for="audit-staff-actor" class="sr-only">Actor</label>
         <select id="audit-staff-actor" name="staff_id" data-testid="admin-audit-filter-staff" style="padding:.45rem .8rem; font-size:.84rem; border:1px solid var(--line); border-radius:6px; background:var(--white); color:var(--ink);">
           <option value="">All Staff Actors</option>
@@ -51,8 +46,7 @@
         </select>
       </div>
 
-      {{-- Date Range --}}
-      <div style="display:flex; align-items:center; gap:.35rem;">
+            <div style="display:flex; align-items:center; gap:.35rem;">
         <label for="audit-date-from" style="font-size:.82rem; color:var(--cancelled);">From:</label>
         <input type="date" id="audit-date-from" name="from" value="{{ $filters['from'] ?? '' }}" style="padding:.45rem .6rem; font-size:.84rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-audit-filter-from">
       </div>
@@ -62,8 +56,7 @@
         <input type="date" id="audit-date-to" name="to" value="{{ $filters['to'] ?? '' }}" style="padding:.45rem .6rem; font-size:.84rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-audit-filter-to">
       </div>
 
-      {{-- Search Input --}}
-      <div style="flex:1; min-width:200px;">
+            <div style="flex:1; min-width:200px;">
         <label for="audit-search-input" class="sr-only">Search</label>
         <input type="text" id="audit-search-input" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search actor, reason, IP, entity ID..." style="width:100%; padding:.45rem .8rem; font-size:.84rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-audit-search-input">
       </div>
@@ -74,8 +67,7 @@
       @endif
     </form>
 
-    {{-- Audit Log Events Table --}}
-    <div class="table-scroll">
+        <div class="table-scroll">
       <table class="table" data-testid="admin-audit-table">
         <thead>
           <tr>
@@ -178,8 +170,7 @@
       </table>
     </div>
 
-    {{-- Pagination --}}
-    @if ($logs->hasPages())
+        @if ($logs->hasPages())
       <div style="margin-top:1.5rem;" data-testid="admin-audit-pagination">
         {{ $logs->links() }}
       </div>

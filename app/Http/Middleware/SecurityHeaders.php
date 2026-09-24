@@ -6,15 +6,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Response headers for every web request.
- *
- * The policy can name every origin the app actually uses because nothing is
- * loaded from a CDN: Google Fonts is the only third party, charts are inline
- * SVG, and Echo ships through Vite. `unsafe-inline` stays for scripts and
- * styles because SDD 8.7 puts page scripts in `@push('scripts')` blocks and
- * the KDS and floor screens carry inline style attributes.
- */
 class SecurityHeaders
 {
     private const POLICY = [
@@ -48,12 +39,6 @@ class SecurityHeaders
     }
 
     /**
-     * While `npm run dev` is running, Vite serves the bundle and its HMR socket
-     * from its own port, which `'self'` does not cover — the page would load
-     * with its scripts silently blocked. The allowance is keyed on the hot file
-     * Vite writes, so it disappears the moment the dev server stops, and it can
-     * never apply to a built deployment.
-     *
      * @return array<int, string>
      */
     private function policy(): array

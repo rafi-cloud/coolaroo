@@ -13,9 +13,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/**
- * Admin only — the whole route group is behind role:admin.
- */
 class RefundController extends Controller
 {
     public function __construct(private RefundService $refunds) {}

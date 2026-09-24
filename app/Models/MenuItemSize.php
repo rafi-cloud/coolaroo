@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuItemSize extends Model
 {
-    /** @use HasFactory<MenuItemSizeFactory> */
+    /**
+     * @use HasFactory<MenuItemSizeFactory>
+     */
     use HasFactory;
 
     protected $table = 'menu_item_size';

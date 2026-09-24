@@ -4,11 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * 2, The staff table's foreign key gives MySQL an index on
- * role_id alone; 6.4.2 asks for the composite that also covers is_active, which
- * is how every staff list and the role filter query the table.
- */
 return new class extends Migration
 {
     public function up(): void

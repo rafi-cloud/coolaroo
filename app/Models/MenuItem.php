@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuItem extends Model
 {
-    /** @use HasFactory<MenuItemFactory> */
+    /**
+     * @use HasFactory<MenuItemFactory>
+     */
     use HasFactory;
 
     protected $table = 'menu_item';

@@ -30,7 +30,8 @@
 
       <div class="auth-field">
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" required minlength="8" data-testid="register-password">
+        <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" required minlength="8" aria-describedby="password-hint" data-testid="register-password">
+        <p class="field-hint" id="password-hint">At least 8 characters, with upper and lower case, a number and a symbol.</p>
         @error('password')<p class="field-error" role="alert">{{ $message }}</p>@enderror
       </div>
 

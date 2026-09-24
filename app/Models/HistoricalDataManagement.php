@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class HistoricalDataManagement extends Model
 {
-    /** @use HasFactory<HistoricalDataManagementFactory> */
+    /**
+     * @use HasFactory<HistoricalDataManagementFactory>
+     */
     use HasFactory;
 
     protected $table = 'historical_data_management';

@@ -1,82 +1,86 @@
 # Coolaroo — Restaurant Management System
 
-QR table ordering, a kitchen and bar display, reservations, and an admin dashboard for
-a bistro and sports bar. Built with Laravel, MySQL and Laravel Reverb for live updates.
+QR table ordering, live kitchen and bar displays, reservations, refunds and an admin
+dashboard for a bistro and sports bar.
 
-This guide gets it running on your machine and walks you through testing it as a
-customer, waiter, kitchen and admin at the same time.
+This README is the only documentation in the repository. It takes you from a fresh clone
+to a running system you can test as four different people at once.
+
+- [What it does](#what-it-does)
+- [Built with](#built-with)
+- [Before you start](#before-you-start)
+- [Setup](#setup) · [macOS and Linux](#macos-and-linux)
+- [Running it](#running-it)
+- [Logging in](#logging-in)
+- [Testing it by hand](#testing-it-by-hand)
+- [Automated tests](#automated-tests)
+- [What the demo data contains](#what-the-demo-data-contains)
+- [Project layout](#project-layout)
+- [Command reference](#command-reference)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
-## What you need installed
+## What it does
+
+**Customers** scan the QR code on their table, browse the menu, order and pay by card or
+cash, then watch a live tracker as the kitchen works. They can book tables, leave a
+review, and request a refund within 24 hours of paying.
+
+**Waitstaff** get a live floor plan — table status, cash requests, ready-to-serve alerts
+and call-waiter pings arrive without refreshing. They seat walk-ins, assign bookings,
+take orders at the table, collect cash and raise refund requests.
+
+**Kitchen and bar** each get their own station display, showing only their own lines,
+with per-item ready tickboxes and an ETA per ticket.
+
+**Admins** manage the menu, tables and QR codes, staff accounts, reservations, reviews,
+refunds and settings, with reports on sales, items, operations, bookings and feedback.
+Every significant change is written to an audit log.
+
+An AI dining assistant and meal builder are available on the public site when an API key
+is configured.
+
+## Built with
+
+| Layer | Choice |
+|---|---|
+| Framework | Laravel 13 (PHP 8.3+) |
+| Database | MySQL 8 |
+| Live updates | Laravel Reverb (WebSockets) + Laravel Echo |
+| Front end | Blade components, vanilla JS, Vite. **No CSS framework** — `public/css/style.css` (public) and `public/css/dashboard.css` (staff/admin) |
+| Payments | Stripe, test mode. No webhooks — payment is confirmed by retrieving the Checkout Session |
+| AI | Google Gemini via its OpenAI-compatible endpoint |
+| PDFs / QR | dompdf, endroid/qr-code |
+| Tests | PHPUnit, against SQLite in memory |
+| Style | Laravel Pint |
+
+Timezone is `Australia/Melbourne`. Money is AUD, GST-inclusive, GST = total ÷ 11.
+
+---
+
+## Before you start
 
 | Tool | Version | Notes |
 |---|---|---|
-| PHP | 8.3 or newer (built on 8.5) | Extensions: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `curl`, `zip`. For the automated tests also `pdo_sqlite` and `sqlite3` |
+| PHP | 8.3+ | Extensions: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `curl`, `zip`, plus `pdo_sqlite` and `sqlite3` for the tests |
 | Composer | 2.x | |
-| Node.js + npm | 18 or newer | Only used once, to build the front-end assets |
-| MySQL | 8.x | XAMPP is fine — you only need its MySQL, not its PHP |
+| Node.js + npm | 18+ | Builds the front-end assets |
+| MySQL | 8.x | XAMPP is fine — you need only its **MySQL**, not its PHP |
 | Git | any | |
 
-Check your PHP extensions with `php -m`.
+Check your extensions with `php -m`.
+
+> **Do not use XAMPP's bundled PHP.** It is usually older than 8.3. Install PHP separately
+> and make sure `php -v` reports the version you expect.
 
 ---
 
-## On a Mac? Read this first
+## Setup
 
-The steps below are written for Windows. Everything works the same on macOS; only these
-commands differ. Use **Terminal**, and open new tabs with `Cmd+T`.
+Commands are PowerShell. See [macOS and Linux](#macos-and-linux) for the few that differ.
 
-**Install the tools** with [Homebrew](https://brew.sh):
-
-```bash
-brew install php composer node mysql
-```
-
-```bash
-brew services start mysql
-```
-
-Homebrew's PHP already includes the extensions you need. Homebrew's MySQL has no root
-password, so leave `DB_PASSWORD` empty in `.env`. (XAMPP for macOS or Laravel Herd also
-work if you already use one of them.)
-
-**Step 2 — create `.env`** (then run `php artisan key:generate` as normal):
-
-```bash
-cp .env.example .env
-```
-
-**Step 3 — create the database** (in place of the XAMPP command):
-
-```bash
-mysql -u root -e "CREATE DATABASE coolaroo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-```
-
-**Step 4 — skip it.** The certificate problem is Windows-only; Homebrew's PHP trusts
-HTTPS certificates out of the box.
-
-**Step 6 — browser windows.** Use four separate sessions, for example:
-
-| Window | Role | Browser |
-|---|---|---|
-| 1 | Customer | Chrome |
-| 2 | Waiter | Chrome **Incognito** (`Cmd+Shift+N`) |
-| 3 | Kitchen | Safari |
-| 4 | Admin | Safari **Private Window** (`Cmd+Shift+N`) |
-
-**Step 6 — getting a table link.** Use single quotes on a Mac:
-
-```bash
-php artisan tinker --execute='echo app(App\Services\TableQrService::class)->signedUrl(App\Models\RestaurantTable::where("table_number","T1")->first());'
-```
-
-Everything else — `composer install`, `npm run build`, the `php artisan` commands, the
-logins and the walkthrough — is identical.
-
----
-
-## 1. Get the code and install dependencies
+### 1. Clone and install
 
 ```powershell
 git clone -b develop https://github.com/rafi-cloud/coolaroo.git
@@ -98,17 +102,12 @@ npm install
 npm run build
 ```
 
-`npm run build` is required — the compiled assets are not in the repository.
+`npm run build` is required — compiled assets are not committed.
 
----
+### 2. Create your `.env`
 
-## 2. Create your `.env` file
-
-The app will not start without a `.env` file in the project root.
-
-**If Rafi sent you a `.env` file**, put it in the project root and skip to step 3.
-
-**Otherwise**, copy the template and generate an app key:
+The app will not boot without it. If a teammate sent you a filled-in `.env`, drop it in
+the project root and skip to step 3. Otherwise:
 
 ```powershell
 Copy-Item .env.example .env
@@ -118,167 +117,309 @@ Copy-Item .env.example .env
 php artisan key:generate
 ```
 
-(In Command Prompt instead of PowerShell, the first command is `copy .env.example .env`.)
+The template works as-is. Set `DB_PASSWORD` if your MySQL root user has one — XAMPP's
+default is blank. **Never commit `.env`**; it is already ignored.
 
-The template works as-is. Two features need keys that are **not** in the repository:
+Two features need keys that are deliberately **not** in the repository:
 
 | Feature | Key | Without it |
 |---|---|---|
-| Card payments | `STRIPE_KEY`, `STRIPE_SECRET` (Stripe **test** keys) | Card payment is unavailable. **Cash payment works fully**, so you can still test the whole order flow |
-| AI chat and meal builder | `AI_API_KEY` (free Google Gemini key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)) | Shows "The assistant is busy right now" — the designed fallback, not a bug |
+| Card payments | `STRIPE_KEY`, `STRIPE_SECRET` (test keys, `pk_test_…` / `sk_test_…`) | Card payment is unavailable. **Cash works end to end**, so you can still test the full order flow |
+| AI assistant | `AI_API_KEY` — free from [aistudio.google.com/apikey](https://aistudio.google.com/apikey) | Shows "The assistant is busy right now". That is the designed fallback, not a bug |
 
-If your MySQL root user has a password, set `DB_PASSWORD` in `.env`. XAMPP's default is
-no password.
+### 3. Create and populate the database
 
-**Never commit your `.env` file.** It is already in `.gitignore`.
-
----
-
-## 3. Set up the database
-
-Start **MySQL** from the XAMPP Control Panel, then create the database. Either open
-phpMyAdmin (http://localhost/phpmyadmin) and create a database called `coolaroo`, or run:
+Start **MySQL** from the XAMPP Control Panel, then:
 
 ```powershell
 C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE coolaroo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
 ```
-
-Then build the tables and load the demo data:
 
 ```powershell
 php artisan migrate --seed
 ```
 
 ```powershell
-php artisan db:seed --class=DemoSeeder
-```
-
-```powershell
 php artisan storage:link
 ```
 
-The demo seeder gives you a realistic menu, customers, orders, reservations and reviews to
-test with.
+One command does the whole database: `migrate --seed` builds the tables **and** loads the
+demo data. See [what you get](#what-the-demo-data-contains).
+
+### 4. Windows only — let PHP make HTTPS calls
+
+PHP on Windows ships without a CA bundle, so Stripe and the AI fail with
+`cURL error 60: unable to get local issuer certificate`. **Skip this if you are not
+testing card payments or the AI.**
+
+Find your `php.ini`:
+
+```powershell
+php --ini
+```
+
+Download the bundle (adjust `C:\php` to your PHP folder):
+
+```powershell
+Invoke-WebRequest -Uri https://curl.se/ca/cacert.pem -OutFile C:\php\cacert.pem
+```
+
+Then in `php.ini`, uncomment these two lines and point them at the file:
+
+```ini
+curl.cainfo = "C:\php\cacert.pem"
+openssl.cafile = "C:\php\cacert.pem"
+```
 
 ---
 
-## 4. Windows only — let PHP make HTTPS calls (one-time)
+## macOS and Linux
 
-PHP on Windows ships without a certificate bundle, so Stripe and the AI fail with
-`cURL error 60: unable to get local issuer certificate`. Fix it once:
+Everything is identical except these. Install with [Homebrew](https://brew.sh):
 
-1. Find your `php.ini`:
+```bash
+brew install php composer node mysql && brew services start mysql
+```
 
-   ```powershell
-   php --ini
-   ```
+Step 2 — copy the env file:
 
-2. Download the certificate bundle into your PHP folder (adjust `C:\php` to your path):
+```bash
+cp .env.example .env
+```
 
-   ```powershell
-   Invoke-WebRequest -Uri https://curl.se/ca/cacert.pem -OutFile C:\php\cacert.pem
-   ```
+Step 3 — create the database:
 
-3. In `php.ini`, find these two lines, remove the leading `;`, and set the path:
+```bash
+mysql -u root -e "CREATE DATABASE coolaroo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+```
 
-   ```ini
-   curl.cainfo = "C:\php\cacert.pem"
-   openssl.cafile = "C:\php\cacert.pem"
-   ```
+Step 4 — skip it. Homebrew's PHP trusts HTTPS certificates already.
 
-You can skip this step if you are not testing card payments or the AI.
+Homebrew's MySQL has no root password, so leave `DB_PASSWORD` blank.
 
 ---
 
-## 5. Start the app — four terminals
+## Running it
 
-Open **four separate terminal windows**, `cd` into the project in each, and run one
-command per window. Leave all four running while you test.
+### The quick way
 
-| Terminal | Command | What it does |
+```powershell
+php artisan dev
+```
+
+One terminal, running the web server, Reverb, a queue worker and Vite together. Good for
+day-to-day work. **It does not run the scheduler**, and its queue worker ignores queue
+priority — so use the four terminals below when testing anything time-based.
+
+### The full way — four terminals
+
+`cd` into the project in each and leave all four running.
+
+| # | Command | What it does |
 |---|---|---|
-| 1 | `php artisan serve` | The website, at http://localhost:8000 |
-| 2 | `php artisan reverb:start` | Live updates — kitchen screen, floor plan, order tracking |
-| 3 | `php artisan queue:work --queue=broadcasts,mail,default` | Delivers the live updates and emails |
-| 4 | `php artisan schedule:work` | Background jobs — payment checks, table auto-clear, reminders |
+| 1 | `php artisan serve` | The site, at http://localhost:8000 |
+| 2 | `php artisan reverb:start` | Live updates — station displays, floor plan, order tracker |
+| 3 | `php artisan queue:work --queue=broadcasts,mail,default` | Delivers those updates and the emails |
+| 4 | `php artisan schedule:work` | Payment reconciliation, table auto-clear, booking reminders, no-show suggestions |
 
-If terminals 2 or 3 are not running, pages still load but **nothing updates live** — you
-would have to refresh by hand.
+The queue order is priority, not decoration: a floor or kitchen frame arriving late is
+useless, a reminder email arriving late is not.
+
+Without terminals 2 and 3, pages still work but **nothing updates live** — you would have
+to refresh by hand.
 
 ---
 
-## 6. Test it — four browser windows
+## Logging in
 
-Test as four people at once: a **customer**, a **waiter**, the **kitchen**, and the
-**admin**. Put the windows side by side so you can watch changes arrive live.
+**Every seeded account's password is `Hello@123`.**
 
-### Why four *separate* browser sessions
+| Role | URL | Email |
+|---|---|---|
+| Customer | http://localhost:8000/login | `customer@coolaroo.test` |
+| Admin | http://localhost:8000/staff/login | `admin@coolaroo.test` |
+| Waitstaff | http://localhost:8000/staff/login | `waiter@coolaroo.test` |
+| Kitchen | http://localhost:8000/staff/login | `kitchen@coolaroo.test` |
+| Bar | http://localhost:8000/staff/login | `bar@coolaroo.test` |
 
-A browser keeps **one staff login at a time**. If you log in as the waiter and then as the
-kitchen in the same browser, the kitchen login replaces the waiter's. So each role needs
-its own session. The easiest way on Windows:
+There are eleven more customer accounts with order history — `jack.t@coolaroo.test`,
+`sarah.j@coolaroo.test` and so on, all the same password.
 
-| Window | Role | Browser | Log in at | Email |
-|---|---|---|---|---|
-| 1 | **Customer** | Chrome | http://localhost:8000/login | `customer@coolaroo.test` |
-| 2 | **Waiter** | Chrome **Incognito** (`Ctrl+Shift+N`) | http://localhost:8000/staff/login | `waiter@coolaroo.test` |
-| 3 | **Kitchen** | Edge | http://localhost:8000/staff/login | `kitchen@coolaroo.test` |
-| 4 | **Admin** | Edge **InPrivate** (`Ctrl+Shift+N`) | http://localhost:8000/staff/login | `admin@coolaroo.test` |
+> If you register a **new** account, the password must be at least 8 characters with upper
+> and lower case, a number and a symbol. `Hello@123` satisfies it.
 
-**Every password is `password`.**
+---
 
-There is also a bar account, `bar@coolaroo.test`, which sees drinks only. Swap it in for
-the kitchen window to test the bar display.
+## Testing it by hand
 
-### Getting a table link (the customer's "QR scan")
+### Use four browser sessions
 
-Customers start an order by scanning the QR code on their table. On a laptop, print the
-link that QR code contains instead, and paste it into the **customer** window:
+A browser holds **one staff login at a time** — logging in as the kitchen replaces the
+waiter. So give each role its own session:
+
+| Window | Role | Browser |
+|---|---|---|
+| 1 | Customer | Chrome |
+| 2 | Waiter | Chrome **Incognito** (`Ctrl+Shift+N`) |
+| 3 | Kitchen | Edge |
+| 4 | Admin | Edge **InPrivate** (`Ctrl+Shift+N`) |
+
+On macOS use Safari and a Safari Private Window for 3 and 4 (`Cmd+Shift+N`).
+
+### Get a table link — the customer's "QR scan"
+
+Customers start by scanning the QR code on their table. On a laptop, print the link that
+code contains and paste it into the **customer** window:
 
 ```powershell
 php artisan tinker --execute="echo app(App\Services\TableQrService::class)->signedUrl(App\Models\RestaurantTable::where('table_number','T1')->first());"
 ```
 
-Change `T1` to any table from `T1` to `T12`. If you edit even one character of the link,
-you should get a **403** — that is the tamper protection working.
+On macOS and Linux, swap the quoting:
 
-### A full walkthrough across all four windows
+```bash
+php artisan tinker --execute='echo app(App\Services\TableQrService::class)->signedUrl(App\Models\RestaurantTable::where("table_number","T1")->first());'
+```
 
-| Step | Window | Do this | You should see |
+Use any table from `T1`–`T9`, or `B1`–`B3` for the bar. Change one character of the link
+and you should get a **403** — that is the tamper protection working.
+
+### The walkthrough
+
+| Step | Window | Do this | Expect |
 |---|---|---|---|
-| 1 | Customer | Open the table link, add two items to the cart, check out | Order placed, awaiting payment |
-| 2 | Customer | Choose **Pay with cash** | The request goes to the waitstaff |
-| 3 | Waiter | Open **Floor** — the cash request appears **without refreshing** — click **Record cash payment** | Order marked paid |
-| 4 | Kitchen | The ticket appears **live** — click **Start**, then **Ready** | Ticket moves across the lanes |
-| 5 | Customer | Watch the order page | Timeline moves paid → preparing → ready on its own |
-| 6 | Waiter | Click **Serve** on the ready order | Order complete |
-| 7 | Admin | Open the **Dashboard**, then **Orders** and **Reports** | Today's figures include the new order |
+| 1 | Customer | Open the table link, add two items, check out | Order placed, awaiting payment |
+| 2 | Customer | Choose **Pay with cash** | Request goes to the floor |
+| 3 | Waiter | Open **Floor** — the cash request appears **without refreshing** — **Record cash payment** | Order marked paid |
+| 4 | Kitchen | The ticket appears **live** — **Start**, then **Ready** | Ticket moves across the lanes |
+| 5 | Customer | Watch the order page | Timeline advances paid → preparing → ready on its own |
+| 6 | Waiter | **Serve** the ready order | Order complete |
+| 7 | Admin | **Dashboard**, then **Orders** and **Reports** | Today's figures include the new order |
 
-If you have Stripe test keys set, choose to pay by card in step 2 instead, with card number
-`4242 4242 4242 4242`, any future expiry date and any 3-digit CVC.
+With Stripe test keys set, pay by card at step 2 instead: card `4242 4242 4242 4242`, any
+future expiry, any 3-digit CVC.
 
-### More things to try
+### Also worth trying
 
-- **Reservations** — as the customer, click **Book a table** on the homepage. As the
-  waiter or admin, approve it under **Reservations**.
-- **Sold out** — as the kitchen, toggle an item unavailable. It greys out on the
+- **Refunds** — as the customer, go to **My orders**, press **Request a refund** on a paid
+  order and fill in the modal. Track its progress on the same page. As the admin, approve
+  or decline it under **Refunds**.
+- **Reservations** — book from the homepage as a customer; approve it as waiter or admin.
+  The venue trades seven days a week, half-hourly from 11:30 to 21:00.
+- **Sold out** — as the kitchen, toggle an item unavailable; it greys out on the
   customer's menu **live**.
-- **Call waiter** — as the customer at a table, press **Call waiter**. The alert pops up on
-  the waiter's floor screen.
-- **Admin** — manage the menu, tables and QR codes, staff accounts, reviews, and settings.
-  Every change is recorded under **Audit log**.
-- **Emails** go to `storage/logs/laravel.log` rather than a real inbox.
+- **Call waiter** — as a seated customer, press **Call waiter**; the alert appears on the
+  floor screen.
+- **Audit log** — as admin, see every change recorded.
+
+### Where the emails go
+
+Mail is written to a log, not sent. Look in **`storage/logs/mail-<date>.log`**.
+
+Stripe and AI failures are logged separately, in `storage/logs/integrations-<date>.log`.
 
 ---
 
-## 7. Run the automated tests
+## Automated tests
 
 ```powershell
 php artisan test
 ```
 
-This runs the full suite on a temporary in-memory database, so it does **not** need MySQL
-running and will not touch your demo data. All tests should pass.
+668 tests. They run against **SQLite in memory**, so MySQL does not need to be running and
+your demo data is never touched.
+
+Useful variations:
+
+```powershell
+php artisan test --filter=RefundRequest
+```
+
+```powershell
+php artisan test --testsuite=Unit
+```
+
+Check code style before pushing:
+
+```powershell
+vendor\bin\pint --test
+```
+
+```powershell
+vendor\bin\pint
+```
+
+---
+
+## What the demo data contains
+
+`php artisan migrate --seed` gives you a populated, internally consistent system:
+
+| | |
+|---|---|
+| Staff | 4 — admin, waitstaff, kitchen, bar |
+| Customers | 12, with history and trust badges (regulars, a flagged no-show, a late cancellation) |
+| Tables | 12 — `T1`–`T9` dining, `B1`–`B3` bar |
+| Menu | 49 items across 10 categories, with sizes, add-ons, allergens and dietary tags |
+| Booking slots | 20 — every half hour, 11:30 to 21:00, seven days a week |
+| Reservations | 56, including bookings on **every day of the next fortnight** |
+| Orders | ~245 across 8 weeks, with line items, payments and full status histories |
+| Reviews | 13 visible (3 featured) plus 1 hidden |
+
+It is also seeded so every dashboard widget has something to show: a cash payment waiting,
+an open refund request, a stock conflict, a late ticket, low stock and an unassigned
+booking.
+
+To reset at any point — **this wipes the database**:
+
+```powershell
+php artisan migrate:fresh --seed
+```
+
+---
+
+## Project layout
+
+```
+app/
+  Enums/                  backed enums; status transitions live here
+  Http/Controllers/       thin — Admin/, Customer/, Staff/, Public/
+  Http/Requests/          all validation
+  Models/
+  Policies/               authorisation
+  Services/               all business logic
+database/
+  migrations/  seeders/  factories/
+public/css/               style.css (public) + dashboard.css (staff/admin)
+resources/
+  js/                     Echo, floor, KDS, order tracker, modals
+  views/components/       Blade components — layouts, modals, drawers, badges
+  views/{admin,staff,customer,public}/
+routes/web.php
+tests/{Feature,Unit}/
+```
+
+**Conventions** if you are contributing: business logic goes in `app/Services`, not
+controllers. Validation goes in Form Requests. Status changes go through the enum
+transition maps, never by setting a column directly. Views use Blade components — no
+`@extends` or `@include`. Every interactive control carries a `data-testid`. No CSS
+framework.
+
+---
+
+## Command reference
+
+| Task | Command |
+|---|---|
+| Start everything (quick) | `php artisan dev` |
+| Reset the database | `php artisan migrate:fresh --seed` |
+| Run the tests | `php artisan test` |
+| Fix code style | `vendor\bin\pint` |
+| Rebuild assets | `npm run build` |
+| Clear caches after editing `.env` | `php artisan config:clear` |
+| Clear compiled Blade | `php artisan view:clear` |
+| List all routes | `php artisan route:list` |
+| Back up the database | `php artisan db:backup` |
 
 ---
 
@@ -287,10 +428,13 @@ running and will not touch your demo data. All tests should pass.
 | Problem | Fix |
 |---|---|
 | `No connection could be made … actively refused it` | MySQL is not running. Start it in XAMPP |
-| `cURL error 60` in `storage/logs/integrations-*.log` | Do step 4 |
-| Page loads but nothing updates live | Terminals 2 (Reverb) and 3 (queue) must both be running |
-| Live updates stopped after editing the `REVERB_*` values | Run `npm run build` again, then restart all four terminals |
-| Changed `.env` but nothing changed | Run `php artisan config:clear`, then restart `php artisan serve` |
-| "The assistant is busy right now" | No `AI_API_KEY`, or Gemini is briefly overloaded — try again. The real reason is in `storage/logs/integrations-*.log` |
-| Port 8000 already in use | Run `php artisan serve --port=8001`, and set `APP_URL=http://localhost:8001` in `.env` so table links match |
-| Want the demo data back | `php artisan migrate:fresh --seed`, then `php artisan db:seed --class=DemoSeeder`. **This wipes the database** |
+| `cURL error 60` in `storage/logs/integrations-*.log` | Do [setup step 4](#4-windows-only--let-php-make-https-calls) |
+| Pages load but nothing updates live | Reverb and the queue worker must both be running |
+| Live updates broke after editing `REVERB_*` | `npm run build` again, then restart everything |
+| Changed `.env`, nothing happened | `php artisan config:clear`, then restart `php artisan serve` |
+| A Blade edit has no effect | `php artisan view:clear` |
+| "The assistant is busy right now" | No `AI_API_KEY`, or the model is briefly overloaded. Real reason is in `storage/logs/integrations-*.log` |
+| Port 8000 already in use | `php artisan serve --port=8001`, and set `APP_URL=http://localhost:8001` in `.env` so table links match |
+| Tests fail on `pdo_sqlite` | Enable `pdo_sqlite` and `sqlite3` in `php.ini` |
+| No email arrived | It never sends. Read `storage/logs/mail-<date>.log` |
+| Want the demo data back | `php artisan migrate:fresh --seed`. **This wipes the database** |

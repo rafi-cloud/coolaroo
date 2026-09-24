@@ -169,7 +169,6 @@ class CustomerManagementTest extends TestCase
             'no_show_by_staff_id' => $this->waitstaff->staff_id,
         ]);
 
-        // Prior to clearing: customer has uncleared no-show -> Flagged (BR40)
         $trustService = app(TrustService::class);
         $this->assertSame(TrustService::BADGE_FLAGGED, $trustService->badge($customer));
 
@@ -190,7 +189,6 @@ class CustomerManagementTest extends TestCase
         $this->assertSame($this->admin->staff_id, $reservation->no_show_cleared_by_staff_id);
         $this->assertSame('Customer called to apologize, stuck in subway blackout', $reservation->no_show_clear_reason);
 
-        // Audit log created (FR10)
         $this->assertDatabaseHas('audit_log', [
             'staff_id' => $this->admin->staff_id,
             'action_type' => 'no_show_cleared',
@@ -198,7 +196,6 @@ class CustomerManagementTest extends TestCase
             'entity_id' => $reservation->reservation_id,
         ]);
 
-        // Badge recalculated on read -> now New (no uncleared no-shows, < 3 completed visits)
         $this->assertSame(TrustService::BADGE_NEW, $trustService->badge($customer));
     }
 

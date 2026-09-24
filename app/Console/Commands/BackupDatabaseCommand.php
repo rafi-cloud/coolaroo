@@ -7,15 +7,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 
-/**
- * Daily mysqldump, kept 14 days.
- *
- * The dump runs through mysqldump rather than PHP because a PHP-side dump of a
- * live database is neither consistent nor fast. The binary is named by
- * MYSQLDUMP_PATH, which differs between XAMPP on Windows and the VPS,
- * and the password reaches it through MYSQL_PWD rather than the
- * command line, where `ps` would show it.
- */
 class BackupDatabaseCommand extends Command
 {
     protected $signature = 'db:backup {--keep-days= : Override how many days of dumps to keep}';
@@ -67,7 +58,6 @@ class BackupDatabaseCommand extends Command
         return self::SUCCESS;
     }
 
-    /** dumps older than the retention window go. */
     private function prune(string $directory): int
     {
         $keepDays = (int) ($this->option('keep-days') ?? config('database.backup_keep_days', 14));

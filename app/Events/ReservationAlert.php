@@ -10,12 +10,6 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/**
- * One event for every reservation alert kind, plus the no-show
- * suggestion — the scheduler's only way of telling the floor a booking
- * is past grace, since only staff may confirm the no-show itself.
- * Constants rather than a backed enum: no column stores these.
- */
 class ReservationAlert implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;
@@ -30,7 +24,9 @@ class ReservationAlert implements ShouldBroadcast, ShouldDispatchAfterCommit
 
     public function __construct(public Reservation $reservation, public string $kind) {}
 
-    /** @return array<int, PrivateChannel> */
+    /**
+     * @return array<int, PrivateChannel>
+     */
     public function broadcastOn(): array
     {
         return [new PrivateChannel('floor'), new PrivateChannel('admin')];

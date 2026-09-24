@@ -4,7 +4,6 @@ namespace App\Http\Requests\Staff;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Authorization is role:waitstaff on the route — no per-table condition. */
 class SeatTableRequest extends FormRequest
 {
     public function authorize(): bool

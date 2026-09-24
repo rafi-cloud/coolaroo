@@ -9,10 +9,6 @@ use App\Services\RefundService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 
-/**
- * FR51: the customer half of raising a refund request. The request itself is
- * only ever a request — RefundService::approve() is Admin's, and unchanged.
- */
 class RefundRequestController extends Controller
 {
     public function __construct(private RefundService $refunds) {}
@@ -30,6 +26,6 @@ class RefundRequestController extends Controller
             $request->user('customer'),
         );
 
-        return redirect()->route('orders.show', $order)->with('status', 'refund-requested');
+        return redirect()->route('orders.index')->with('status', 'refund-requested');
     }
 }

@@ -12,7 +12,9 @@ use Illuminate\Support\Collection;
 
 class RestaurantTable extends Model
 {
-    /** @use HasFactory<RestaurantTableFactory> */
+    /**
+     * @use HasFactory<RestaurantTableFactory>
+     */
     use HasFactory;
 
     const UPDATED_AT = null;
@@ -40,10 +42,6 @@ class RestaurantTable extends Model
     }
 
     /**
-     * FR65: bookings holding this table — an open visit row with opened_at
-     * still NULL is what an assignment is, and seatReservation() is what opens
-     * it.
-     *
      * @return Collection<int, Reservation>
      */
     public function heldReservations(): Collection
@@ -59,9 +57,6 @@ class RestaurantTable extends Model
     }
 
     /**
-     * FR69: of those, the ones a waiter can seat right now — confirmed and for
-     * today. Same "confirmed and assigned" condition S27 seats on.
-     *
      * @return Collection<int, Reservation>
      */
     public function seatableReservations(): Collection

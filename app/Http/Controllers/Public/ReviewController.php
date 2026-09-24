@@ -7,11 +7,6 @@ use App\Models\Feedback;
 use App\Services\SettingService;
 use Illuminate\View\View;
 
-/**
- * The public review wall behind the homepage's "What our diners say".
- * Hidden feedback never appears here, and the averages follow the same
- * minimum-review rule as the homepage card (BR45).
- */
 class ReviewController extends Controller
 {
     public function __construct(

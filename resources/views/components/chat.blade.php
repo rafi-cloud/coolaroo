@@ -28,14 +28,13 @@
 
     <div class="chat-log" id="chat-log" role="log" aria-live="polite" data-testid="chat-log">
       <div class="chat-msg chat-msg-bot">
-        <p style="margin:0 0 .4rem;">Hi! I'm your AI Dining Assistant. Ask me anything about our dishes, prices, dietary options (GF, vegan, etc.), allergens, or today's chef specials.</p>
+        <p style="margin:0 0 .4rem;">Hi! I'm your AI Dining Assistant. Ask me anything about our dishes, prices, dietary options (GF, vegan, etc.), allergens, or drink recommendations.</p>
         <div class="chat-starters">
           <span class="chat-starter-title">Suggested questions:</span>
           <div class="chat-starter-list">
-            <button type="button" class="chat-starter-btn" data-question="What are your vegetarian options?">🌱 Vegetarian options</button>
-            <button type="button" class="chat-starter-btn" data-question="Do you have gluten-free dishes?">🌾 Gluten-free dishes?</button>
-            <button type="button" class="chat-starter-btn" data-question="What are today's specials?">🥩 Any specials today?</button>
-            <button type="button" class="chat-starter-btn" data-question="What drinks or wines do you recommend?">🍷 Drink recommendations</button>
+            @foreach (\App\Services\AiMenuService::STARTER_QUESTIONS as $starter)
+              <button type="button" class="chat-starter-btn" data-question="{{ $starter['question'] }}">{{ $starter['label'] }}</button>
+            @endforeach
           </div>
         </div>
       </div>
@@ -44,11 +43,17 @@
     <form class="chat-form" id="chat-form" action="{{ route('ai.chat') }}" method="post">
       @csrf
       <label class="visually-hidden" for="chat-message">Your question</label>
-      <input type="text" id="chat-message" name="message" maxlength="500" autocomplete="off" required placeholder="Ask about ingredients, diet, or specials..." data-testid="chat-input">
+      <input type="text" id="chat-message" name="message" maxlength="500" autocomplete="off" required placeholder="Ask about ingredients, diet, dishes, or drinks..." data-testid="chat-input">
       <button type="submit" class="btn btn-orange" id="chat-send" data-testid="chat-send">Send</button>
     </form>
 
-    <p class="chat-note" data-testid="chat-disclaimer">{{ \App\Services\AiMenuService::ALLERGEN_DISCLAIMER }}</p>
+    <details class="chat-note" data-testid="chat-disclaimer">
+      <summary>
+        <span>⚠️ Allergen &amp; dietary notice</span>
+        <span class="chat-note-toggle">Read notice &darr;</span>
+      </summary>
+      <p>{{ \App\Services\AiMenuService::ALLERGEN_DISCLAIMER }}</p>
+    </details>
   </section>
 </div>
 
@@ -87,7 +92,22 @@ document.addEventListener('DOMContentLoaded', function () {
     node.innerHTML = '<span></span><span></span><span></span>';
     log.appendChild(node);
     log.scrollTop = log.scrollHeight;
+
+    node.slowTimer = window.setTimeout(function () {
+      var note = document.createElement('p');
+      note.className = 'chat-typing-note';
+      note.textContent = 'Still checking the menu…';
+      node.appendChild(note);
+      log.scrollTop = log.scrollHeight;
+    }, 8000);
+
     return node;
+  }
+
+  function clearTyping(node) {
+    if (!node) { return; }
+    window.clearTimeout(node.slowTimer);
+    if (node.parentNode) { node.parentNode.removeChild(node); }
   }
 
   function chips(items) {
@@ -141,6 +161,9 @@ document.addEventListener('DOMContentLoaded', function () {
     send.disabled = true;
     var typing = showTyping();
 
+    var controller = new AbortController();
+    var abortTimer = window.setTimeout(function () { controller.abort(); }, 35000);
+
     fetch(form.action, {
       method: 'POST',
       headers: {
@@ -148,9 +171,11 @@ document.addEventListener('DOMContentLoaded', function () {
         'Accept': 'application/json',
         'X-CSRF-TOKEN': token
       },
-      body: JSON.stringify({ message: question, history: history })
+      body: JSON.stringify({ message: question, history: history }),
+      signal: controller.signal
     })
     .then(function (response) {
+      window.clearTimeout(abortTimer);
       if (response.status === 503) {
         throw new Error('Our menu assistant is busy right now. Please try again in a moment.');
       }
@@ -161,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .then(function (data) {
       send.disabled = false;
-      if (typing && typing.parentNode) { typing.parentNode.removeChild(typing); }
+      clearTyping(typing);
       bubble(data.answer, 'bot');
       chips(data.items);
 
@@ -170,9 +195,15 @@ document.addEventListener('DOMContentLoaded', function () {
       history = history.slice(-10);
     })
     .catch(function (error) {
+      window.clearTimeout(abortTimer);
       send.disabled = false;
-      if (typing && typing.parentNode) { typing.parentNode.removeChild(typing); }
-      bubble(error.message, 'bot');
+      clearTyping(typing);
+      bubble(
+        error.name === 'AbortError'
+          ? 'Our menu assistant is taking too long right now. Please try again in a moment.'
+          : error.message,
+        'bot'
+      );
     });
   });
 });

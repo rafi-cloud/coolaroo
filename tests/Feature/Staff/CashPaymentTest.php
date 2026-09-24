@@ -19,7 +19,6 @@ class CashPaymentTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** A staff-taken order: pending_payment, but the customer never asked for cash. */
     private function pendingOrderWithoutCashRequest(): Order
     {
         $item = MenuItem::factory()->create(['category_id' => MenuCategory::factory(), 'destination' => Destination::Kitchen]);

@@ -1,16 +1,11 @@
 :root{
-
-  /* color scheme is yet to be finalised */
   --orange:#FF6B2C;
   --orange-dark:#E14D14;
   --amber:#FFB627;
   --cream:#FFF6EC;
   --sand:#FBEBDA;
   --ink:#2B1A10;
-  /*  
-  --ink:#2B1510;
-   --amber:#FF6627;
-   --body:#4B5647; */
+
   --body:#6B5647;
   --dark:#241A14;
   --white:#fff;
@@ -73,11 +68,6 @@ svg{display:block}
 .btn-white{background:#fff;color:var(--ink)}
 .btn-white:hover{background:var(--sand)}
 
-/* .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem clamp(2rem,5vw,4rem)}
-.dish{display:flex;align-items:center;gap:1.1rem}
-.dish .thumb{
-  width:72px;height:72px;border-radius:50%;overflow:hidden;flex:none;
-  box-shadow:0 6px 16px rgba(43,26,16,.14); */
 .topbar{
   position:sticky;top:0;z-index:50;
   background:#fff;
@@ -109,8 +99,7 @@ svg{display:block}
   background:var(--orange);color:#fff;
   font-size:.62rem;font-weight:700;
   min-width:17px;height:17px;border-radius:50%;
-    /* font-size:clamp(2.4rem,6.2vw,4.6rem);font-weight:800;letter-spacing:-.02em;
-  text-shadow:0 4px 24px rgba(60,25,5,.45); */
+
   display:grid;place-items:center;line-height:1;
 }
 
@@ -174,13 +163,6 @@ svg{display:block}
   display:block;font-family:var(--serif);font-style:italic;
   font-size:1rem;color:rgba(255,255,255,.9);
 }
-/* .tiles{display:grid;grid-template-columns:repeat(3,1fr)}
-.tile{position:relative;min-height:260px;overflow:hidden;display:block}
-.tile img{
-  position:absolute;inset:0;
-  width:100%;height:100%;object-fit:cover;
-  transition:transform .4s ease;
-} */
 
 .about{
   display:grid;grid-template-columns:1fr 1fr;
@@ -395,12 +377,6 @@ svg{display:block}
   .menu-cta{gap:1.1rem}
 }
 
-
-/* =====================================================================
-   v2 additions: hamburger nav, menu filter, dish tags, reviews, chat
-   ===================================================================== */
-
-/* hamburger (CSS only, shown below 820px) */
 .nav-toggle{position:absolute;opacity:0;pointer-events:none}
 .hamburger{
   display:none;margin-left:auto;width:44px;height:44px;border-radius:6px;
@@ -426,7 +402,6 @@ svg{display:block}
   .icons{display:none}
 }
 
-/* menu category links */
 .menu-filter{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:.6rem 0 2.4rem}
 .menu-filter a{
   padding:.45em 1.1em;border:1px solid #E6D3BF;border-radius:999px;
@@ -434,7 +409,6 @@ svg{display:block}
 }
 .menu-filter a:hover,.menu-filter a.on{background:var(--ink);border-color:var(--ink);color:#fff}
 
-/* dish price states and tags */
 .dish-head .price small{font-size:.75rem;font-weight:500;color:var(--body)}
 .dish-head .price s{font-weight:400;color:var(--body);margin-right:.25rem}
 .dish p.tags{font-family:var(--sans);font-style:normal;display:flex;gap:.35rem;margin-top:.35rem}
@@ -447,7 +421,6 @@ svg{display:block}
 .dish.is-soldout .thumb,.dish.is-soldout .dish-head{opacity:.5}
 .menu-note{font-size:.9rem;color:var(--body)}
 
-/* reviews */
 .reviews{display:grid;grid-template-columns:300px 1fr;gap:clamp(1.6rem,4vw,3rem);margin-top:2.6rem;align-items:start}
 .reviews.no-rating-card{grid-template-columns:1fr}
 .rating-card{background:#fff;border-radius:12px;padding:1.8rem;box-shadow:var(--shadow)}
@@ -473,12 +446,6 @@ svg{display:block}
   .review-grid{grid-template-columns:1fr}
 }
 
-
-/* =====================================================================
-   T006: order-bar header for QR table ordering (S04, S05, S07 QR variant)
-   — pulled from docs/design/colaroo html temp 2/customer-pages.css. The rest of
-   that file (auth, cart, item modal) lands with the tasks that build those pages.
-   ===================================================================== */
 .order-bar{
   position:sticky;top:0;z-index:50;background:#fff;
   box-shadow:0 2px 18px rgba(43,26,16,.07);
@@ -495,10 +462,6 @@ svg{display:block}
 }
 .table-chip svg{width:16px;height:16px;color:var(--orange)}
 
-/* =====================================================================
-   T020: auth pages (S07 login / register / reset / verify)
-   — pulled from docs/design/colaroo html temp 2/customer-pages.css.
-   ===================================================================== */
 .auth{
   min-height:calc(100vh - 74px);
   display:flex;align-items:center;justify-content:center;
@@ -551,6 +514,7 @@ svg{display:block}
 .auth-error svg{width:18px;height:18px;flex:none;margin-top:1px}
 .auth-error.auth-success{background:#DDF2E5;border-color:#BFE6CE;color:#1F7844}
 .field-error{color:#9A2D14;font-size:.82rem;margin-top:.4rem}
+.field-hint{color:#6B5647;font-size:.82rem;margin-top:.4rem}
 .rating-field{border:none;padding:0;margin:0 0 1.1rem}
 .rating-field legend{font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:.4rem;padding:0}
 .rating-options{display:flex;gap:1rem}
@@ -564,9 +528,6 @@ svg{display:block}
   margin:2.5rem auto;
 }
 
-/* order status — the same five colours as dashboard.css's .b-* badges;
-   'paid' has no colour of its own in that scheme (see T062 guide/log) so it
-   reuses 'pending''s */
 .status-pill{
   display:inline-block;padding:.3em .9em;border-radius:100px;
   font-size:.78rem;font-weight:700;letter-spacing:.02em;
@@ -577,7 +538,6 @@ svg{display:block}
 .status-pill-served{background:#EFE7E0;color:var(--served)}
 .status-pill-cancelled{background:#F0EAE5;color:var(--cancelled)}
 
-/* ===== Modern Customer Order Status & Tracking (S12) ===== */
 .order-page {
   padding-block: 2rem 4rem;
 }
@@ -654,7 +614,6 @@ svg{display:block}
   color: var(--orange);
 }
 
-/* Flash banners */
 .order-banner-paid,
 .order-banner-cash {
   display: flex;
@@ -686,7 +645,6 @@ svg{display:block}
   margin-bottom: 0.15rem;
 }
 
-/* Two-column layout */
 .order-layout {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -700,7 +658,6 @@ svg{display:block}
   }
 }
 
-/* Tracking Hero Card */
 .order-track-card {
   background: #FFFFFF;
   border: 1.5px solid #EEE0D0;
@@ -792,7 +749,6 @@ svg{display:block}
   font-weight: 600;
 }
 
-/* ===== THE PROGRESS TRACKING BAR (TIMELINE) ===== */
 .order-timeline-wrapper {
   margin-block: 0.5rem 1rem;
 }
@@ -815,7 +771,6 @@ svg{display:block}
   padding-inline: 0.4rem;
 }
 
-/* Connecting track bar between steps */
 .order-timeline-step::after {
   content: '';
   position: absolute;
@@ -836,7 +791,6 @@ svg{display:block}
   background: #2E7D32;
 }
 
-/* Step Node (Circle) */
 .order-step-node {
   width: 44px;
   height: 44px;
@@ -866,7 +820,6 @@ svg{display:block}
   line-height: 1;
 }
 
-/* Active / Current Step */
 .order-timeline-step.is-current .order-step-node {
   background: var(--orange);
   border-color: #C04200;
@@ -881,7 +834,6 @@ svg{display:block}
   100% { box-shadow: 0 0 0 4px rgba(230, 81, 0, 0.2), 0 4px 12px rgba(230, 81, 0, 0.25); }
 }
 
-/* Completed / Done Step */
 .order-timeline-step.is-done .order-step-node {
   background: #1F7844;
   border-color: #176035;
@@ -897,7 +849,6 @@ svg{display:block}
   display: none;
 }
 
-/* Step Label & Info */
 .order-step-info {
   display: flex;
   flex-direction: column;
@@ -939,7 +890,6 @@ svg{display:block}
   margin-top: 0.25rem;
 }
 
-/* Mobile Stepper Layout (<= 680px) */
 @media (max-width: 680px) {
   .order-timeline {
     display: flex;
@@ -973,7 +923,6 @@ svg{display:block}
   }
 }
 
-/* Ready Alert Banner */
 .order-ready-alert {
   display: flex;
   align-items: center;
@@ -1022,7 +971,6 @@ svg{display:block}
   opacity: 0.95;
 }
 
-/* ETAs Grid */
 .order-etas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1056,7 +1004,6 @@ svg{display:block}
   flex: none;
 }
 
-/* Pending Payment Box */
 .order-pay-actions-box {
   background: #FFFBF5;
   border: 1.5px solid #F2DEC8;
@@ -1102,7 +1049,163 @@ svg{display:block}
   background: #FFEBEE;
 }
 
-/* Feedback Box */
+.order-refund-link {
+  margin: 1.2rem 0 0;
+  font-size: 0.85rem;
+  color: var(--body);
+  text-align: right;
+}
+.order-refund-link a {
+  color: var(--orange-dark);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.refund-modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 12px 36px rgba(43, 26, 16, 0.25);
+  animation: slideUp 0.2s ease;
+}
+@media (min-width: 640px) {
+  .refund-modal {
+    border-radius: 16px;
+  }
+}
+.refund-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid #F0E6D8;
+}
+.refund-modal-head h2 {
+  font-size: 1.15rem;
+  margin: 0;
+  color: var(--ink);
+}
+.refund-modal-close {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sand);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.refund-modal-close:hover {
+  background: var(--orange);
+  color: #fff;
+}
+.refund-modal-body {
+  padding: 1.2rem 1.4rem 1.4rem;
+}
+.refund-modal-sub {
+  font-size: 0.85rem;
+  color: var(--body);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+.refund-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.refund-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.order-refunds {
+  margin: 0 0 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #F3EAE0;
+}
+.order-refunds-title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--body);
+  margin: 0 0 0.6rem;
+}
+.refund-track {
+  background: var(--cream);
+  border: 1px solid #F0E6D8;
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  margin-bottom: 0.6rem;
+}
+.refund-track:last-child {
+  margin-bottom: 0;
+}
+.refund-track-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+.refund-track-item {
+  font-size: 0.85rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+.refund-track-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+}
+.refund-track-steps li {
+  position: relative;
+  font-size: 0.78rem;
+  color: var(--body);
+  padding-left: 1.05rem;
+}
+.refund-track-steps li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid #D8C8B6;
+  background: #fff;
+}
+.refund-track-steps li.is-done {
+  color: var(--ink);
+  font-weight: 600;
+}
+.refund-track-steps li.is-done::before {
+  background: #2E9E5B;
+  border-color: #2E9E5B;
+}
+.refund-track-note {
+  font-size: 0.8rem;
+  color: #9B1C1C;
+  line-height: 1.45;
+  margin: 0 0 0.5rem;
+}
+.refund-track-meta {
+  font-size: 0.75rem;
+  color: var(--body);
+  margin: 0;
+}
+
 .order-feedback-section {
   padding-top: 0.5rem;
 }
@@ -1215,7 +1318,6 @@ svg{display:block}
   box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.15);
 }
 
-/* ===== Right Column: Order Details Card ===== */
 .order-details-card {
   background: #FFFFFF;
   border: 1.5px solid #EEE0D0;
@@ -1355,7 +1457,6 @@ svg{display:block}
   display: inline-block;
 }
 
-/* Totals */
 .order-summary-totals {
   background: #FAF5F0;
   border-radius: 10px;
@@ -1433,8 +1534,6 @@ svg{display:block}
   font-weight: 700;
 }
 
-
-/* ===== Full Menu & Ordering (S02, FR32, FR33, FR34) ===== */
 .menu-head{padding-top:2rem;margin-bottom:1.5rem}
 .cat-tabs{
   display:flex;flex-wrap:wrap;gap:.6rem;
@@ -1485,21 +1584,16 @@ svg{display:block}
 .order-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
   gap:1.4rem;padding-bottom:5rem;
-  /* Each card takes its own height. Stretching them to the tallest in the row
-     is what left the dead space above "View details". */
+
   align-items:start;
 }
-/* Scoped to .order-grid on purpose: the "My orders" list (S13, further down
-   this file) reuses .order-card / .order-card-head / .order-card-body, and
-   being later it otherwise wins — that was the divider under the price, the
-   1rem margin and the 1.4rem padding showing up on menu cards. */
+
 .order-grid .order-card{
   background:#fff;border-radius:14px;overflow:hidden;padding:.5rem;
   box-shadow:0 2px 10px rgba(43,26,16,.06);
   border:1px solid #F1E5D6;
   display:flex;flex-direction:column;
-  /* Shadow rather than transform: a transform here would become the
-     containing block for any position:fixed descendant (S03's modal). */
+
   transition:box-shadow .18s ease,border-color .18s ease;
 }
 .order-grid .order-card:hover{box-shadow:0 10px 26px rgba(43,26,16,.13);border-color:#E6D2BC}
@@ -1527,7 +1621,7 @@ svg{display:block}
 .order-grid .order-card p.desc{
   font-size:.83rem;line-height:1.4;margin:0;
   font-family:var(--serif);font-style:italic;color:var(--body);
-  /* Two lines keeps the cards from running tall; the modal has the rest. */
+
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
 .order-grid .order-card p.tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:0}
@@ -1543,9 +1637,6 @@ svg{display:block}
 .order-grid .order-card-foot{margin-top:.6rem;padding-top:.65rem;border-top:1px solid #F5EAE0}
 .order-grid .order-card-foot .btn{width:100%;justify-content:center}
 
-/* =====================================================================
-   T034: item detail modal (S03)
-   ===================================================================== */
 .modal-scrim{
   position:fixed;inset:0;background:rgba(36,26,20,.6);z-index:90;
   display:none;align-items:flex-end;justify-content:center;
@@ -1603,8 +1694,7 @@ svg{display:block}
 }
 .item-modal-section legend{font-weight:700;font-size:.9rem;color:var(--ink);padding:0 .4rem}
 .size-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:.6rem}
-/* Radio in its own column, name above price — on one row the price ran out
-   of the box at desktop widths, where three options share the modal. */
+
 .size-option-label{
   display:grid;grid-template-columns:auto 1fr;align-items:center;
   gap:.1rem .55rem;padding:.55rem .75rem;
@@ -1668,7 +1758,6 @@ svg{display:block}
 .modal-state-notice.no-table .notice-body{display:flex;align-items:center;gap:.7rem}
 .modal-state-notice.paused{background:#FFF7EE;color:var(--ink);border-left:4px solid var(--amber)}
 
-/* ---------- reservation wizard (S18) ---------- */
 .reserve-section{background:var(--sand)}
 .reserve-success-card,.reserve-paused-card{
   background:var(--white);border-radius:12px;box-shadow:var(--shadow);
@@ -1751,9 +1840,6 @@ svg{display:block}
   .wizard-step-node .step-label{display:none}
 }
 
-/* ==========================================================================
-   Customer Account Pages (S13 My Orders, S19 My Reservations)
-   ========================================================================== */
 .customer-container{
   padding-block:clamp(2rem,5vw,3.5rem);
 }
@@ -1790,7 +1876,6 @@ svg{display:block}
 .customer-empty-card h3{font-size:1.3rem;margin-bottom:.4rem}
 .customer-empty-card p{color:var(--body);font-size:.93rem}
 
-/* Orders list (S13) */
 .orders-list{display:flex;flex-direction:column;gap:1.2rem}
 .order-card{
   background:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(43,26,16,.06);
@@ -1810,6 +1895,10 @@ svg{display:block}
 .order-badge-refund{
   display:inline-block;padding:.2rem .6rem;border-radius:4px;
   font-size:.75rem;font-weight:700;background:#FDE8E8;color:#9B1C1C;
+}
+.order-badge-refund-pending{
+  display:inline-block;padding:.2rem .6rem;border-radius:4px;
+  font-size:.75rem;font-weight:700;background:#FEF3C7;color:#92400E;
 }
 
 .order-card-body{
@@ -1832,7 +1921,6 @@ svg{display:block}
 }
 .btn-subtle:hover{background:#EFE2D2}
 
-/* Reservations (S19) */
 .reservations-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1.4rem;
 }
@@ -1934,7 +2022,6 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
 
 .customer-pagination{margin-top:2rem;width:100%}
 
-/* Accessible framework-free pagination */
 .pagination-nav{
   display:flex;
   align-items:center;
@@ -2003,7 +2090,7 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
   background:transparent;
   cursor:default;
 }
-/* Meal builder (S16) */
+
 .mb-form{margin-top:2rem;max-width:760px}
 .mb-grid{display:grid;gap:1.2rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .mb-field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.2rem}
@@ -2038,7 +2125,6 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
 .mb-scan{font-size:.9rem;color:var(--body)}
 .mb-note{margin-top:2rem;font-size:.85rem;color:var(--body);max-width:760px}
 
-/* Chat widget (S17, FR43, NFR11) */
 .chat{position:fixed;right:1.5rem;bottom:1.5rem;z-index:999}
 .chat-launcher{
   display:inline-flex;align-items:center;gap:.65rem;
@@ -2149,6 +2235,10 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
 }
 .chat-typing span:nth-child(2){animation-delay:.2s}
 .chat-typing span:nth-child(3){animation-delay:.4s}
+.chat-typing{flex-wrap:wrap}
+.chat-typing-note{
+  flex-basis:100%;margin:.35rem 0 0;font-size:.78rem;color:var(--body);
+}
 @keyframes chatDotBounce{
   0%,80%,100%{transform:scale(0.8);opacity:.4}
   40%{transform:scale(1.2);opacity:1}
@@ -2166,14 +2256,24 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
 .chat-form input:focus{outline:none;border-color:var(--orange-dark);background:#fff}
 .chat-form .btn{border-radius:999px;padding:.55rem 1.1rem;font-size:.88rem;font-weight:600}
 .chat-note{
-  padding:.5rem 1rem .75rem;font-size:.72rem;color:var(--body);
-  background:#fff;line-height:1.35;border-top:1px solid #F5EFE8;
+  padding:.45rem 1rem;font-size:.72rem;color:var(--body);
+  background:#fff;border-top:1px solid #F5EFE8;
 }
+.chat-note summary{
+  cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;
+  font-weight:600;color:var(--muted);transition:color .15s ease;user-select:none;
+}
+.chat-note summary:hover,.chat-note summary:focus-visible{color:var(--ink)}
+.chat-note-toggle{font-weight:400;font-size:.68rem;color:var(--orange-dark);text-decoration:underline}
+.chat-note[open]{padding-bottom:.65rem}
+.chat-note[open] summary{margin-bottom:.35rem;color:var(--ink)}
+.chat-note[open] .chat-note-toggle{text-decoration:none}
+.chat-note p{margin:0;color:var(--body);font-size:.7rem;line-height:1.35}
 
 @media (max-width:480px){
   .chat{right:1rem;bottom:1rem}
   .chat-panel{position:fixed;right:.5rem;left:.5rem;bottom:.5rem;width:auto;height:min(580px,calc(100vh - 1rem))}
-  /* The header holds four things; below 480px it needs the room back. */
+
   .chat-head{gap:.5rem;padding:.75rem .85rem}
   .chat-head h2{font-size:.88rem}
   .chat-head-sub{font-size:.68rem}
@@ -2182,7 +2282,6 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
   .chat-launcher{padding:.85rem;border-radius:50%}
 }
 
-/* AI Meal Builder & Nav integration styles */
 .nav-ai{display:inline-flex;align-items:center;font-weight:600;color:var(--orange-dark)}
 .hero-actions{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:1.5rem}
 .btn-white{
@@ -2210,12 +2309,10 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
 .menu-ai-banner strong{font-size:.98rem;color:var(--ink)}
 .menu-ai-banner span{font-size:.84rem;color:var(--body)}
 
-/* Footer legal links (NFR12) */
 .foot-links{display:flex;align-items:center;gap:.7rem;color:rgba(255,255,255,.75);font-size:.88rem}
 .foot-links a{color:rgba(255,255,255,.8);text-decoration:underline;text-underline-offset:3px}
 .foot-links a:hover{color:var(--orange)}
 
-/* Legal pages (Privacy Policy & Terms — NFR12) */
 .legal-card{
   background:#fff;border-radius:12px;box-shadow:var(--shadow);
   padding:clamp(1.5rem,4vw,3.5rem);margin-bottom:3rem;
@@ -2243,7 +2340,6 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
 }
 .legal-nav-link.active{background:var(--orange);color:#fff}
 
-/* Accessible skip-to-content link (NFR11) */
 .skip-link{
   position:absolute;top:-999px;left:-999px;z-index:999;
 }
@@ -2254,7 +2350,6 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
   width:auto;height:auto;clip:auto;white-space:normal;
 }
 
-/* 44px minimum touch targets on mobile viewports (NFR11, SDD 8.7) */
 @media (max-width:820px){
   .btn,
   .cat-tab,
@@ -2268,12 +2363,10 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
     display:inline-flex;align-items:center;justify-content:center;
   }
   .filter-checkbox{padding:.5rem .9rem}
-  /* Kept out of the list above: inline-flex would drop its margin-left:auto,
-     which is what parks it top-right over the image. */
+
   .item-modal-close{width:44px;height:44px;min-height:44px;min-width:44px}
 }
 
-/* ===== Cart Page (S08, FR35, FR36, UC08, NFR11) ===== */
 .cart-page{
   padding-block:clamp(1.5rem,3.5vw,3rem);
 }
@@ -2505,7 +2598,6 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
   .cart-btn-more,.cart-btn-clear{width:100%;text-align:center;justify-content:center}
 }
 
-/* ===== Payment Page (S09, FR46, FR47, FR48, BR24, BR25, NFR11) ===== */
 .pay-page{
   padding-block:clamp(1.5rem,3.5vw,3rem);
 }
@@ -2653,8 +2745,6 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
 .pay-summary-total-label{font-size:1.05rem;font-weight:700;color:var(--ink)}
 .pay-summary-total-amount{font-size:1.75rem;font-weight:800;color:var(--orange-dark)}
 
-
-/* ---------- all-reviews page ---------- */
 .reviews-summary{
   display:flex;
   flex-wrap:wrap;

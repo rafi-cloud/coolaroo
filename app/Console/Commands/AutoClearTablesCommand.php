@@ -6,9 +6,6 @@ use App\Services\SettingService;
 use App\Services\TableStatusService;
 use Illuminate\Console\Command;
 
-/**
- * Scheduled every five minutes.
- */
 class AutoClearTablesCommand extends Command
 {
     protected $signature = 'tables:auto-clear';

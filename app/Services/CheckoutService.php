@@ -13,12 +13,6 @@ use App\Models\Staff;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-/**
- * Takes the plain array from CartService::rawLines(), not the cart itself — checkout doesn't need to know a cart is
- * session-backed. $staffActor is null for the QR customer path and
- * switches the staff-order differences: exact stock check (not the 5x QR
- * buffer), taken_by_staff_id recorded, event_source 'waitstaff'.
- */
 class CheckoutService
 {
     public function __construct(
@@ -56,8 +50,6 @@ class CheckoutService
     }
 
     /**
-     * revalidate availability, options and current prices.
-     *
      * @return array{0: array<int, array>, 1: string[]}
      */
     private function revalidate(array $cartLines): array
@@ -99,10 +91,6 @@ class CheckoutService
         return [$valid, $removed];
     }
 
-    /**
-     * Stock check, buffered for the QR path or exact for staff orders,
-     * aggregated per item_id across every valid line that ordered it.
-     */
     private function checkStock(array $validLines, bool $exact): void
     {
         $quantityByItem = [];
@@ -184,8 +172,6 @@ class CheckoutService
             'event_source' => $staffActor !== null ? 'waitstaff' : 'customer',
         ]);
 
-        // BR01: the table is taken from the moment the order is placed, so the
-        // floor sees a diner before the payment clears.
         $table = RestaurantTable::whereKey($tableId)->lockForUpdate()->first();
 
         if ($table !== null) {

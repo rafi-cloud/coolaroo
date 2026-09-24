@@ -15,11 +15,6 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
-/**
- * The "Confirm" action of the cash payment flow — everything
- * before it (open the item, see the amount, enter received) is
- * the cash modal's job.
- */
 class CashPaymentController extends Controller
 {
     public function __construct(private CashPaymentService $cash, private PaymentService $payments) {}
@@ -36,9 +31,6 @@ class CashPaymentController extends Controller
             ->latest('payment_id')
             ->first();
 
-        // FR49 is a create for staff. The customer may have pressed "Cash" and
-        // left a pending row, but a staff-taken order never has one, so the
-        // waiter opens the attempt here rather than being turned away.
         $payment ??= $order->payments()->create([
             'method' => PaymentMethod::Cash,
             'amount' => $order->total_amount,

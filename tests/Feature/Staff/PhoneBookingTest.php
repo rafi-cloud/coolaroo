@@ -125,7 +125,6 @@ class PhoneBookingTest extends TestCase
 
     public function test_phone_booking_allowed_when_online_reservations_paused(): void
     {
-        // Pause online reservations per BR58
         Setting::updateOrCreate(
             ['setting_key' => 'reservations_online_enabled'],
             ['setting_value' => '0', 'value_type' => 'bool']
@@ -153,14 +152,12 @@ class PhoneBookingTest extends TestCase
 
     public function test_phone_booking_blocked_when_slot_capacity_exceeded(): void
     {
-        // Slot has max_covers = 20. Fill 18 covers.
         Reservation::factory()->confirmed()->create([
             'slot_id' => $this->slot->slot_id,
             'booking_date' => '2026-09-25',
             'party_size' => 18,
         ]);
 
-        // Attempting phone booking for 5 covers (18 + 5 = 23 > 20)
         $response = $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
             ->post(route('staff.reservations.store'), [

@@ -15,9 +15,6 @@ class CustomerController extends Controller
         private readonly TrustService $trustService,
     ) {}
 
-    /**
-     * Searchable customer list with trust badges.
-     */
     public function index(Request $request): View
     {
         $search = trim((string) $request->input('search', ''));
@@ -48,9 +45,6 @@ class CustomerController extends Controller
         ]);
     }
 
-    /**
-     * View customer profile, trust breakdown, reservation history and order history.
-     */
     public function show(Customer $customer): View
     {
         $profile = $this->trustService->profile($customer);

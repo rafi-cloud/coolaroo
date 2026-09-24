@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AddOnGroup extends Model
 {
-    /** @use HasFactory<AddOnGroupFactory> */
+    /**
+     * @use HasFactory<AddOnGroupFactory>
+     */
     use HasFactory;
 
     protected $table = 'add_on_group';

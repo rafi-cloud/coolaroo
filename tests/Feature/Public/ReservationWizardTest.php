@@ -26,7 +26,6 @@ class ReservationWizardTest extends TestCase
         parent::setUp();
         $this->seed(SettingSeeder::class);
 
-        // Fixed test time: Tuesday 22 Sep 2026 12:00:00 (Tuesday is an open day)
         Carbon::setTestNow(Carbon::parse('2026-09-22 12:00:00', 'Australia/Melbourne'));
 
         $this->slot = SlotCapacity::factory()->create([
@@ -63,7 +62,6 @@ class ReservationWizardTest extends TestCase
 
     public function test_authenticated_verified_customer_can_submit_reservation_request(): void
     {
-        // Book for Friday 25 Sep 2026 at 18:00 (open day, within 60 days, > 2h lead time)
         $bookingDate = '2026-09-25';
 
         $response = $this->actingAs($this->customer, 'customer')
@@ -151,7 +149,9 @@ class ReservationWizardTest extends TestCase
 
     public function test_past_date_or_closed_weekday_is_rejected(): void
     {
-        // Monday 28 Sep 2026 is closed by default
+        Setting::where('setting_key', 'closed_weekdays')->update(['setting_value' => '1']);
+        app(SettingService::class)->clearCache();
+
         $mondayDate = '2026-09-28';
 
         $response = $this->actingAs($this->customer, 'customer')
@@ -163,7 +163,6 @@ class ReservationWizardTest extends TestCase
 
         $response->assertSessionHasErrors('booking_date');
 
-        // Past date
         $pastDate = '2026-09-20';
         $pastResponse = $this->actingAs($this->customer, 'customer')
             ->post(route('reservations.store'), [

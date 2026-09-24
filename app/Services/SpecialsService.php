@@ -7,10 +7,6 @@ use App\Models\MenuItemSize;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
-/**
- * Nothing calls this yet — the public menu and homepage offer
- * block are both later tasks; this is the decision logic they'll use.
- */
 class SpecialsService
 {
     public function isSaleActive(MenuItemSize $size): bool
@@ -32,7 +28,9 @@ class SpecialsService
         return true;
     }
 
-    /** @return Collection<int, MenuItem> */
+    /**
+     * @return Collection<int, MenuItem>
+     */
     public function itemsOnSpecial(): Collection
     {
         return MenuItem::where('is_active', true)
@@ -45,7 +43,9 @@ class SpecialsService
             ->get();
     }
 
-    /** @return array{size: MenuItemSize, discount_percent: float, ends_at: ?Carbon}|null */
+    /**
+     * @return array{size: MenuItemSize, discount_percent: float, ends_at: ?Carbon}|null
+     */
     public function topSpecial(): ?array
     {
         $best = null;

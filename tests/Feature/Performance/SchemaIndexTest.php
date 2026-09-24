@@ -6,20 +6,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
-/**
- * T219, NFR08. Every index SDD 6.4 lists under "Indexes and constraints",
- * checked against the schema the migrations actually build. A missing index is
- * invisible until the table is large, which is exactly when it is expensive to
- * discover.
- */
 class SchemaIndexTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * Table => the column lists SDD 6.4 requires an index on, in order.
-     * Unique constraints count: they index too.
-     *
      * @return array<string, array<int, array<int, string>>>
      */
     private function expectedIndexes(): array
@@ -61,11 +52,6 @@ class SchemaIndexTest extends TestCase
                 Schema::getIndexes($table),
             );
 
-            // MySQL indexes every foreign key column whether or not the
-            // migration says `index()`, and the app runs on MySQL. SQLite,
-            // which these tests use, does not — so a single-column index the
-            // data design asks for counts as present when a foreign key on
-            // that column provides it at runtime.
             foreach (Schema::getForeignKeys($table) as $foreignKey) {
                 $actual[] = array_map('strtolower', $foreignKey['columns']);
             }

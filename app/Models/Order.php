@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
-    /** @use HasFactory<OrderFactory> */
+    /**
+     * @use HasFactory<OrderFactory>
+     */
     use HasFactory;
 
     protected $table = 'orders';
@@ -95,10 +97,6 @@ class Order extends Model
         return $this->hasOne(Feedback::class, 'order_id', 'order_id');
     }
 
-    /**
-     * BR: a cash request leaves the order pending_payment — the floor records
-     * the payment, so the customer waits rather than paying by card.
-     */
     public function hasPendingCashRequest(): bool
     {
         return $this->payments->contains(

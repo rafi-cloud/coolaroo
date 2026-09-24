@@ -97,7 +97,6 @@ class ReservationBoardTest extends TestCase
 
     public function test_board_filters_by_date(): void
     {
-        // Reservation for today (2026-09-22)
         $todayRes = Reservation::factory()->create([
             'customer_id' => $this->customer->customer_id,
             'slot_id' => $this->slot->slot_id,
@@ -106,7 +105,6 @@ class ReservationBoardTest extends TestCase
             'reference_code' => 'CR-TODAY1',
         ]);
 
-        // Reservation for Friday (2026-09-25)
         $fridayRes = Reservation::factory()->create([
             'customer_id' => $this->customer->customer_id,
             'slot_id' => $this->slot->slot_id,
@@ -115,7 +113,6 @@ class ReservationBoardTest extends TestCase
             'reference_code' => 'CR-FRIDAY',
         ]);
 
-        // Default view: today
         $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
             ->get(route('staff.reservations.index', ['date' => '2026-09-22']))
@@ -123,7 +120,6 @@ class ReservationBoardTest extends TestCase
             ->assertSee('CR-TODAY1')
             ->assertDontSee('CR-FRIDAY');
 
-        // Filtered view: Friday
         $this->actingAs($this->waitstaff, 'staff')
             ->withSession(['staff_last_activity' => now()])
             ->get(route('staff.reservations.index', ['date' => '2026-09-25']))
@@ -134,7 +130,6 @@ class ReservationBoardTest extends TestCase
 
     public function test_board_filters_by_status(): void
     {
-        // 1 requested
         $requested = Reservation::factory()->create([
             'customer_id' => $this->customer->customer_id,
             'slot_id' => $this->slot->slot_id,
@@ -143,7 +138,6 @@ class ReservationBoardTest extends TestCase
             'reference_code' => 'CR-REQ001',
         ]);
 
-        // 1 confirmed
         $confirmed = Reservation::factory()->confirmed()->create([
             'customer_id' => $this->customer->customer_id,
             'slot_id' => $this->slot->slot_id,
@@ -162,7 +156,6 @@ class ReservationBoardTest extends TestCase
 
     public function test_unassigned_booking_inside_t30_is_highlighted(): void
     {
-        // Current test time is 12:00. Booking at 12:20 is 20 minutes away (< 30 minutes).
         $slot1220 = SlotCapacity::factory()->create(['slot_time' => '12:20', 'max_covers' => 20]);
 
         $urgentRes = Reservation::factory()->confirmed()->create([

@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Route;
 use ReflectionProperty;
 use Tests\TestCase;
 
-/**
- * T218, NFR01–NFR04, NFR06. The audit half of the security pass: the rules
- * below hold for every route in the app, so they are asserted over the route
- * table rather than page by page.
- */
 class SecurityHardeningTest extends TestCase
 {
     use RefreshDatabase;
@@ -100,7 +95,6 @@ class SecurityHardeningTest extends TestCase
 
             $middleware = $route->gatherMiddleware();
 
-            // The login pair is the only staff URI a guest may reach.
             if (in_array('guest:staff', $middleware, true)) {
                 continue;
             }

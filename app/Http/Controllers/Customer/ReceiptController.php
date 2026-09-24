@@ -8,10 +8,6 @@ use App\Services\ReceiptService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
-/**
- * Reuses OrderPolicy::view() — a receipt is just
- * another read of the same order, gated by the same "own order" rule.
- */
 class ReceiptController extends Controller
 {
     public function __construct(private ReceiptService $receipts) {}

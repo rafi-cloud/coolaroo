@@ -10,17 +10,8 @@ use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-/**
- * Search audit log (filter by user, action, entity, date; view before/after JSON).
- * View archived records (historical_data_management snapshots).
- */
 class AuditLogService
 {
-    /**
-     * Parse a user-supplied date filter, returning null when it is not a
-     * date this system can read. Filters are dropped rather than raised so
-     * a mistyped query string still renders the log.
-     */
     private function parseDate(mixed $value): ?Carbon
     {
         if (! is_string($value) && ! is_numeric($value)) {
@@ -35,8 +26,6 @@ class AuditLogService
     }
 
     /**
-     * Search and filter immutable audit records.
-     *
      * @param  array{action_type?: string, entity_name?: string, staff_id?: int|string, from?: string, to?: string, search?: string}  $filters
      */
     public function searchLogs(array $filters = []): LengthAwarePaginator
@@ -83,8 +72,6 @@ class AuditLogService
     }
 
     /**
-     * Search and view archived record snapshots.
-     *
      * @param  array{entity_name?: string, search?: string}  $filters
      */
     public function searchArchives(array $filters = []): LengthAwarePaginator
@@ -108,8 +95,6 @@ class AuditLogService
     }
 
     /**
-     * Get distinct action types in the log.
-     *
      * @return list<string>
      */
     public function distinctActionTypes(): array
@@ -123,8 +108,6 @@ class AuditLogService
     }
 
     /**
-     * Get distinct entity names in the log.
-     *
      * @return list<string>
      */
     public function distinctEntityNames(): array
@@ -138,8 +121,6 @@ class AuditLogService
     }
 
     /**
-     * Get distinct entity names in historical archives.
-     *
      * @return list<string>
      */
     public function distinctArchiveEntities(): array
@@ -152,9 +133,6 @@ class AuditLogService
             ->toArray();
     }
 
-    /**
-     * Staff members list for actor filter.
-     */
     public function staffList(): Collection
     {
         return Staff::query()->orderBy('full_name')->get(['staff_id', 'full_name']);

@@ -33,10 +33,6 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            // NFR03, T218: `true` makes the framework register GET and PUT
-            // `storage/{path}` routes outside the web group. Nothing reads or
-            // writes the private disk over HTTP — menu images are served from
-            // the public disk through `storage:link` (10.1 step 5).
             'serve' => false,
             'throw' => false,
             'report' => false,

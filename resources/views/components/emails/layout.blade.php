@@ -23,8 +23,7 @@
     <tr>
       <td align="center">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(43,26,16,0.08);border:1px solid #EAE0D4;">
-          <!-- Brand Header -->
-          <tr>
+                    <tr>
             <td style="background-color:#2B1A10;padding:22px 30px;text-align:center;">
               <h1 style="margin:0;color:#ffffff;font-size:20px;letter-spacing:0.04em;text-transform:uppercase;font-weight:800;">
                 COOLAROO
@@ -35,14 +34,12 @@
             </td>
           </tr>
 
-          <!-- Content Body -->
-          <tr>
+                    <tr>
             <td style="padding:32px 30px 24px 30px;">
               {{ $slot }}
 
               @if ($reservation)
-                <!-- Reservation Details Card -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;background-color:#FFF8F0;border-left:4px solid #FF6B2C;border-radius:6px;border-top:1px solid #F0E2D2;border-right:1px solid #F0E2D2;border-bottom:1px solid #F0E2D2;padding:16px 18px;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;background-color:#FFF8F0;border-left:4px solid #FF6B2C;border-radius:6px;border-top:1px solid #F0E2D2;border-right:1px solid #F0E2D2;border-bottom:1px solid #F0E2D2;padding:16px 18px;">
                   <tr>
                     <td>
                       <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#6B5647;font-weight:700;margin-bottom:10px;">
@@ -78,8 +75,7 @@
               @endif
 
               @if ($actionUrl)
-                <!-- Call to Action Button -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0 10px 0;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0 10px 0;">
                   <tr>
                     <td align="center">
                       <a href="{{ $actionUrl }}" style="display:inline-block;background-color:#FF6B2C;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:12px 28px;border-radius:6px;letter-spacing:0.02em;">
@@ -92,8 +88,7 @@
             </td>
           </tr>
 
-          <!-- Venue Contact & Footer -->
-          <tr>
+                    <tr>
             <td style="background-color:#FAF5EE;padding:24px 30px;border-top:1px solid #EAE0D4;font-size:12px;color:#6B5647;line-height:1.7;text-align:center;">
               <div style="font-weight:700;color:#2B1A10;font-size:13px;margin-bottom:4px;">
                 {{ $venueName }}

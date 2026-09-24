@@ -21,10 +21,7 @@
   data-testid="item-modal-{{ $item->item_id }}"
 >
   <div class="item-modal" data-testid="item-modal-box-{{ $item->item_id }}">
-    {{-- Sticky, and a direct child of the scroll container on purpose: inside
-         .item-modal-wrap it scrolled out of reach on a phone, leaving no way
-         to close a modal taller than the screen. --}}
-    <button
+        <button
       class="item-modal-close"
       type="button"
       data-close-modal="item-modal-{{ $item->item_id }}"
@@ -78,8 +75,7 @@
         </div>
       @endif
 
-      {{-- Nutrition Information --}}
-      @if($hasNutrition)
+            @if($hasNutrition)
         <div class="item-modal-nutrition" data-testid="item-modal-nutrition-{{ $item->item_id }}">
           <h4>Nutrition (per serve)</h4>
           <div class="nutrition-grid">
@@ -111,8 +107,7 @@
         </div>
       @endif
 
-      {{-- Size Selection --}}
-      @if($activeSizes->count() > 1)
+            @if($activeSizes->count() > 1)
         <fieldset class="item-modal-section" data-testid="item-modal-sizes-{{ $item->item_id }}">
           <legend>Size</legend>
           <div class="size-options">
@@ -161,8 +156,7 @@
         >
       @endif
 
-      {{-- Add-on Groups --}}
-      @if($item->addOnGroups->isNotEmpty())
+            @if($item->addOnGroups->isNotEmpty())
         <div class="item-modal-add-ons" data-testid="item-modal-add-ons-{{ $item->item_id }}">
           @foreach($item->addOnGroups as $group)
             <fieldset class="addon-group" data-group-id="{{ $group->group_id }}" data-min="{{ $group->min_select }}" data-max="{{ $group->max_select }}">
@@ -205,8 +199,7 @@
         </div>
       @endif
 
-      {{-- Quantity & Special Request --}}
-      @if($canOrder)
+            @if($canOrder)
         <div class="qty-row">
           <label for="qty-{{ $item->item_id }}">Quantity</label>
           <div class="qty-control">
@@ -256,8 +249,7 @@
         </div>
       @endif
 
-      {{-- Footer / Action Button --}}
-      <div class="item-modal-foot">
+            <div class="item-modal-foot">
         @if(! $item->is_available)
           <div class="modal-state-notice soldout" data-testid="item-modal-soldout-{{ $item->item_id }}">
             <p><strong>Sold out tonight</strong> &mdash; This dish is currently unavailable.</p>

@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Route;
 
 class Role extends Model
 {
-    /** @use HasFactory<RoleFactory> */
+    /**
+     * @use HasFactory<RoleFactory>
+     */
     use HasFactory;
 
     protected $table = 'role';
@@ -27,12 +29,6 @@ class Role extends Model
         return $this->hasMany(Staff::class, 'role_id', 'role_id');
     }
 
-    /**
-     * The screen this role opens after login, and the screen an already
-     * signed-in member is returned to if they ask for the login page again.
-     * Falls back to the public site only when the configured route is
-     * missing, which is a misconfiguration worth recording.
-     */
     public function landingUrl(): string
     {
         if (! Route::has($this->landing_screen)) {

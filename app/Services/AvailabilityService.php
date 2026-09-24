@@ -8,26 +8,18 @@ use App\Models\SlotCapacity;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 
-/**
- * Reservation availability calculations.
- */
 class AvailabilityService
 {
     public function __construct(
         private readonly SettingService $settingService,
     ) {}
 
-    /**
-     * reservations_online_enabled = 0 blocks customer requests.
-     */
     public function isOnlineReservationsEnabled(): bool
     {
         return $this->settingService->getBool('reservations_online_enabled', true);
     }
 
     /**
-     * Closed weekdays (ISO-8601 day numbers, where 1 = Monday ... 7 = Sunday).
-     *
      * @return array<int>
      */
     public function getClosedWeekdays(): array
@@ -40,9 +32,6 @@ class AvailabilityService
         return array_map('intval', array_filter(explode(',', $val), 'is_numeric'));
     }
 
-    /**
-     * Check whether a given date falls on a closed weekday.
-     */
     public function isClosedWeekday(CarbonInterface|string $date): bool
     {
         $carbon = is_string($date)
@@ -52,34 +41,21 @@ class AvailabilityService
         return in_array($carbon->dayOfWeekIso, $this->getClosedWeekdays(), true);
     }
 
-    /**
-     * Online booking advance limit in days.
-     */
     public function getMaxDaysAhead(): int
     {
         return $this->settingService->getInt('reservation_max_days_ahead', 60);
     }
 
-    /**
-     * Minimum lead time required in hours.
-     */
     public function getMinLeadHours(): int
     {
         return $this->settingService->getInt('reservation_min_lead_hours', 2);
     }
 
-    /**
-     * Maximum party size allowed for online booking.
-     */
     public function getMaxPartyOnline(): int
     {
         return $this->settingService->getInt('reservation_max_party_online', 10);
     }
 
-    /**
-     * Duration in minutes by party size.
-     * 1–2 guests 90 min, 3–6 guests 120 min, 7+ guests 150 min.
-     */
     public function getDurationMinutes(int $partySize): int
     {
         if ($partySize <= 2) {
@@ -93,9 +69,6 @@ class AvailabilityService
         return $this->settingService->getInt('reservation_duration_7_plus', 150);
     }
 
-    /**
-     * Verify if the requested date is within [today, today + max_days_ahead].
-     */
     public function isDateWithinWindow(CarbonInterface|string $date): bool
     {
         $carbon = is_string($date)
@@ -108,9 +81,6 @@ class AvailabilityService
         return $carbon->gte($today) && $carbon->lte($maxDate);
     }
 
-    /**
-     * Verify if a specific slot time meets the lead time requirement.
-     */
     public function isLeadTimeValid(CarbonInterface|string $date, string $slotTime): bool
     {
         $dateStr = $date instanceof CarbonInterface ? $date->toDateString() : (string) $date;
@@ -120,9 +90,6 @@ class AvailabilityService
         return $slotDateTime->gte($minAllowed);
     }
 
-    /**
-     * Sum of covers for requested, confirmed, and seated bookings for a slot.
-     */
     public function getBookedCovers(int $slotId, CarbonInterface|string $date, ?int $ignoreReservationId = null): int
     {
         $dateStr = $date instanceof CarbonInterface ? $date->toDateString() : (string) $date;
@@ -143,9 +110,6 @@ class AvailabilityService
         return (int) $query->sum('party_size');
     }
 
-    /**
-     * Check if a slot has sufficient remaining capacity for the party.
-     */
     public function hasSlotCapacity(
         int|SlotCapacity $slot,
         CarbonInterface|string $date,
@@ -163,8 +127,6 @@ class AvailabilityService
     }
 
     /**
-     * Get available slots with capacity details for a date and party size.
-     *
      * @return array<array<string, mixed>>
      */
     public function getAvailableSlots(CarbonInterface|string $date, int $partySize, bool $isOnline = true): array
@@ -209,8 +171,6 @@ class AvailabilityService
     }
 
     /**
-     * Full date availability check including all business rules.
-     *
      * @return array<string, mixed>
      */
     public function checkDateAvailability(CarbonInterface|string $date, int $partySize = 2, bool $isOnline = true): array

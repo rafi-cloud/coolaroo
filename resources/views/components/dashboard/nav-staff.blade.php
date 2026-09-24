@@ -1,8 +1,4 @@
 @php
-    // Only the screens this role may actually open: the floor and the
-    // reservations board are gated to waitstaff, the station displays to
-    // kitchen and bar. Listing all four gave every role two links that
-    // could only answer 403.
     $role = auth('staff')->user()?->role?->role_name;
 
     $groups = [];

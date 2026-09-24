@@ -4,9 +4,6 @@ namespace App\Http\Requests\Staff;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * Phone booking request validation.
- */
 class StorePhoneBookingRequest extends FormRequest
 {
     public function authorize(): bool

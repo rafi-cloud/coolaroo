@@ -22,9 +22,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Stripe\Exception\ApiErrorException;
 
-/**
- * (request) and (approve/reject/complete/retry).
- */
 class RefundService
 {
     public function __construct(
@@ -33,14 +30,8 @@ class RefundService
         private StripeService $stripe,
     ) {}
 
-    /**
-     * How long after payment a refund may still be asked for. A rolling window
-     * rather than "same service day", so a table that pays at 11pm still has
-     * the next morning to raise a problem.
-     */
     public const REQUEST_WINDOW_HOURS = 24;
 
-    /** Units of a line not already refunded or claimed by an open request. */
     public function remainingQuantity(OrderItem $item): int
     {
         $claimed = $item->refunded_qty + $item->refunds()
@@ -50,14 +41,12 @@ class RefundService
         return max(0, $item->quantity - $claimed);
     }
 
-    /** The one place the window is decided, so the screens and the write agree. */
     public function isWithinRequestWindow(Order $order): bool
     {
         return $order->paid_at !== null
             && $order->paid_at->gte(now()->subHours(self::REQUEST_WINDOW_HOURS));
     }
 
-    /** Whether this order can still be the subject of a new refund request at all. */
     public function canBeRefundRequested(Order $order): bool
     {
         if (! $this->isWithinRequestWindow($order)) {
@@ -71,13 +60,6 @@ class RefundService
         return $order->items->contains(fn (OrderItem $item) => $this->remainingQuantity($item) > 0);
     }
 
-    /**
-     * BR27: the request may come from staff or, since it is their own paid
-     * order, from the customer on it. Exactly one requester column is filled.
-     *
-     * payment.method (PaymentMethod) and refund.method (RefundMethod) are
-     * separate enums; mapped via ::from() below.
-     */
     public function request(OrderItem $item, int $quantity, string $reason, Staff|Customer $actor): Refund
     {
         $order = $item->order;
@@ -126,7 +108,6 @@ class RefundService
         return $refund;
     }
 
-    /** 5.5: cash and manual complete immediately; stripe goes to processing and calls the API. */
     public function approve(
         Refund $refund,
         Staff $admin,
@@ -163,7 +144,6 @@ class RefundService
         return $this->sendToStripe($refund, $admin);
     }
 
-    /** 5.5: requested → rejected. Nothing else about the order changes. */
     public function reject(Refund $refund, Staff $admin, string $reason): Refund
     {
         $refund->status->ensureCanTransitionTo(RefundStatus::Rejected);
@@ -179,7 +159,6 @@ class RefundService
         return $refund;
     }
 
-    /** 5.5: failed → processing, then a fresh API attempt. */
     public function retry(Refund $refund, Staff $admin): Refund
     {
         $refund->status->ensureCanTransitionTo(RefundStatus::Processing);
@@ -192,10 +171,6 @@ class RefundService
         return $this->sendToStripe($refund, $admin);
     }
 
-    /**
-     * The "Check refund status" half of the own logic, for a refund left at
-     * processing because this app never saw the API result.
-     */
     public function checkProcessing(Refund $refund, Staff $admin): Refund
     {
         if ($refund->status !== RefundStatus::Processing) {
@@ -238,7 +213,6 @@ class RefundService
         return $refund;
     }
 
-    /** integration failures go to the integrations channel, not the request log. */
     private function markFailed(Refund $refund, string $message): Refund
     {
         $refund->status->ensureCanTransitionTo(RefundStatus::Failed);
@@ -253,10 +227,6 @@ class RefundService
         return $refund;
     }
 
-    /**
-     * lock order → check total ≤ paid → refunded_qty, payment_status,
-     * optional stock return.
-     */
     private function complete(Refund $refund, Staff $admin): Refund
     {
         return DB::transaction(function () use ($refund, $admin) {
@@ -298,7 +268,6 @@ class RefundService
         });
     }
 
-    /** a line whose whole quantity is refunded is cancelled. gates the stock return. */
     private function applyToLine(Refund $refund, OrderItem $item): void
     {
         $item->forceFill(['refunded_qty' => $item->refunded_qty + $refund->quantity])->save();
@@ -316,7 +285,6 @@ class RefundService
         }
     }
 
-    /** 5.2. Refunded has no outgoing transition, so a fully refunded order stops here. */
     private function recalculatePaymentStatus(Order $order, float $paidAmount, float $refundedAmount): void
     {
         $target = round($refundedAmount, 2) >= round($paidAmount, 2)
@@ -331,7 +299,6 @@ class RefundService
         $order->forceFill(['payment_status' => $target])->save();
     }
 
-    /** 5.1: paid → cancelled, "all lines refunded before start". */
     private function cancelOrderIfFullyRefunded(Order $order, Staff $admin): void
     {
         if ($order->status !== OrderStatus::Paid) {

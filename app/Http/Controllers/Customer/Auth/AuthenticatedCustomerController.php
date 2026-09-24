@@ -28,9 +28,16 @@ class AuthenticatedCustomerController extends Controller
     {
         $request->authenticate();
 
-        $request->session()->regenerate();
-
         $customer = $request->user('customer');
+
+        if (! $customer->hasVerifiedEmail()) {
+            Auth::guard('customer')->logout();
+
+            return redirect()->route('verification.notice')
+                ->with('verification.email', $customer->email);
+        }
+
+        $request->session()->regenerate();
         $customer->update(['last_login_at' => now()]);
 
         $this->auditLogger->log($customer, 'login', $customer);

@@ -7,10 +7,6 @@ use App\Models\RestaurantTable;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * A cache cooldown rather than a named rate limiter: step 3
- * wants a friendly page message, not a bare 429.
- */
 class WaiterCallService
 {
     public function call(RestaurantTable $table): bool

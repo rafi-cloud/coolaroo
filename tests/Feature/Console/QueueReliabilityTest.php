@@ -12,9 +12,6 @@ use ReflectionClass;
 use SplFileInfo;
 use Tests\TestCase;
 
-/**
- * T222, NFR10. Retry settings, queue routing and the nightly dump.
- */
 class QueueReliabilityTest extends TestCase
 {
     public function test_every_broadcast_event_carries_retry_settings_and_the_broadcasts_queue(): void

@@ -4,7 +4,7 @@
     <div class="auth-head">
       <img src="{{ asset('images/logo.svg') }}" alt="">
       <h1>Verify your email</h1>
-      <p>We sent a verification link to {{ auth('customer')->user()->email }}. Click it to unlock table reservations — you can keep ordering in the meantime.</p>
+      <p>We sent a verification link to <strong>{{ $email }}</strong>. Click it to finish setting up your account — you'll be signed in automatically.</p>
     </div>
 
     @if (session('status') === 'verification-link-sent')
@@ -16,9 +16,11 @@
 
     <form method="POST" action="{{ route('verification.send') }}" novalidate>
       @csrf
+      <input type="hidden" name="email" value="{{ $email }}">
       <button class="btn btn-orange" type="submit" data-testid="verify-email-resend">Resend verification email</button>
     </form>
 
+    <p class="auth-foot"><a href="{{ route('customer.login') }}" data-testid="verify-email-login-link">Back to log in</a></p>
     <p class="auth-foot"><a href="{{ url('/') }}" data-testid="verify-email-home-link">Back to homepage</a></p>
   </div>
 </main>

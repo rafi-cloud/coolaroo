@@ -58,10 +58,10 @@ class SpecialsServiceTest extends TestCase
     public function test_top_special_picks_the_largest_percentage_discount_not_the_largest_dollar_amount(): void
     {
         $smallPercentBigDollar = MenuItem::factory()->create();
-        $smallPercentBigDollar->sizes()->create(['size_name' => 'Regular', 'price' => 40, 'sale_price' => 35]); // 12.5%
+        $smallPercentBigDollar->sizes()->create(['size_name' => 'Regular', 'price' => 40, 'sale_price' => 35]);
 
         $bigPercentSmallDollar = MenuItem::factory()->create();
-        $bigPercentSmallDollar->sizes()->create(['size_name' => 'Regular', 'price' => 10, 'sale_price' => 8]); // 20%
+        $bigPercentSmallDollar->sizes()->create(['size_name' => 'Regular', 'price' => 10, 'sale_price' => 8]);
 
         $top = app(SpecialsService::class)->topSpecial();
 

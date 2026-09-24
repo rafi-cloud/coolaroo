@@ -12,11 +12,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-/**
- * T219, NFR08. A page meets its budget when its query count is flat in the
- * number of rows it renders. Asserting "same count at 3 rows and at 24" catches
- * an N+1 without hard-coding a number that every later change has to chase.
- */
 class PageBudgetTest extends TestCase
 {
     use RefreshDatabase;
@@ -27,7 +22,9 @@ class PageBudgetTest extends TestCase
         $this->seed(SettingSeeder::class);
     }
 
-    /** @return int the number of queries the callback ran */
+    /**
+     * @return int the number of queries the callback ran
+     */
     private function countQueries(callable $callback): int
     {
         $queries = 0;
@@ -59,8 +56,6 @@ class PageBudgetTest extends TestCase
     {
         $this->seedMenu(1);
 
-        // Warm the settings cache first: its one-off read would otherwise show
-        // up only in the first measurement and look like a saving.
         $this->get('/menu')->assertOk();
 
         $small = $this->countQueries(fn () => $this->get('/menu')->assertOk());

@@ -11,20 +11,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
-/**
- * Waitstaff, Kitchen or Bar may request — Admin passes
- * via the project-wide Gate::before bypass. (approve/reject/complete)
- * is the Admin::RefundController, not this class.
- */
 class RefundRequestController extends Controller
 {
     public function __construct(private RefundService $refunds) {}
 
-    /**
-     * S46: the table's recent paid orders, what has already been asked for on
-     * each line, and the form. Separate from S24 so "Take order" stays the one
-     * job that screen does.
-     */
     public function index(RestaurantTable $table): View
     {
         Gate::authorize('requestRefund', Order::class);

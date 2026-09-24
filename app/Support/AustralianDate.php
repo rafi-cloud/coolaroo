@@ -17,7 +17,6 @@ class AustralianDate
         return $date->format(self::DATE);
     }
 
-    /** Clock time alone, for live screens where the date is always today. */
     public static function time(DateTimeInterface $date): string
     {
         return $date->format(self::TIME);

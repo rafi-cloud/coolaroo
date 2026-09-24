@@ -9,9 +9,6 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Staff;
 
-/**
- * 3.3: order rows. Admin passes every method via Gate::before.
- */
 class OrderPolicy
 {
     public function take(Staff $staff): bool
@@ -34,11 +31,6 @@ class OrderPolicy
         return in_array($staff->role->role_name, ['waitstaff', 'kitchen', 'bar'], true);
     }
 
-    /**
-     * BR27: a customer may raise a request against their own paid order. The
-     * 24-hour window and what is left to refund are RefundService's call —
-     * column checks only here, as with FeedbackPolicy::create().
-     */
     public function requestRefundAsCustomer(Customer $customer, Order $order): bool
     {
         return $order->customer_id !== null
@@ -46,7 +38,6 @@ class OrderPolicy
             && $order->payment_status === PaymentStatus::Paid;
     }
 
-    /** a station may only move its own lines. Admin passes via Gate::before. */
     public function updateStation(Staff $staff, Destination $destination): bool
     {
         return $staff->role->role_name === $destination->value;

@@ -6,7 +6,6 @@ use App\Enums\ReservationStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** Authorization is role:waitstaff on the route — no per-table condition. */
 class AssignReservationRequest extends FormRequest
 {
     public function authorize(): bool

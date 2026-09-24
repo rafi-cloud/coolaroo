@@ -7,10 +7,6 @@ use App\Models\Setting;
 use App\Models\Staff;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * Settings management, cache, typed getters,
- * venue details, and operational switches.
- */
 class SettingService
 {
     private const CACHE_KEY = 'app_settings_map';
@@ -22,8 +18,6 @@ class SettingService
     ) {}
 
     /**
-     * Get all settings as a key => value map.
-     *
      * @return array<string, string>
      */
     public function all(): array
@@ -63,9 +57,6 @@ class SettingService
         Cache::forget(self::CACHE_KEY);
     }
 
-    /**
-     * Set a setting value, invalidating the settings cache.
-     */
     public function set(string $key, string $value, ?Staff $actor = null): Setting
     {
         $setting = Setting::updateOrCreate(
@@ -83,8 +74,6 @@ class SettingService
     }
 
     /**
-     * Bulk update settings with change detection, audit logging, and switch broadcasting.
-     *
      * @param  array<string, mixed>  $values
      * @return list<string> list of updated setting keys
      */
@@ -130,9 +119,6 @@ class SettingService
         return $changed;
     }
 
-    /**
-     * Toggle an operational switch.
-     */
     public function toggleSwitch(string $key, Staff $admin): bool
     {
         $allowed = ['qr_ordering_enabled', 'reservations_online_enabled', 'ai_enabled'];
@@ -167,8 +153,6 @@ class SettingService
     }
 
     /**
-     * Venue information bundle for header, footer, AI, emails.
-     *
      * @return array<string, mixed>
      */
     public function venue(): array
@@ -202,9 +186,6 @@ class SettingService
     }
 
     /**
-     * Format venue trading hours human-readably.
-     * e.g., ["Tue to Sun, 11am to 11pm", "Monday: closed"]
-     *
      * @return list<string>
      */
     private function formatOpeningHours(string $opening, string $closing, string $closedWeekdays): array

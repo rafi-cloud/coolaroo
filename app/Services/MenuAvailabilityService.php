@@ -7,10 +7,6 @@ use App\Models\AddOnOption;
 use App\Models\MenuItem;
 use App\Models\Staff;
 
-/**
- * Station-scoped sold-out toggle — deliberately not
- * MenuItemService's job (see that class's own docblock).
- */
 class MenuAvailabilityService
 {
     public function __construct(private AuditLogger $auditLogger) {}

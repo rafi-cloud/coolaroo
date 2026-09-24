@@ -227,7 +227,6 @@ class ReservationSeatingAndNoShowTest extends TestCase
             'guest_count' => 4,
         ]);
 
-        // Advance time to 18:20 (20 min after 18:00, grace is 15 min)
         Carbon::setTestNow(Carbon::parse('2026-09-22 18:20:00', 'Australia/Melbourne'));
 
         $response = $this->actingAs($this->waitstaff, 'staff')
@@ -242,16 +241,13 @@ class ReservationSeatingAndNoShowTest extends TestCase
         $this->assertNotNull($reservation->no_show_at);
         $this->assertSame($this->waitstaff->staff_id, $reservation->no_show_by_staff_id);
 
-        // Visit closed with reason no_show
         $visit->refresh();
         $this->assertNotNull($visit->closed_at);
         $this->assertSame(VisitCloseReason::NoShow, $visit->close_reason);
 
-        // Table reverted to Available
         $table->refresh();
         $this->assertSame(TableStatus::Available, $table->status);
 
-        // Customer trust badge is now Flagged (BR40)
         $trustService = app(TrustService::class);
         $this->assertSame(TrustService::BADGE_FLAGGED, $trustService->badge($this->customer));
     }
@@ -267,7 +263,6 @@ class ReservationSeatingAndNoShowTest extends TestCase
             'status' => ReservationStatus::Confirmed,
         ]);
 
-        // Advance time to 18:05 (only 5 min after 18:00, within 15 min grace)
         Carbon::setTestNow(Carbon::parse('2026-09-22 18:05:00', 'Australia/Melbourne'));
 
         $response = $this->actingAs($this->waitstaff, 'staff')
@@ -319,7 +314,6 @@ class ReservationSeatingAndNoShowTest extends TestCase
             'guest_count' => 8,
         ]);
 
-        // 17:50 (10 min before 18:00, inside 15 min window)
         Carbon::setTestNow(Carbon::parse('2026-09-22 17:50:00', 'Australia/Melbourne'));
 
         $scanUrl = URL::signedRoute('table.scan', [
@@ -332,19 +326,16 @@ class ReservationSeatingAndNoShowTest extends TestCase
 
         $response->assertRedirect(route('menu.index'));
 
-        // Both tables are now Occupied
         $table1->refresh();
         $table2->refresh();
         $this->assertSame(TableStatus::Occupied, $table1->status);
         $this->assertSame(TableStatus::Occupied, $table2->status);
 
-        // Both visits opened
         $visit1->refresh();
         $visit2->refresh();
         $this->assertNotNull($visit1->opened_at);
         $this->assertNotNull($visit2->opened_at);
 
-        // Reservation is Seated
         $reservation->refresh();
         $this->assertSame(ReservationStatus::Seated, $reservation->status);
     }

@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MenuCategory extends Model
 {
-    /** @use HasFactory<MenuCategoryFactory> */
+    /**
+     * @use HasFactory<MenuCategoryFactory>
+     */
     use HasFactory;
 
     protected $table = 'menu_category';

@@ -8,9 +8,6 @@ use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * T211: Error pages: 403, 404, 419, 500 and paused states (NFR11).
- */
 class ErrorPagesTest extends TestCase
 {
     use RefreshDatabase;
@@ -28,8 +25,6 @@ class ErrorPagesTest extends TestCase
 
     public function test_403_error_page_renders_custom_view(): void
     {
-        // Visiting customer profile as an unauthenticated visitor aborts or redirects
-        // Let's hit a route that directly aborts with 403 or trigger a 403 via tampered QR scan
         $table = RestaurantTable::factory()->create();
         $tamperedUrl = route('table.scan', ['table' => $table->table_id, 'token' => 'invalid-token-signature']).'&signature=bad';
 
@@ -82,11 +77,9 @@ class ErrorPagesTest extends TestCase
             ->withSession(['table_id' => $table->table_id])
             ->get(route('cart.index'));
 
-        // BR58 & EnsureQrOrderingEnabled: blocks customer cart / checkout when paused
         $response->assertRedirect()
             ->assertSessionHas('error', 'Online ordering is paused right now — please order with a staff member.');
 
-        // Test rendering cart view directly with qrOrderingEnabled = false
         $rendered = view('customer.cart', [
             'lines' => collect(),
             'total' => 0.0,

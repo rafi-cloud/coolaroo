@@ -43,8 +43,7 @@
       </div>
     @endif
 
-    <!-- Phone booking drawer -->
-    <details class="kds-drawer phone-booking-drawer" data-testid="reservations-phone-booking-drawer">
+        <details class="kds-drawer phone-booking-drawer" data-testid="reservations-phone-booking-drawer">
       <summary class="btn btn-orange btn-sm" data-testid="reservations-phone-booking-summary">
         + New phone booking
       </summary>
@@ -105,8 +104,7 @@
       </form>
     </details>
 
-    <!-- Status filter navigation tabs -->
-    <div class="filter-tabs" data-testid="reservations-filter-tabs">
+        <div class="filter-tabs" data-testid="reservations-filter-tabs">
       <a href="{{ route('staff.reservations.index', ['date' => $date]) }}" class="filter-pill {{ empty($statusFilter) ? 'active' : '' }}" data-testid="reservations-filter-all">
         All ({{ $counts['all'] }})
       </a>
@@ -127,8 +125,7 @@
       </a>
     </div>
 
-    <!-- Reservations list -->
-    <div class="reservations-grid" data-testid="reservations-grid">
+        <div class="reservations-grid" data-testid="reservations-grid">
       @forelse ($reservations as $r)
         @php
           $statusValue = $r->status->value;
@@ -189,8 +186,7 @@
             </div>
           </div>
 
-          <!-- Table assignment info & controls -->
-          <div class="card-table-section">
+                    <div class="card-table-section">
             <div class="card-table-info">
               <strong>Table:</strong>
               @if ($r->assigned_tables->isNotEmpty())
@@ -217,8 +213,7 @@
             </div>
           @endif
 
-          <!-- Confirmed actions: Seat & Mark No-show -->
-          @if ($r->status === \App\Enums\ReservationStatus::Confirmed)
+                    @if ($r->status === \App\Enums\ReservationStatus::Confirmed)
             <div class="card-confirmed-actions" data-testid="reservations-confirmed-actions-{{ $r->reservation_id }}" style="margin-top:auto; padding-top:0.5rem; border-top:1px solid var(--line); display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
               @if ($r->can_seat)
                 <form method="POST" action="{{ route('staff.reservations.seat', $r) }}" style="display:inline;">
@@ -238,8 +233,7 @@
             </div>
           @endif
 
-          <!-- Review panel for requested bookings -->
-          @if ($r->status === \App\Enums\ReservationStatus::Requested)
+                    @if ($r->status === \App\Enums\ReservationStatus::Requested)
             <div class="card-review-wrapper">
               <x-reservations.review :reservation="$r" />
             </div>

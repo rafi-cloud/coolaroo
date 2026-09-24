@@ -24,7 +24,12 @@ class TableController extends Controller
 
     public function index(): View
     {
-        return view('admin.tables.index', ['tables' => RestaurantTable::orderBy('table_number')->get()]);
+        $tables = RestaurantTable::query()
+            ->orderByRaw("CASE WHEN section = 'Dining' THEN 1 WHEN section = 'Bar' THEN 2 ELSE 3 END")
+            ->orderByRaw('LENGTH(table_number) ASC, table_number ASC')
+            ->get();
+
+        return view('admin.tables.index', ['tables' => $tables]);
     }
 
     public function create(): View

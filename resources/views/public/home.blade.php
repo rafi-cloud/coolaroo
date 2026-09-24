@@ -2,8 +2,7 @@
     title="Coolaroo Restaurant & Bistro — Taste something new"
     description="Coolaroo Restaurant & Bistro. Wood-fired pizza, burgers and fresh seafood. Scan the QR code at your table for the menu, or book ahead online."
 >
-  {{-- Hero Section --}}
-  <section class="hero" data-testid="home-hero">
+    <section class="hero" data-testid="home-hero">
     <img class="hero-img" src="{{ asset('images/hero-1.jpg') }}" alt="A table of wood-fired dishes at Coolaroo">
     <div class="hero-shade"></div>
 
@@ -23,8 +22,7 @@
     <div class="dots" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
   </section>
 
-  {{-- Action Tiles --}}
-  <section class="tiles" data-testid="home-tiles">
+    <section class="tiles" data-testid="home-tiles">
     <a class="tile" href="{{ url('/#menu') }}" data-testid="home-tile-menu">
       <img src="{{ asset('images/tile-menu.jpg') }}" alt="A plate of pasta from the Coolaroo menu">
       <span class="tile-cap"><span class="tile-title">OUR MENU</span><span class="tile-sub">View our specialities</span></span>
@@ -41,8 +39,7 @@
     </a>
   </section>
 
-  {{-- About Section --}}
-  <section class="section wrap" id="about" data-testid="home-about">
+    <section class="section wrap" id="about" data-testid="home-about">
     <div class="about">
       <div class="about-figure">
         <img src="{{ asset('images/about-kitchen.jpg') }}" alt="Head chef plating dishes on the pass">
@@ -62,16 +59,14 @@
     </div>
   </section>
 
-  {{-- Menu Section --}}
-  <section class="section menu-section" id="menu" data-testid="home-menu-section">
+    <section class="section menu-section" id="menu" data-testid="home-menu-section">
     <div class="wrap">
       <div class="center">
         <div class="rule center"></div>
         <h2 class="section-title">Our Daily Menu</h2>
       </div>
 
-      {{-- Category filter navigation --}}
-      <nav class="menu-filter" aria-label="Menu categories" data-testid="home-menu-filter">
+            <nav class="menu-filter" aria-label="Menu categories" data-testid="home-menu-filter">
         <a class="on" href="{{ url('/#menu') }}" data-testid="home-filter-featured">Featured</a>
         @if($hasSpecials)
           <a href="{{ url('/menu?category=specials') }}" data-testid="home-filter-specials">Specials</a>
@@ -83,8 +78,7 @@
         @endforeach
       </nav>
 
-      {{-- Specials offer block, hidden when there are none --}}
-      @if($topSpecial)
+            @if($topSpecial)
         @php
           $specialSize = $topSpecial['size'];
           $specialItem = $specialSize->menuItem;
@@ -107,8 +101,7 @@
         </div>
       @endif
 
-      {{-- Featured items grid (up to 12 items) --}}
-      <div class="menu-grid" data-testid="home-featured-grid">
+            <div class="menu-grid" data-testid="home-featured-grid">
         @forelse($featuredItems as $item)
           @php
             $activeSizes = $item->sizes;
@@ -162,16 +155,14 @@
     </div>
   </section>
 
-  {{-- Reviews Section --}}
-  <section class="section wrap" id="reviews" data-testid="home-reviews-section">
+    <section class="section wrap" id="reviews" data-testid="home-reviews-section">
     <div class="center">
       <div class="rule center"></div>
       <h2 class="section-title">What our diners say</h2>
     </div>
 
     <div class="reviews @if(! $showRatingCard) no-rating-card @endif" data-testid="home-reviews-container">
-      {{-- Rating summary card: shown when count >= public_rating_min_count --}}
-      @if($showRatingCard && $ratingStats)
+            @if($showRatingCard && $ratingStats)
         <div class="rating-card" data-testid="home-rating-card">
           <p class="rating-big">{{ $ratingStats['overall_avg'] }}<span>/5</span></p>
           <div class="rating-row">
@@ -226,9 +217,7 @@
     </div>
   </section>
 
-  {{-- Reservation Wizard --}}
-  <x-reserve />
+    <x-reserve />
 
-  {{-- Section Anchor Hooks for subsequent Phase 6 tasks --}}
-  <div id="table-order-info" class="visually-hidden" aria-hidden="true"></div>
+    <div id="table-order-info" class="visually-hidden" aria-hidden="true"></div>
 </x-layouts.public>

@@ -4,10 +4,6 @@ namespace App\Http\Requests\Public;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * Open to everyone including visitors; `ai_enabled` is the gate
- * and the controller checks it.
- */
 class AiMealBuilderRequest extends FormRequest
 {
     public function authorize(): bool
@@ -15,7 +11,9 @@ class AiMealBuilderRequest extends FormRequest
         return true;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [

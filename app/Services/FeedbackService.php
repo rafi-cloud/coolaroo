@@ -9,24 +9,12 @@ use App\Models\Staff;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
-/**
- * Customer feedback submit.
- * View and reply to feedback.
- * Hide abusive feedback with mandatory reason.
- * Feature review on public site.
- */
 class FeedbackService
 {
     public function __construct(
         private readonly AuditLogger $auditLogger,
     ) {}
 
-    /**
-     * one feedback per served, paid QR order. Ownership, served status and
-     * staff-taken exclusion are FeedbackPolicy::create()'s job, checked before
-     * this runs; "not already submitted" is checked here instead, since it needs
-     * a query the policy deliberately avoids.
-     */
     public function submit(Order $order, Customer $customer, array $data): Feedback
     {
         if ($order->feedback()->exists()) {
@@ -45,8 +33,6 @@ class FeedbackService
     }
 
     /**
-     * Paginated feedback list for admin moderation.
-     *
      * @param  array{status?: string, rating?: int|string, search?: string}  $filters
      */
     public function listForAdmin(array $filters = []): LengthAwarePaginator
@@ -91,8 +77,6 @@ class FeedbackService
     }
 
     /**
-     * Summary counters for moderation overview.
-     *
      * @return array{total: int, visible: int, hidden: int, featured: int, unreplied: int}
      */
     public function counts(): array
@@ -106,10 +90,6 @@ class FeedbackService
         ];
     }
 
-    /**
-     * Reply to feedback.
-     * Admin cannot edit customer rating or comment.
-     */
     public function reply(Feedback $feedback, Staff $admin, string $reply): Feedback
     {
         $reply = trim($reply);
@@ -125,10 +105,6 @@ class FeedbackService
         return $feedback;
     }
 
-    /**
-     * Hide abusive feedback with mandatory reason.
-     * Hidden feedback is excluded from public averages and cannot be featured.
-     */
     public function hide(Feedback $feedback, Staff $admin, string $reason): Feedback
     {
         $reason = trim($reason);
@@ -149,9 +125,6 @@ class FeedbackService
         return $feedback;
     }
 
-    /**
-     * Unhide feedback.
-     */
     public function unhide(Feedback $feedback, Staff $admin): Feedback
     {
         $feedback->update([
@@ -164,10 +137,6 @@ class FeedbackService
         return $feedback;
     }
 
-    /**
-     * Feature review on public site.
-     * Hidden feedback cannot be featured.
-     */
     public function feature(Feedback $feedback, Staff $admin): Feedback
     {
         if ($feedback->is_hidden) {
@@ -185,9 +154,6 @@ class FeedbackService
         return $feedback;
     }
 
-    /**
-     * Unfeature review.
-     */
     public function unfeature(Feedback $feedback, Staff $admin): Feedback
     {
         $feedback->update([
@@ -199,9 +165,6 @@ class FeedbackService
         return $feedback;
     }
 
-    /**
-     * Toggle featured state.
-     */
     public function toggleFeatured(Feedback $feedback, Staff $admin): Feedback
     {
         if ($feedback->is_featured) {

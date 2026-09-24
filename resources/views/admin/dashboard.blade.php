@@ -13,10 +13,8 @@
       </div>
     </div>
 
-    {{-- 8 KPI Tiles (08.5 widgets 1 to 8) --}}
-    <div class="dashboard-grid">
-      {{-- Widget 1: Sales today (gross) --}}
-      <article class="card tile" data-testid="admin-tile-sales">
+        <div class="dashboard-grid">
+            <article class="card tile" data-testid="admin-tile-sales">
         <div class="tile-top">
           <span class="tile-ico ico-orange">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -39,8 +37,7 @@
         @endif
       </article>
 
-      {{-- Widget 2: Orders today (paid) --}}
-      <article class="card tile" data-testid="admin-tile-orders">
+            <article class="card tile" data-testid="admin-tile-orders">
         <div class="tile-top">
           <span class="tile-ico ico-green">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h12l1 16H5z"></path><path d="M9 9h6"></path></svg>
@@ -54,8 +51,7 @@
         </p>
       </article>
 
-      {{-- Widget 3: Average order value --}}
-      <article class="card tile" data-testid="admin-tile-aov">
+            <article class="card tile" data-testid="admin-tile-aov">
         <div class="tile-top">
           <span class="tile-ico ico-amber">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 6v6l4 2"></path></svg>
@@ -69,8 +65,7 @@
         </p>
       </article>
 
-      {{-- Widget 4: Cash vs Stripe --}}
-      <article class="card tile" data-testid="admin-tile-payment-split">
+            <article class="card tile" data-testid="admin-tile-payment-split">
         <div class="tile-top">
           <span class="tile-ico ico-orange">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path></svg>
@@ -88,8 +83,7 @@
         </p>
       </article>
 
-      {{-- Widget 5: Covers booked today --}}
-      <article class="card tile" data-testid="admin-tile-covers">
+            <article class="card tile" data-testid="admin-tile-covers">
         <div class="tile-top">
           <span class="tile-ico ico-green">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="4"></circle><path d="M17 11a3 3 0 1 0-2.8-4"></path><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"></path><path d="M16 15a4 4 0 0 1 4 4v2"></path></svg>
@@ -103,8 +97,7 @@
         </p>
       </article>
 
-      {{-- Widget 6: Pending reservation requests --}}
-      <article class="card tile" data-testid="admin-tile-reservations">
+            <article class="card tile" data-testid="admin-tile-reservations">
         <div class="tile-top">
           <span class="tile-ico ico-amber">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
@@ -118,8 +111,7 @@
         </a>
       </article>
 
-      {{-- Widget 7: Open refund requests --}}
-      <article class="card tile" data-testid="admin-tile-refunds">
+            <article class="card tile" data-testid="admin-tile-refunds">
         <div class="tile-top">
           <span class="tile-ico {{ $dashboard['open_refund_requests'] > 0 ? 'ico-orange' : 'ico-green' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h11a5 5 0 0 1 0 10h-3"></path></svg>
@@ -133,8 +125,7 @@
         </a>
       </article>
 
-      {{-- Widget 8: Average rating (30 days) --}}
-      <article class="card tile" data-testid="admin-tile-rating">
+            <article class="card tile" data-testid="admin-tile-rating">
         <div class="tile-top">
           <span class="tile-ico ico-amber">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -151,10 +142,8 @@
       </article>
     </div>
 
-    {{-- 3 Charts (08.5 widgets 9 to 11) --}}
-    <div class="dashboard-grid">
-      {{-- Widget 9: Sales by hour today (bar chart) --}}
-      <article class="card" style="grid-column: span 6" data-testid="admin-chart-hourly">
+        <div class="dashboard-grid">
+            <article class="card" style="grid-column: span 6" data-testid="admin-chart-hourly">
         <header class="card-head">
           <div>
             <h3>Sales by hour today</h3>
@@ -184,8 +173,7 @@
         </ul>
       </article>
 
-      {{-- Widget 10: Sales last 7 / 30 days (line chart with toggle) --}}
-      <article class="card" style="grid-column: span 6" data-testid="admin-chart-trend">
+            <article class="card" style="grid-column: span 6" data-testid="admin-chart-trend">
         <header class="card-head">
           <div>
             <h3>Sales trend</h3>
@@ -197,8 +185,7 @@
           </div>
         </header>
 
-        {{-- 7 Days SVG Container --}}
-        @php
+                @php
           $max7 = max(array_merge([1.0], array_column($trend7, 'amount')));
           $n7 = count($trend7);
           $points7 = [];
@@ -240,8 +227,7 @@
           </ul>
         </div>
 
-        {{-- 30 Days SVG Container --}}
-        @php
+                @php
           $max30 = max(array_merge([1.0], array_column($trend30, 'amount')));
           $n30 = count($trend30);
           $points30 = [];
@@ -278,8 +264,7 @@
         </div>
       </article>
 
-      {{-- Widget 11: Orders by status now (bar chart) --}}
-      <article class="card wide" data-testid="admin-chart-status">
+            <article class="card wide" data-testid="admin-chart-status">
         <header class="card-head">
           <div>
             <h3>Orders by status today</h3>
@@ -325,10 +310,8 @@
       </article>
     </div>
 
-    {{-- 4 Lists (08.5 widgets 12 to 15) --}}
-    <div class="dashboard-grid">
-      {{-- Widget 12: Needs attention --}}
-      <article class="card" style="grid-column: span 6" data-testid="admin-list-attention">
+        <div class="dashboard-grid">
+            <article class="card" style="grid-column: span 6" data-testid="admin-list-attention">
         <header class="card-head">
           <div>
             <h3>Needs attention</h3>
@@ -345,8 +328,7 @@
               &check; All clear — no active stock conflicts, late orders, or pending cash waits.
             </div>
           @else
-            {{-- Stock Conflicts --}}
-            @foreach ($dashboard['needs_attention']['stock_conflicts'] as $order)
+                        @foreach ($dashboard['needs_attention']['stock_conflicts'] as $order)
               <div class="attention-item">
                 <div class="attention-item-info">
                   <strong>Stock conflict: Order #{{ $order->order_number }}</strong>
@@ -356,8 +338,7 @@
               </div>
             @endforeach
 
-            {{-- Refund Requests --}}
-            @foreach ($dashboard['needs_attention']['refund_requests'] as $refund)
+                        @foreach ($dashboard['needs_attention']['refund_requests'] as $refund)
               <div class="attention-item warn">
                 <div class="attention-item-info">
                   <strong>Refund requested: ${{ number_format($refund->amount, 2) }}</strong>
@@ -367,8 +348,7 @@
               </div>
             @endforeach
 
-            {{-- Cash Waiting > 10 min --}}
-            @foreach ($dashboard['needs_attention']['cash_waiting'] as $payment)
+                        @foreach ($dashboard['needs_attention']['cash_waiting'] as $payment)
               <div class="attention-item info">
                 <div class="attention-item-info">
                   <strong>Cash payment waiting (&gt;10m)</strong>
@@ -378,8 +358,7 @@
               </div>
             @endforeach
 
-            {{-- Unassigned Bookings inside T-30 --}}
-            @foreach ($dashboard['needs_attention']['unassigned_bookings'] as $res)
+                        @foreach ($dashboard['needs_attention']['unassigned_bookings'] as $res)
               <div class="attention-item warn">
                 <div class="attention-item-info">
                   <strong>Unassigned booking (T&minus;30)</strong>
@@ -389,8 +368,7 @@
               </div>
             @endforeach
 
-            {{-- Late Lines past ETA --}}
-            @foreach ($dashboard['needs_attention']['late_lines'] as $lateOrder)
+                        @foreach ($dashboard['needs_attention']['late_lines'] as $lateOrder)
               <div class="attention-item">
                 <div class="attention-item-info">
                   <strong>Past ETA: Order #{{ $lateOrder->order_number }}</strong>
@@ -403,8 +381,7 @@
         </div>
       </article>
 
-      {{-- Widget 13: Top 5 items today --}}
-      <article class="card selling" style="grid-column: span 6" data-testid="admin-list-top-items">
+            <article class="card selling" style="grid-column: span 6" data-testid="admin-list-top-items">
         <header class="card-head">
           <div>
             <h3>Top 5 items today</h3>
@@ -432,8 +409,7 @@
         @endif
       </article>
 
-      {{-- Widget 14: Low stock / sold out --}}
-      <article class="card" style="grid-column: span 6" data-testid="admin-list-low-stock">
+            <article class="card" style="grid-column: span 6" data-testid="admin-list-low-stock">
         <header class="card-head">
           <div>
             <h3>Low stock & sold out</h3>
@@ -467,8 +443,7 @@
         @endif
       </article>
 
-      {{-- Widget 15: Latest feedback --}}
-      <article class="card" style="grid-column: span 6" data-testid="admin-list-feedback">
+            <article class="card" style="grid-column: span 6" data-testid="admin-list-feedback">
         <header class="card-head">
           <div>
             <h3>Latest feedback</h3>

@@ -20,13 +20,14 @@ class BroadcastEventTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @return array<int, string> */
+    /**
+     * @return array<int, string>
+     */
     private function channelNames(object $event): array
     {
         return array_map(fn ($channel) => (string) $channel, $event->broadcastOn());
     }
 
-    /** 07.8 lists eleven events. */
     public function test_all_eleven_events_from_the_design_exist(): void
     {
         foreach ([
@@ -58,7 +59,6 @@ class BroadcastEventTest extends TestCase
         $this->assertSame('place_sign', $event->broadcastWith()['kind']);
     }
 
-    /** T110: 'menu' has no authorisation callback, so it must stay public. */
     public function test_the_menu_channel_events_are_public(): void
     {
         $item = MenuItem::factory()->create(['category_id' => MenuCategory::factory()]);
