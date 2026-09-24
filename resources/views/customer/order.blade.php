@@ -1,5 +1,5 @@
 <x-layouts.customer title="Order #{{ $order->order_number }}" :table-label="$tableLabel ?? null">
-<div class="wrap order-page" data-order-page data-order-id="{{ $order->order_id }}" data-state-url="{{ route('orders.state', $order) }}" data-status="{{ $order->status->value }}" data-testid="order-status-page">
+<div class="wrap order-page" data-order-page data-order-id="{{ $order->order_id }}" data-state-url="{{ route('orders.state', $order) }}" data-status="{{ $order->status->value }}" data-payment-status="{{ $order->payment_status->value }}" data-testid="order-status-page">
   @if (session('status') === 'order-cancelled')
     <div class="auth-error auth-warning" role="status" data-testid="order-cancelled-notice">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -87,7 +87,11 @@
         {{-- Status narrative message --}}
         <div class="order-status-narrative">
           @if ($order->status->value === 'pending_payment')
-            <p class="order-narrative-p" data-testid="order-waiting-payment">Waiting for payment to be confirmed.</p>
+            @if ($order->hasPendingCashRequest())
+              <p class="order-narrative-p" data-testid="order-waiting-cash">Waiting for a staff member to collect your cash payment.</p>
+            @else
+              <p class="order-narrative-p" data-testid="order-waiting-payment">Waiting for payment to be confirmed.</p>
+            @endif
           @elseif ($order->status->value === 'cancelled')
             <p class="order-narrative-p order-narrative-cancelled" data-testid="order-cancelled">This order was cancelled.</p>
           @elseif (in_array($order->status->value, ['paid', 'preparing', 'ready'], true))
@@ -160,25 +164,41 @@
 
         {{-- Pending Payment Action Box --}}
         @if ($order->status->value === 'pending_payment')
-          <div class="order-pay-actions-box">
-            <div class="order-pay-actions-prompt">
-              <strong>Complete Payment</strong>
-              <span>Your order will be sent to the kitchen as soon as payment is confirmed.</span>
+          @if ($order->hasPendingCashRequest())
+            <div class="order-pay-actions-box" data-testid="order-cash-waiting">
+              <div class="order-pay-actions-prompt">
+                <strong>Waiting for cash payment</strong>
+                <span>A staff member is on their way to collect @money($order->total_amount). Your order goes to the kitchen as soon as they record it.</span>
+              </div>
+              <div class="order-pay-actions-btns">
+                <a href="{{ route('orders.pay.show', $order) }}" class="btn btn-outline" data-testid="order-pay-by-card">Pay by card instead</a>
+                <form method="POST" action="{{ route('orders.cancel', $order) }}">
+                  @csrf
+                  <button class="btn btn-subtle-danger" type="submit" data-testid="order-cancel">Cancel order</button>
+                </form>
+              </div>
             </div>
-            <div class="order-pay-actions-btns">
-              <a href="{{ route('orders.pay.show', $order) }}" class="btn btn-orange">
-                <span>Pay @money($order->total_amount) now &rarr;</span>
-              </a>
-              <form method="POST" action="{{ route('orders.pay.check', $order) }}">
-                @csrf
-                <button class="btn btn-outline" type="submit" data-testid="order-check-payment">Check payment status</button>
-              </form>
-              <form method="POST" action="{{ route('orders.cancel', $order) }}">
-                @csrf
-                <button class="btn btn-subtle-danger" type="submit" data-testid="order-cancel">Cancel order</button>
-              </form>
+          @else
+            <div class="order-pay-actions-box">
+              <div class="order-pay-actions-prompt">
+                <strong>Complete Payment</strong>
+                <span>Your order will be sent to the kitchen as soon as payment is confirmed.</span>
+              </div>
+              <div class="order-pay-actions-btns">
+                <a href="{{ route('orders.pay.show', $order) }}" class="btn btn-orange">
+                  <span>Pay @money($order->total_amount) now &rarr;</span>
+                </a>
+                <form method="POST" action="{{ route('orders.pay.check', $order) }}">
+                  @csrf
+                  <button class="btn btn-outline" type="submit" data-testid="order-check-payment">Check payment status</button>
+                </form>
+                <form method="POST" action="{{ route('orders.cancel', $order) }}">
+                  @csrf
+                  <button class="btn btn-subtle-danger" type="submit" data-testid="order-cancel">Cancel order</button>
+                </form>
+              </div>
             </div>
-          </div>
+          @endif
         @endif
 
         {{-- Feedback Section when served --}}
@@ -189,10 +209,12 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;color:#1F7844;"><path d="M20 6L9 17l-5-5"/></svg>
                 <span>You've already rated this order — thanks!</span>
               </div>
-            @elseif ($order->taken_by_staff_id === null)
-              <div class="order-feedback-card">
-                <x-feedback-modal :order="$order" />
-              </div>
+            @else
+              @can('create', [\App\Models\Feedback::class, $order])
+                <div class="order-feedback-card">
+                  <x-feedback-modal :order="$order" />
+                </div>
+              @endcan
             @endif
           </div>
         @endif
@@ -247,7 +269,8 @@
         </div>
 
         @php
-          $latestPayment = $order->payments?->last();
+          $latestPayment = $order->payments->last(fn ($payment) => $payment->status->value === 'succeeded')
+            ?? $order->payments->last();
         @endphp
         <div class="order-payment-status-block">
           <div class="order-payment-meta">

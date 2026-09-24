@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentAttemptStatus;
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -91,5 +93,17 @@ class Order extends Model
     public function feedback(): HasOne
     {
         return $this->hasOne(Feedback::class, 'order_id', 'order_id');
+    }
+
+    /**
+     * BR: a cash request leaves the order pending_payment — the floor records
+     * the payment, so the customer waits rather than paying by card.
+     */
+    public function hasPendingCashRequest(): bool
+    {
+        return $this->payments->contains(
+            fn (Payment $payment) => $payment->method === PaymentMethod::Cash
+                && $payment->status === PaymentAttemptStatus::Pending
+        );
     }
 }

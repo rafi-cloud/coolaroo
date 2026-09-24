@@ -3,6 +3,7 @@
 namespace Tests\Feature\Customer;
 
 use App\Enums\PaymentAttemptStatus;
+use App\Enums\PaymentMethod;
 use App\Models\Customer;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
@@ -77,6 +78,36 @@ class OrderTest extends TestCase
         $this->actingAs($other, 'customer')
             ->get(route('orders.show', $order))
             ->assertForbidden();
+    }
+
+    public function test_a_served_order_offers_the_feedback_form_and_drops_the_payment_prompt(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->orderFor($customer, 'served');
+
+        $this->actingAs($customer, 'customer')
+            ->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('feedback-form')
+            ->assertDontSee('Complete Payment');
+    }
+
+    public function test_an_order_waiting_on_cash_does_not_push_the_card_payment(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = $this->orderFor($customer, 'pending_payment');
+        Payment::create([
+            'order_id' => $order->order_id,
+            'method' => PaymentMethod::Cash,
+            'amount' => $order->total_amount,
+        ]);
+
+        $this->actingAs($customer, 'customer')
+            ->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('order-cash-waiting')
+            ->assertDontSee('Complete Payment')
+            ->assertDontSee('Check payment status');
     }
 
     public function test_the_state_endpoint_reports_the_current_status(): void
