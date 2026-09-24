@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 /**
- * FR31, BR02, BR03, BR07, BR56, BR57, UC07, 08.2. The 'signed' middleware
+ * The 'signed' middleware
  * proves we issued the URL; the qr_token comparison below is what makes
- * FR14's "regenerating invalidates the old QR" actually true (T051).
+ * the "regenerating invalidates the old QR" actually true.
  */
 class TableScanController extends Controller
 {
@@ -72,7 +72,7 @@ class TableScanController extends Controller
         return $this->enterOrdering($request, $table);
     }
 
-    /** BR57: the cart belongs to one table; switching clears it. */
+    /** the cart belongs to one table; switching clears it. */
     public function switchTable(Request $request, RestaurantTable $table): RedirectResponse
     {
         abort_unless(

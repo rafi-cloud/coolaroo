@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * NFR01, NFR02, T218. Response headers for every web request.
+ * Response headers for every web request.
  *
  * The policy can name every origin the app actually uses because nothing is
  * loaded from a CDN: Google Fonts is the only third party, charts are inline

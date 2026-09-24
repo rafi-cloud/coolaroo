@@ -15,9 +15,9 @@ return new class extends Migration
             $table->increments('customer_id');
             $table->string('email', 150)->unique();
             $table->string('password_hash', 255);
-            $table->string('full_name', 100); // shown to others as first name + last initial (BR41)
-            $table->string('phone', 20)->nullable()->unique(); // unique when present (BR52); MySQL allows multiple NULLs
-            $table->dateTime('email_verified_at')->nullable(); // NULL = unverified; required before reservation (BR42)
+            $table->string('full_name', 100); // shown to others as first name + last initial
+            $table->string('phone', 20)->nullable()->unique(); // unique when present; MySQL allows multiple NULLs
+            $table->dateTime('email_verified_at')->nullable(); // NULL = unverified; required before reservation
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->dateTime('last_login_at')->nullable();

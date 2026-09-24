@@ -22,8 +22,15 @@ function pushAlert(page, event, payload) {
 
     list.prepend(item);
 
-    while (list.children.length > MAX_ALERTS) {
-        list.removeChild(list.lastElementChild);
+    const emptyRow = list.querySelector('[data-alerts-empty]');
+    if (emptyRow) {
+        emptyRow.hidden = true;
+    }
+
+    // cap the ephemeral ones only; the derived rows mirror real state
+    const ephemeral = list.querySelectorAll('.floor-alert-item:not([data-derived-alert])');
+    for (let i = MAX_ALERTS; i < ephemeral.length; i += 1) {
+        ephemeral[i].remove();
     }
 }
 

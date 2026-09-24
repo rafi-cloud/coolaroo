@@ -8,7 +8,7 @@ use App\Models\MenuItem;
 use App\Models\Staff;
 
 /**
- * FR29, BR14, 07.8. Station-scoped sold-out toggle — deliberately not
+ * Station-scoped sold-out toggle — deliberately not
  * MenuItemService's job (see that class's own docblock).
  */
 class MenuAvailabilityService

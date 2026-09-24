@@ -10,7 +10,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-/** FR29, BR14, UC29, S31. */
 class AvailabilityController extends Controller
 {
     public function __construct(private MenuAvailabilityService $availability) {}

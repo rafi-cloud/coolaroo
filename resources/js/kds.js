@@ -18,4 +18,17 @@ export function initKds() {
     ], refresh);
 
     onReconnect(refresh);
+
+    // Ticking a dish submits its own form. The box is disabled immediately so a
+    // second tick cannot post twice while the round trip is in flight; the
+    // re-rendered ticket comes back with the line already ready.
+    page.addEventListener('change', (event) => {
+        const box = event.target.closest('[data-line-ready]');
+        if (!box || !box.checked) {
+            return;
+        }
+
+        box.disabled = true;
+        box.form.submit();
+    });
 }

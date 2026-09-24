@@ -16,9 +16,9 @@ use Illuminate\Validation\ValidationException;
 use Throwable;
 
 /**
- * BR29 (customer cancel, FR41, T063), BR54 and BR63 (staff, FR93/FR94, T076),
- * BR26 (closing-time cleanup, FR50, T160). 07.4's named owner of "customer and
- * staff cancel of unpaid orders; resolve stock conflict".
+ * Customer cancel, staff cancel and the closing-time cleanup: the named
+ * owner of "customer and staff cancel of unpaid orders; resolve stock
+ * conflict".
  */
 class OrderService
 {
@@ -28,7 +28,7 @@ class OrderService
         private PaymentService $payments,
     ) {}
 
-    /** BR29: pending_payment only. UC12 step 2's local half — see class docblock. */
+    /** pending_payment only. step 2's local half — see class docblock. */
     public function cancelUnpaid(Order $order, Customer $actor): Order
     {
         return DB::transaction(function () use ($order, $actor) {
@@ -64,8 +64,8 @@ class OrderService
     }
 
     /**
-     * FR50, BR26, 07.10. Orders never expire on a timer — this job at
-     * closing_time is the only thing that cancels them, and BR25 applies to
+     * Orders never expire on a timer — this job at
+     * closing_time is the only thing that cancels them, and applies to
      * the job as much as to a person: each open Stripe session is expired and
      * then retrieved, so an order paid moments before close is marked paid
      * rather than cancelled.
@@ -101,7 +101,7 @@ class OrderService
         return $result;
     }
 
-    /** BR25, BR26: expire the session first, then let Stripe settle the argument. */
+    /** expire the session first, then let Stripe settle the argument. */
     private function settleLateStripePayment(Order $order): bool
     {
         $attempts = $order->payments()
@@ -121,7 +121,7 @@ class OrderService
         return false;
     }
 
-    /** BR26: the cancel itself, with no actor — audit and history both read `system`. */
+    /** the cancel itself, with no actor — audit and history both read `system`. */
     private function cancelBySystem(Order $order): void
     {
         DB::transaction(function () use ($order) {
@@ -148,11 +148,11 @@ class OrderService
                 'event_source' => 'system',
             ]);
 
-            $this->auditLogger->log(null, 'order_cancelled', $locked, 'Unpaid at closing time (BR26).');
+            $this->auditLogger->log(null, 'order_cancelled', $locked, 'Unpaid at closing time.');
         });
     }
 
-    /** FR93, BR63, 07.7. Waitstaff or Admin; pending_payment only. */
+    /** Waitstaff or Admin; pending_payment only. */
     public function cancelByStaff(Order $order, Staff $actor, string $reason): Order
     {
         if ($order->status !== OrderStatus::PendingPayment) {
@@ -195,7 +195,7 @@ class OrderService
         });
     }
 
-    /** FR94, BR54. Both choices clear the flag; the refund choice opens UC26 in the UI, not here. */
+    /** Both choices clear the flag; the refund choice opens in the UI, not here. */
     public function resolveConflict(Order $order, Staff $actor, string $resolution): Order
     {
         if (! $order->has_stock_conflict) {
@@ -212,7 +212,7 @@ class OrderService
     }
 
     /**
-     * 07.7's "expire Stripe session → verify not paid (retrieve)" — BR25 asked
+     * the "expire Stripe session → verify not paid (retrieve)" — asked
      * in reverse. Runs outside the cancel transaction because markPaid() opens
      * its own and must survive the refusal thrown here.
      */
@@ -243,7 +243,7 @@ class OrderService
             ->each(fn (Payment $payment) => $payment->forceFill(['status' => PaymentAttemptStatus::Expired])->save());
     }
 
-    /** UC12 step 2: the real Stripe call, wired now that StripeService (T070) exists. */
+    /** the real Stripe call, wired now that StripeService exists. */
     private function expirePendingStripeAttempts(Order $order): void
     {
         $order->payments()

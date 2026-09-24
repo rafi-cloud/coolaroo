@@ -10,7 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Collection;
 
 /**
- * FR53. Assembles the receipt data (lines, sale discounts, the succeeded
+ * Assembles the receipt data (lines, sale discounts, the succeeded
  * payment's method/rounding/adjustment, completed refunds) and renders it.
  */
 class ReceiptService

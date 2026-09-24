@@ -8,9 +8,6 @@ use App\Models\HistoricalDataManagement;
 use App\Models\Staff;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * FR89, BR62, NFR14.
- */
 class AuditLogger
 {
     public function log(Staff|Customer|null $actor, string $actionType, Model $entity, ?string $reason = null): AuditLog
@@ -26,10 +23,10 @@ class AuditLogger
     }
 
     /**
-     * 06.4.24: AI usage rides on audit_log as action `ai_request`, with
+     * 24: AI usage rides on audit_log as action `ai_request`, with
      * `{feature, tokens_in, tokens_out}` in details. No table row is
      * affected, so `entity_name` carries the logical feature and
-     * `entity_id` stays null. The IP is kept because BR49 gives the
+     * `entity_id` stays null. The IP is kept because gives the
      * assistant no app rate limit — it is the only abuse signal there is.
      *
      * @param  array{tokens_in:int, tokens_out:int}  $usage

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** FR55, 07.8. New paid lines for the station displays and admin dashboard. */
+/** New paid lines for the station displays and admin dashboard. */
 class OrderPaid implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;

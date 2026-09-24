@@ -26,16 +26,16 @@ class RoleFactory extends Factory
 
     public function waitstaff(): static
     {
-        return $this->state(fn () => ['role_name' => 'waitstaff', 'landing_screen' => 'floor.index']);
+        return $this->state(fn () => ['role_name' => 'waitstaff', 'landing_screen' => 'staff.floor.index']);
     }
 
     public function kitchen(): static
     {
-        return $this->state(fn () => ['role_name' => 'kitchen', 'landing_screen' => 'kds.kitchen']);
+        return $this->state(fn () => ['role_name' => 'kitchen', 'landing_screen' => 'staff.kds.kitchen']);
     }
 
     public function bar(): static
     {
-        return $this->state(fn () => ['role_name' => 'bar', 'landing_screen' => 'kds.bar']);
+        return $this->state(fn () => ['role_name' => 'bar', 'landing_screen' => 'staff.kds.bar']);
     }
 }

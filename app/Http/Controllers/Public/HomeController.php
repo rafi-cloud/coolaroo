@@ -11,7 +11,7 @@ use App\Services\SpecialsService;
 use Illuminate\View\View;
 
 /**
- * S01, FR32, FR80, FR91, BR45, BR59: Public homepage.
+ * Public homepage.
  */
 class HomeController extends Controller
 {
@@ -39,7 +39,7 @@ class HomeController extends Controller
             ->orderBy('display_order')
             ->get();
 
-        // FR80, BR45: Public ratings section
+        // Public ratings section
         $minReviews = $this->settingService->getInt('public_rating_min_count', 10);
         $nonHidden = Feedback::where('is_hidden', false);
         $reviewCount = (clone $nonHidden)->count();

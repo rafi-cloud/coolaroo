@@ -24,7 +24,7 @@ class RecordCashPaymentRequest extends FormRequest
         ];
     }
 
-    /** BR23: category and note become mandatory only once an adjustment is actually given. */
+    /** category and note become mandatory only once an adjustment is actually given. */
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {

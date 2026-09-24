@@ -11,8 +11,8 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * FR71, 07.8. One event, the alert kinds FR71 lists, plus FR70/BR39's no-show
- * suggestion (T160) — the scheduler's only way of telling the floor a booking
+ * One event for every reservation alert kind, plus the no-show
+ * suggestion — the scheduler's only way of telling the floor a booking
  * is past grace, since only staff may confirm the no-show itself.
  * Constants rather than a backed enum: no column stores these.
  */

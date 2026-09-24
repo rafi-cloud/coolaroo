@@ -487,14 +487,14 @@
       </thead>
       <tbody>
         <tr>
-          <td><strong>Chat Assistant (S17, FR43)</strong></td>
+          <td><strong>Chat Assistant</strong></td>
           <td class="num">{{ $data['by_feature']['chat']['requests'] }}</td>
           <td class="num">{{ number_format($data['by_feature']['chat']['tokens_in']) }}</td>
           <td class="num">{{ number_format($data['by_feature']['chat']['tokens_out']) }}</td>
           <td class="num"><strong>{{ number_format($data['by_feature']['chat']['total_tokens']) }}</strong></td>
         </tr>
         <tr>
-          <td><strong>Meal Builder (S16, FR44)</strong></td>
+          <td><strong>Meal Builder</strong></td>
           <td class="num">{{ $data['by_feature']['meal_builder']['requests'] }}</td>
           <td class="num">{{ number_format($data['by_feature']['meal_builder']['tokens_in']) }}</td>
           <td class="num">{{ number_format($data['by_feature']['meal_builder']['tokens_out']) }}</td>

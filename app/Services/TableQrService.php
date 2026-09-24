@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 /**
- * FR14, FR15. Regenerates qr_token and renders it as a signed-URL QR code
+ * Regenerates qr_token and renders it as a signed-URL QR code
  * (PNG or, embedded in a printable page, PDF) — nothing here is stored.
  */
 class TableQrService

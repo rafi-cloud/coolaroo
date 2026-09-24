@@ -6,9 +6,6 @@ use App\Models\MenuCategory;
 use App\Models\Staff;
 use Illuminate\Validation\ValidationException;
 
-/**
- * FR22, BR62.
- */
 class CategoryService
 {
     public function __construct(private AuditLogger $auditLogger) {}

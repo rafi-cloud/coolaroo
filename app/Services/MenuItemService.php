@@ -7,8 +7,8 @@ use App\Models\Staff;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR23, FR24, FR25, BR62. Sizes/add-ons/daily-limit/availability are other
- * tasks' jobs (see T041's guide) — this only owns the item's own fields.
+ * Sizes/add-ons/daily-limit/availability are other
+ * tasks' jobs ('s guide) — this only owns the item's own fields.
  */
 class MenuItemService
 {

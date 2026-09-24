@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Screen S42 Archive Tab: Historical Data Management Snapshots.
- * FR99: View archived records (snapshots, BR62).
+ * Historical data management snapshots.
+ * View archived records (snapshots).
  */
 class ArchiveController extends Controller
 {
@@ -18,7 +18,7 @@ class ArchiveController extends Controller
     ) {}
 
     /**
-     * S42 Archive Tab, UC36: Browse immutable entity snapshots with formatted JSON views.
+     * Browse immutable entity snapshots with formatted JSON views.
      */
     public function index(Request $request): View
     {

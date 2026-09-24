@@ -9,7 +9,7 @@ use Illuminate\Contracts\View\View;
 class LegalController extends Controller
 {
     /**
-     * Display the Privacy Policy page under Australian Privacy Principles (NFR12).
+     * Display the Privacy Policy page under Australian Privacy Principles.
      */
     public function privacy(SettingService $settingService): View
     {
@@ -19,7 +19,7 @@ class LegalController extends Controller
     }
 
     /**
-     * Display the Terms & Conditions page (NFR12).
+     * Display the Terms & Conditions page.
      */
     public function terms(SettingService $settingService): View
     {

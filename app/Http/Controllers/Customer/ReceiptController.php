@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * FR53, UC11. Reuses OrderPolicy::view() (T062) — a receipt is just
+ * Reuses OrderPolicy::view() — a receipt is just
  * another read of the same order, gated by the same "own order" rule.
  */
 class ReceiptController extends Controller

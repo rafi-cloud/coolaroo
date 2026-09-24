@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * S02, FR32, FR33, FR34, BR59, BR61: Full menu browsing and filtering.
+ * Full menu browsing and filtering.
  */
 class MenuController extends Controller
 {
@@ -25,10 +25,10 @@ class MenuController extends Controller
 
     public function index(Request $request): View
     {
-        $selectedCategory = $request->query('category', 'all');
+        $selectedCategory = is_scalar($category = $request->query('category', 'all')) ? (string) $category : 'all';
         $selectedDietary = (array) $request->query('dietary', []);
         $selectedAllergens = (array) $request->query('exclude_allergen', []);
-        $search = trim((string) $request->query('q', ''));
+        $search = trim(is_scalar($q = $request->query('q', '')) ? (string) $q : '');
 
         $query = MenuItem::where('is_active', true)
             ->with([
@@ -39,7 +39,7 @@ class MenuController extends Controller
                 'allergens' => fn ($q) => $q->where('is_active', true),
             ]);
 
-        // Category filter (including Specials per BR59)
+        // Category filter (including Specials)
         if ($selectedCategory === 'specials') {
             $query->whereHas('sizes', function ($q) {
                 $q->whereNotNull('sale_price')
@@ -58,7 +58,7 @@ class MenuController extends Controller
             }
         }
 
-        // Allergen filter (exclude items that contain any of the selected allergens, BR61)
+        // Allergen filter (exclude items that contain any of the selected allergens)
         $allergenIds = array_filter($selectedAllergens, 'is_numeric');
         if (! empty($allergenIds)) {
             $query->whereDoesntHave('allergens', fn ($q) => $q->whereIn('allergen.allergen_id', $allergenIds));

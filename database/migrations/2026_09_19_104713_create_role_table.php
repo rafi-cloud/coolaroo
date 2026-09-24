@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('role', function (Blueprint $table) {
             $table->tinyIncrements('role_id');
-            $table->string('role_name', 20)->unique(); // admin, waitstaff, kitchen, bar (06.3)
+            $table->string('role_name', 20)->unique(); // admin, waitstaff, kitchen, bar
             $table->string('description', 150)->nullable();
             $table->string('landing_screen', 50); // route name, e.g. admin.dashboard, floor.index, kds.kitchen
         });

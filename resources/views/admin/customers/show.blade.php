@@ -32,7 +32,7 @@
         </div>
       </div>
 
-      <!-- Trust Profile Box (FR09, BR40) -->
+      <!-- Trust Profile Box -->
       @php
         $badgeClass = match ($profile['badge']) {
             'Flagged' => 'badge-flagged',
@@ -152,6 +152,56 @@
           @empty
             <tr>
               <td colspan="6" class="text-center muted">No reservations on record for this customer.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin:1.8rem 0 0.8rem">Order history</h3>
+
+    <div class="customer-order-summary" data-testid="admin-customer-order-summary">
+      <div class="customer-order-stat">
+        <span class="customer-order-stat-value">{{ $orderTotals['count'] }}</span>
+        <span class="customer-order-stat-label">Orders placed</span>
+      </div>
+      <div class="customer-order-stat">
+        <span class="customer-order-stat-value">@money($orderTotals['spend'])</span>
+        <span class="customer-order-stat-label">Lifetime spend</span>
+      </div>
+      <div class="customer-order-stat">
+        <span class="customer-order-stat-value">{{ $orderTotals['last'] ? $orderTotals['last']->diffForHumans() : '—' }}</span>
+        <span class="customer-order-stat-label">Last order</span>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table class="table" data-testid="admin-customer-orders-table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Placed</th>
+            <th>Table</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse ($orders as $order)
+            <tr data-testid="admin-customer-order-row-{{ $order->order_id }}">
+              <td>{{ $order->order_number }}</td>
+              <td>@auDateTime($order->placed_at)</td>
+              <td>{{ $order->restaurantTable?->table_number ? 'T'.$order->restaurantTable->table_number : '—' }}</td>
+              <td>{{ $order->items_count }}</td>
+              <td>@money($order->total_amount)</td>
+              <td><span class="badge b-{{ $order->status->value }}">{{ ucfirst(str_replace('_', ' ', $order->status->value)) }}</span></td>
+              <td><a href="{{ route('admin.orders.show', $order) }}" data-testid="admin-customer-order-view-{{ $order->order_id }}">View</a></td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="7" class="text-center muted">No orders on record for this customer.</td>
             </tr>
           @endforelse
         </tbody>

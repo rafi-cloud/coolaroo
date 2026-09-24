@@ -40,8 +40,8 @@ class Staff extends Authenticatable
     }
 
     /**
-     * 3.2, FR04. Admin clears every role check, so admin sees the shared
-     * staff screens (S22, S27) with admin navigation around them.
+     * Admin clears every role check, so admin sees the shared
+     * staff screens with admin navigation around them.
      */
     public function isAdmin(): bool
     {

@@ -5,7 +5,7 @@ namespace App\Http\Requests\Staff;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * FR64: Phone booking request validation.
+ * Phone booking request validation.
  */
 class StorePhoneBookingRequest extends FormRequest
 {

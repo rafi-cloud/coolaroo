@@ -6,7 +6,7 @@ use App\Services\PaymentService;
 use Illuminate\Console\Command;
 
 /**
- * BR25, FR47, 07.10. Scheduled every two minutes. Stripe runs in test mode
+ * Scheduled every two minutes. Stripe runs in test mode
  * with no webhooks, so this job is what catches a payment whose customer
  * never came back to the return URL.
  */
@@ -14,7 +14,7 @@ class ReconcilePaymentsCommand extends Command
 {
     protected $signature = 'payments:reconcile';
 
-    protected $description = 'Retrieve pending Stripe sessions and mark verified payments paid (BR25, FR47)';
+    protected $description = 'Retrieve pending Stripe sessions and mark verified payments paid';
 
     public function handle(PaymentService $payments): int
     {

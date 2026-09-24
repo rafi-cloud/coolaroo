@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR58, FR60, BR28, 5.1, 5.3. Lines of one order at one station move together;
+ * Lines of one order at one station move together;
  * the order's own status is always derived, never set by hand.
  */
 class KitchenService
@@ -32,19 +32,52 @@ class KitchenService
 
     public function __construct(private AuditLogger $auditLogger) {}
 
-    /** FR58: Start. */
+    /** Start. */
     public function start(Order $order, Destination $destination, Staff $actor): Order
     {
         return $this->advanceLines($order, $destination, $actor, OrderItemStatus::Pending, OrderItemStatus::Preparing);
     }
 
-    /** FR58: Ready. */
+    /** Ready. */
     public function ready(Order $order, Destination $destination, Staff $actor): Order
     {
         return $this->advanceLines($order, $destination, $actor, OrderItemStatus::Preparing, OrderItemStatus::Ready);
     }
 
-    /** FR60. Waitstaff only — no per-station restriction, unlike Start/Ready. */
+    /**
+     * Ready, one line at a time. The order climbs to ready on its own once the
+     * last active line is ticked, because deriveOrderStatus() re-runs here and
+     * already treats "every active line ready or served" as the order being
+     * ready. Ticking is one-way: the line state machine has no route back from
+     * ready to preparing.
+     */
+    public function markLineReady(OrderItem $line, Staff $actor): Order
+    {
+        return DB::transaction(function () use ($line, $actor) {
+            $locked = Order::whereKey($line->order_id)->lockForUpdate()->firstOrFail();
+
+            $fresh = $locked->items()->whereKey($line->getKey())->firstOrFail();
+
+            $fresh->status->ensureCanTransitionTo(OrderItemStatus::Ready);
+
+            $fresh->forceFill([
+                'status' => OrderItemStatus::Ready,
+                'prepared_at' => now(),
+            ])->save();
+
+            $this->deriveOrderStatus($locked, $actor);
+
+            $this->auditLogger->log($actor, 'line_ready', $locked);
+
+            $locked->refresh();
+
+            event(new OrderLinesUpdated($locked, $fresh->destination));
+
+            return $locked;
+        });
+    }
+
+    /** Waitstaff only — no per-station restriction, unlike Start/Ready. */
     public function serve(Order $order, Destination $destination, Staff $actor): Order
     {
         return $this->advanceLines($order, $destination, $actor, OrderItemStatus::Ready, OrderItemStatus::Served);
@@ -93,7 +126,7 @@ class KitchenService
     }
 
     /**
-     * BR28. The single source of truth for an order's own status. Cancelled
+     * The single source of truth for an order's own status. Cancelled
      * lines are not "active" — a refunded line must not hold an order back.
      */
     public function deriveOrderStatus(Order $order, ?Staff $actor = null): Order
@@ -115,7 +148,7 @@ class KitchenService
         return $this->climbTo($order, $target, $actor);
     }
 
-    /** BR28's three clauses, most-advanced first. */
+    /** the three clauses, most-advanced first. */
     private function targetStatus(Collection $active): ?OrderStatus
     {
         if ($active->every(fn (OrderItem $line) => $line->status === OrderItemStatus::Served)) {

@@ -19,7 +19,7 @@ class ReservationController extends Controller
     ) {}
 
     /**
-     * FR72, UC14: Customer views their upcoming and past reservations.
+     * Customer views their upcoming and past reservations.
      */
     public function index(Request $request): View
     {
@@ -51,7 +51,7 @@ class ReservationController extends Controller
     }
 
     /**
-     * FR62, UC13: Submit online reservation request.
+     * Submit online reservation request.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -73,7 +73,7 @@ class ReservationController extends Controller
     }
 
     /**
-     * FR66, BR36, BR64, UC14: Customer updates their reservation.
+     * Customer updates their reservation.
      * Core edits revert confirmed bookings to requested and unlink tables.
      * Locked within 2 hours of booking time.
      */
@@ -102,7 +102,7 @@ class ReservationController extends Controller
     }
 
     /**
-     * FR67, BR38, BR64, UC14: Customer cancels their reservation.
+     * Customer cancels their reservation.
      * Flags late cancellation if within 2 hours of booking time; unlinks tables.
      */
     public function cancel(Request $request, Reservation $reservation): RedirectResponse

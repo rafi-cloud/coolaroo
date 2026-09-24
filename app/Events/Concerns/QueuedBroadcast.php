@@ -3,7 +3,7 @@
 namespace App\Events\Concerns;
 
 /**
- * NFR10, 07.8, T222. Retry settings every broadcast event shares.
+ * Retry settings every broadcast event shares.
  *
  * `Illuminate\Broadcasting\BroadcastEvent` copies `tries`, `backoff` and
  * `timeout` off the event when it queues it, so declaring them here reaches

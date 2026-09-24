@@ -38,7 +38,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
 /**
- * SDD 09.1, TC-UC35-01.
+ * SDD, TC--01.
  * Seeds realistic volume data across catalogue, customers, reservations,
  * visits, orders, payments, refunds, feedback, and audit logs.
  */
@@ -237,7 +237,7 @@ class DemoSeeder extends Seeder
             [
                 'size_name' => '300g Cut',
                 'price' => 44.00,
-                'sale_price' => 38.00, // BR59 Special
+                'sale_price' => 38.00, // on special
                 'sale_starts_at' => Carbon::now()->subDays(2),
                 'sale_ends_at' => Carbon::now()->addDays(5),
                 'order' => 1,
@@ -652,7 +652,7 @@ class DemoSeeder extends Seeder
             );
         }
 
-        // 2. David: Has uncleared no-show -> 'Flagged' trust badge (BR40)
+        // 2. David: Has uncleared no-show -> 'Flagged' trust badge
         $noShowDate = Carbon::today()->subDays(8);
         Reservation::firstOrCreate(
             ['reference_code' => 'CR-NOSHOW1'],
@@ -1037,7 +1037,7 @@ class DemoSeeder extends Seeder
 
     private function seedFeedback(Staff $admin): void
     {
-        // Must seed >= 10 non-hidden reviews so the Homepage rating summary card displays (BR45, TC-UC03-01)
+        // Must seed >= 10 non-hidden reviews so the Homepage rating summary card displays (TC--01)
         $orders = Order::where('status', OrderStatus::Served->value)->get();
         if ($orders->count() < 10) {
             return;
@@ -1064,7 +1064,7 @@ class DemoSeeder extends Seeder
                 'comment' => 'Good family dining experience. Plenty of high chairs and spacious outdoor tables.',
                 'reply' => 'Thank you for dining with us! We look forward to welcoming you and your family back soon.',
             ],
-            // Hidden abusive/spam review (is_hidden = true, BR44, BR45)
+            // Hidden abusive/spam review (is_hidden = true)
             [
                 'food' => 1,
                 'serv' => 1,
@@ -1126,7 +1126,7 @@ class DemoSeeder extends Seeder
             ]
         );
 
-        // 3. AI assistant usage requests (Populates AI Usage Report T125)
+        // 3. AI assistant usage requests (Populates AI Usage Report)
         for ($i = 1; $i <= 6; $i++) {
             $tokensIn = rand(250, 600);
             $tokensOut = rand(80, 220);

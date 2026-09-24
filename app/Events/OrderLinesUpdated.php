@@ -11,7 +11,7 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** FR58, FR59, 07.8. Line status or ETA moved at one station (T081, T082). */
+/** Line status or ETA moved at one station. */
 class OrderLinesUpdated implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;

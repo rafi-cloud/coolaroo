@@ -7,19 +7,28 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\RestaurantTable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
-/** FR102, UC33, S33. Read-only search and detail. */
+/** Read-only search and detail. */
 class OrderController extends Controller
 {
     public function index(Request $request): View
     {
+        $filters = Validator::make($request->query(), [
+            'number' => ['nullable', 'string', 'max:64'],
+            'date' => ['nullable', 'date'],
+            'table_id' => ['nullable', 'integer'],
+            'status' => ['nullable', Rule::enum(OrderStatus::class)],
+        ])->valid();
+
         $orders = Order::query()
             ->with('restaurantTable')
-            ->when($request->filled('number'), fn ($query) => $query->where('order_number', 'like', '%'.$request->query('number').'%'))
-            ->when($request->filled('date'), fn ($query) => $query->whereDate('placed_at', $request->query('date')))
-            ->when($request->filled('table_id'), fn ($query) => $query->where('table_id', $request->query('table_id')))
-            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->query('status')))
+            ->when(filled($filters['number'] ?? null), fn ($query) => $query->where('order_number', 'like', '%'.$filters['number'].'%'))
+            ->when(filled($filters['date'] ?? null), fn ($query) => $query->whereDate('placed_at', $filters['date']))
+            ->when(filled($filters['table_id'] ?? null), fn ($query) => $query->where('table_id', $filters['table_id']))
+            ->when(filled($filters['status'] ?? null), fn ($query) => $query->where('status', $filters['status']))
             ->orderByDesc('placed_at')
             ->paginate(25)
             ->withQueryString();
@@ -28,7 +37,7 @@ class OrderController extends Controller
             'orders' => $orders,
             'tables' => RestaurantTable::orderBy('table_number')->get(),
             'statuses' => OrderStatus::cases(),
-            'filters' => $request->only(['number', 'date', 'table_id', 'status']),
+            'filters' => $filters,
         ]);
     }
 

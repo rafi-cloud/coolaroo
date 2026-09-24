@@ -1,12 +1,12 @@
-<x-layouts.admin title="Archived Records" page-title="Historical Data Archives" page-sub="Read-only repository of archived entity snapshots and deactivation audits (FR99, BR62)">
+<x-layouts.admin title="Archived Records" page-title="Historical Data Archives" page-sub="Read-only repository of archived entity snapshots and deactivation audits">
   <div class="card" data-testid="admin-archive-page">
     {{-- Navigation Tabs: Events vs Archive --}}
     <nav class="report-nav" aria-label="Audit navigation" style="margin-bottom:1.5rem;" data-testid="admin-audit-tabs">
       <a href="{{ route('admin.audit-log.index') }}" class="report-tab" data-testid="admin-audit-tab-events">
-        Audit Events (FR90)
+        Audit Events
       </a>
       <a href="{{ route('admin.archive.index') }}" class="report-tab is-active" data-testid="admin-audit-tab-archive">
-        Archived Records (FR99)
+        Archived Records
       </a>
     </nav>
 
@@ -48,7 +48,7 @@
             <th>Archived By</th>
             <th>Deactivation Reason</th>
             <th>Status</th>
-            <th>JSON Snapshot Data (BR62)</th>
+            <th>JSON Snapshot Data</th>
           </tr>
         </thead>
         <tbody>

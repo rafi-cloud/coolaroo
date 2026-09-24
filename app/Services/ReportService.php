@@ -25,17 +25,17 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * FR81, 08.5. One method per dashboard widget, in the order 08.5 lists them.
+ * One method per dashboard widget, in the order 08.5 lists them.
  * Every figure comes from a paid order (`paid_at`), never a placed one — an
- * unpaid order is not revenue (BR25). Dates use the app timezone
+ * unpaid order is not revenue. Dates use the app timezone
  * (Australia/Melbourne), so "today" is the venue's day, not UTC's.
  */
 class ReportService
 {
-    /** Widget 14's threshold: "remaining < 2× buffer" (08.5). */
+    /** Widget 14's threshold: "remaining < 2× buffer". */
     private const LOW_STOCK_BUFFER_MULTIPLE = 2;
 
-    /** Widget 12: a cash payment waiting longer than this needs someone (08.5). */
+    /** Widget 12: a cash payment waiting longer than this needs someone. */
     private const CASH_WAITING_MINUTES = 10;
 
     public function __construct(
@@ -104,7 +104,7 @@ class ReportService
     /**
      * Widget 4. Share of today's paid amount by method, from the payment
      * rows rather than the orders, because cash rounding and staff
-     * adjustments (BR22, BR23) live there.
+     * adjustments live there.
      *
      * @return array{cash:float, stripe:float, cash_pct:?float}
      */
@@ -135,7 +135,7 @@ class ReportService
             ->sum('party_size');
     }
 
-    /** Widget 6. Links to S27. */
+    /** Widget 6. Links to */
     public function pendingReservationRequests(): int
     {
         return Reservation::where('status', ReservationStatus::Requested)->count();
@@ -149,8 +149,8 @@ class ReportService
 
     /**
      * Widget 8. Hidden feedback is left out: it is hidden because it was
-     * abusive or spam (FR78), and counting it would distort the venue's own
-     * quality signal. FR86's report carries the hidden count separately.
+     * abusive or spam, and counting it would distort the venue's own
+     * quality signal. the report carries the hidden count separately.
      *
      * @return array{food:?float, service:?float, count:int}
      */
@@ -299,7 +299,7 @@ class ReportService
     }
 
     /**
-     * Widget 13. Quantity and revenue from the line snapshots (BR15), not
+     * Widget 13. Quantity and revenue from the line snapshots, not
      * from today's menu prices — a sale price that ended at noon must not
      * repost the morning's takings.
      *
@@ -330,9 +330,9 @@ class ReportService
     }
 
     /**
-     * Widget 14. Two different problems in one list: switched off by hand
-     * (FR29), or close enough to the daily limit that QR checkout is about
-     * to start refusing it (BR09's buffer, doubled per 08.5).
+     * Widget 14. Two different problems in one list: switched off by hand,
+     * or close enough to the daily limit that QR checkout is about
+     * to start refusing it (the buffer, doubled).
      *
      * @return array<int, array<string, mixed>>
      */
@@ -388,7 +388,7 @@ class ReportService
     }
 
     /**
-     * FR68's window, as `Staff\Floor\ReservationController` defines it: a
+     * the window, as `Staff\Floor\ReservationController` defines it: a
      * booking with no open visit, between 30 minutes before and 15 after.
      *
      * @return Collection<int, Reservation>
@@ -409,7 +409,7 @@ class ReportService
     }
 
     /**
-     * FR82. Sales Report: Gross, GST, sale discounts, cash adjustments, refunds, net, method split, order source, cash by staff.
+     * Sales Report: Gross, GST, sale discounts, cash adjustments, refunds, net, method split, order source, cash by staff.
      *
      * @return array<string, mixed>
      */
@@ -518,7 +518,7 @@ class ReportService
     }
 
     /**
-     * FR83. Item and Category Report: top/bottom sellers, category sales, sold-out occurrences.
+     * Item and Category Report: top/bottom sellers, category sales, sold-out occurrences.
      *
      * @return array<string, mixed>
      */
@@ -603,7 +603,7 @@ class ReportService
     }
 
     /**
-     * FR84. Operations Report: peak hours, station prep times, ETA accuracy, table turnover.
+     * Operations Report: peak hours, station prep times, ETA accuracy, table turnover.
      *
      * @return array<string, mixed>
      */
@@ -691,7 +691,7 @@ class ReportService
     }
 
     /**
-     * FR85. Reservation Report: bookings, covers, approval/decline rate, no-show rate, late cancellations, walk-in visits.
+     * Reservation Report: bookings, covers, approval/decline rate, no-show rate, late cancellations, walk-in visits.
      *
      * @return array<string, mixed>
      */
@@ -761,7 +761,7 @@ class ReportService
     }
 
     /**
-     * FR86. Feedback Report: averages, trends, distribution, hidden count.
+     * Feedback Report: averages, trends, distribution, hidden count.
      *
      * @return array<string, mixed>
      */
@@ -813,7 +813,7 @@ class ReportService
     }
 
     /**
-     * FR87. Staff Activity Report: cash payments, adjustments, refund requests, toggles, overrides per staff.
+     * Staff Activity Report: cash payments, adjustments, refund requests, toggles, overrides per staff.
      *
      * @return array<string, mixed>
      */
@@ -865,7 +865,7 @@ class ReportService
     }
 
     /**
-     * FR88. Export report as formatted CSV string.
+     * Export report as formatted CSV string.
      */
     public function exportCsv(string $type, Carbon $from, Carbon $to): string
     {
@@ -915,7 +915,7 @@ class ReportService
     }
 
     /**
-     * FR88. Export report as PDF binary string.
+     * Export report as PDF binary string.
      */
     public function exportPdf(string $type, Carbon $from, Carbon $to): string
     {
@@ -1114,7 +1114,7 @@ class ReportService
     }
 
     /**
-     * FR45. AI Usage Report: requests, tokens, and success/busy rate from audit_log ai_request entries.
+     * AI Usage Report: requests, tokens, and success/busy rate from audit_log ai_request entries.
      *
      * @return array<string, mixed>
      */

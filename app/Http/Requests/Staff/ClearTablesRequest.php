@@ -4,7 +4,6 @@ namespace App\Http\Requests\Staff;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/** FR18. */
 class ClearTablesRequest extends FormRequest
 {
     public function authorize(): bool

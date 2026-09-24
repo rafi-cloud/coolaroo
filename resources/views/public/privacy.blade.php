@@ -16,7 +16,7 @@
 
       <div class="legal-body">
         <div class="legal-callout" data-testid="privacy-compliance-callout">
-          <strong>Australian Privacy Principles Commitment (NFR12)</strong>
+          <strong>Australian Privacy Principles Commitment</strong>
           <p>{{ $venue['name'] ?? 'Coolaroo Restaurant & Bistro' }} is committed to protecting your personal privacy in accordance with the Australian Privacy Principles (APPs) contained in the Privacy Act 1988 (Cth). This policy outlines how we handle personal information, disclose dining attendance records, and safeguard your data when you interact with our restaurant, online reservation wizard, table QR ordering, and dining assistant.</p>
         </div>
 
@@ -40,7 +40,7 @@
 
         <h2>3. Artificial Intelligence &amp; Dining Assistant Privacy</h2>
         <div class="legal-callout" data-testid="privacy-ai-callout">
-          <strong>No Personal Data Sent to AI &bull; Ephemeral Processing (BR47, BR48, NFR12)</strong>
+          <strong>No Personal Data Sent to AI &bull; Ephemeral Processing</strong>
           <p>Our interactive dining assistant and meal builder are designed with privacy-by-design safeguards:</p>
           <ul>
             <li><strong>Zero Personal Data Transmitted:</strong> When you consult the AI assistant or use the meal builder, queries sent to external model providers (GitHub Models / OpenAI API) contain <em>only</em> dish names, ingredient tags, price calculations, and the dietary prompt parameters you select. Your name, contact details, table identity, reservation records, and attendance history are <strong>never</strong> transmitted to external AI services.</li>

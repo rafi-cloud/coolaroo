@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * FR40, UC02, BR07, BR50. Public on purpose — BR50 says this works from the
+ * Public on purpose — says this works from the
  * QR login page without login; the session check is what keeps it to people
- * who actually scanned this table (FR40: "from table ordering page or QR
+ * who actually scanned this table ("from table ordering page or QR
  * login page").
  */
 class WaiterCallController extends Controller

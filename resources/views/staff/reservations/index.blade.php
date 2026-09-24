@@ -43,7 +43,7 @@
       </div>
     @endif
 
-    <!-- Phone booking drawer (FR64, S27) -->
+    <!-- Phone booking drawer -->
     <details class="kds-drawer phone-booking-drawer" data-testid="reservations-phone-booking-drawer">
       <summary class="btn btn-orange btn-sm" data-testid="reservations-phone-booking-summary">
         + New phone booking
@@ -189,7 +189,7 @@
             </div>
           </div>
 
-          <!-- Table assignment info & controls (FR65, FR95) -->
+          <!-- Table assignment info & controls -->
           <div class="card-table-section">
             <div class="card-table-info">
               <strong>Table:</strong>
@@ -248,7 +248,7 @@
             </div>
           @endif
 
-          <!-- Confirmed actions: Seat & Mark No-show (FR69, FR70, BR39) -->
+          <!-- Confirmed actions: Seat & Mark No-show -->
           @if ($r->status === \App\Enums\ReservationStatus::Confirmed)
             <div class="card-confirmed-actions" data-testid="reservations-confirmed-actions-{{ $r->reservation_id }}" style="margin-top:auto; padding-top:0.5rem; border-top:1px solid var(--line); display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
               @if ($r->can_seat)
@@ -269,7 +269,7 @@
             </div>
           @endif
 
-          <!-- Review panel for requested bookings (FR63, S28) -->
+          <!-- Review panel for requested bookings -->
           @if ($r->status === \App\Enums\ReservationStatus::Requested)
             <div class="card-review-wrapper">
               <x-reservations.review :reservation="$r" />

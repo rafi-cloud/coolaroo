@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
- * BR59. Nothing calls this yet — the public menu (FR32) and homepage offer
+ * Nothing calls this yet — the public menu and homepage offer
  * block are both later tasks; this is the decision logic they'll use.
  */
 class SpecialsService

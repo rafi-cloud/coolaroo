@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 /**
- * FR38, FR41, UC11, UC12, BR30. show()/state() render and poll the
- * timeline (T062); cancel() is BR29's customer cancel (T063).
+ * show()/state() render and poll the
+ * timeline; cancel is the customer cancel.
  */
 class OrderController extends Controller
 {
@@ -23,7 +23,7 @@ class OrderController extends Controller
     public function __construct(private OrderService $orders) {}
 
     /**
-     * FR39, UC11: View customer order history.
+     * View customer order history.
      */
     public function index(Request $request): View
     {
@@ -102,7 +102,7 @@ class OrderController extends Controller
         return $steps;
     }
 
-    /** BR30: "shown as a 5-minute range." */
+    /** "shown as a 5-minute range." */
     private function etaRange(?Carbon $eta): ?array
     {
         if ($eta === null) {
@@ -112,7 +112,7 @@ class OrderController extends Controller
         return ['from' => $eta, 'to' => $eta->copy()->addMinutes(5)];
     }
 
-    /** FR59: "customer ETA updates live" needs formatted strings on state(), not just show(). */
+    /** "customer ETA updates live" needs formatted strings on state(), not just show(). */
     private function formatEtaRange(?array $range): ?array
     {
         if ($range === null) {

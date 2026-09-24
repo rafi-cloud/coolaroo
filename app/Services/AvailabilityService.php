@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 
 /**
- * FR61, BR32, BR33, BR34, BR35, BR58: Reservation availability calculations.
+ * Reservation availability calculations.
  */
 class AvailabilityService
 {
@@ -18,7 +18,7 @@ class AvailabilityService
     ) {}
 
     /**
-     * BR58: reservations_online_enabled = 0 blocks customer requests.
+     * reservations_online_enabled = 0 blocks customer requests.
      */
     public function isOnlineReservationsEnabled(): bool
     {
@@ -26,7 +26,7 @@ class AvailabilityService
     }
 
     /**
-     * BR35: Closed weekdays (ISO-8601 day numbers, where 1 = Monday ... 7 = Sunday).
+     * Closed weekdays (ISO-8601 day numbers, where 1 = Monday ... 7 = Sunday).
      *
      * @return array<int>
      */
@@ -41,7 +41,7 @@ class AvailabilityService
     }
 
     /**
-     * BR35: Check whether a given date falls on a closed weekday.
+     * Check whether a given date falls on a closed weekday.
      */
     public function isClosedWeekday(CarbonInterface|string $date): bool
     {
@@ -53,7 +53,7 @@ class AvailabilityService
     }
 
     /**
-     * BR35: Online booking advance limit in days.
+     * Online booking advance limit in days.
      */
     public function getMaxDaysAhead(): int
     {
@@ -61,7 +61,7 @@ class AvailabilityService
     }
 
     /**
-     * BR35: Minimum lead time required in hours.
+     * Minimum lead time required in hours.
      */
     public function getMinLeadHours(): int
     {
@@ -69,7 +69,7 @@ class AvailabilityService
     }
 
     /**
-     * BR35: Maximum party size allowed for online booking.
+     * Maximum party size allowed for online booking.
      */
     public function getMaxPartyOnline(): int
     {
@@ -77,7 +77,7 @@ class AvailabilityService
     }
 
     /**
-     * BR34: Duration in minutes by party size.
+     * Duration in minutes by party size.
      * 1–2 guests 90 min, 3–6 guests 120 min, 7+ guests 150 min.
      */
     public function getDurationMinutes(int $partySize): int
@@ -94,7 +94,7 @@ class AvailabilityService
     }
 
     /**
-     * BR35: Verify if the requested date is within [today, today + max_days_ahead].
+     * Verify if the requested date is within [today, today + max_days_ahead].
      */
     public function isDateWithinWindow(CarbonInterface|string $date): bool
     {
@@ -109,7 +109,7 @@ class AvailabilityService
     }
 
     /**
-     * BR35: Verify if a specific slot time meets the lead time requirement.
+     * Verify if a specific slot time meets the lead time requirement.
      */
     public function isLeadTimeValid(CarbonInterface|string $date, string $slotTime): bool
     {
@@ -121,7 +121,7 @@ class AvailabilityService
     }
 
     /**
-     * BR32: Sum of covers for requested, confirmed, and seated bookings for a slot.
+     * Sum of covers for requested, confirmed, and seated bookings for a slot.
      */
     public function getBookedCovers(int $slotId, CarbonInterface|string $date, ?int $ignoreReservationId = null): int
     {
@@ -144,7 +144,7 @@ class AvailabilityService
     }
 
     /**
-     * BR32, BR33: Check if a slot has sufficient remaining capacity for the party.
+     * Check if a slot has sufficient remaining capacity for the party.
      */
     public function hasSlotCapacity(
         int|SlotCapacity $slot,
@@ -163,7 +163,7 @@ class AvailabilityService
     }
 
     /**
-     * FR61, BR32-BR35: Get available slots with capacity details for a date and party size.
+     * Get available slots with capacity details for a date and party size.
      *
      * @return array<array<string, mixed>>
      */
@@ -209,7 +209,7 @@ class AvailabilityService
     }
 
     /**
-     * FR61, BR32–BR35, BR58: Full date availability check including all business rules.
+     * Full date availability check including all business rules.
      *
      * @return array<string, mixed>
      */

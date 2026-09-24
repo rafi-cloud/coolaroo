@@ -10,11 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Screen S43: Admin Venue Settings & Operational Switches.
- * FR91: Manage Venue Settings (BR11, BR26, BR34, BR35, BR50, BR51).
- * FR96: Pause QR Ordering (BR58).
- * FR97: Pause Online Reservations (BR58).
- * FR98: Toggle AI Assistant (BR49).
+ * Admin venue settings and operational switches.
+ * Manage Venue Settings.
+ * Pause QR Ordering.
+ * Pause Online Reservations.
+ * Toggle AI Assistant.
  */
 class SettingController extends Controller
 {
@@ -23,7 +23,7 @@ class SettingController extends Controller
     ) {}
 
     /**
-     * S43, UC37: Display settings form and operational control switches.
+     * Display settings form and operational control switches.
      */
     public function index(): View
     {
@@ -40,7 +40,7 @@ class SettingController extends Controller
     }
 
     /**
-     * FR91, UC37: Save venue details, hours, reservation rules, and operational timers.
+     * Save venue details, hours, reservation rules, and operational timers.
      */
     public function update(Request $request): RedirectResponse
     {
@@ -112,7 +112,7 @@ class SettingController extends Controller
     }
 
     /**
-     * FR96, FR97, FR98: Quick toggle for operational switches.
+     * Quick toggle for operational switches.
      */
     public function toggle(Request $request, string $key): RedirectResponse
     {

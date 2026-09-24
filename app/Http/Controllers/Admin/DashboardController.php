@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * FR81, 08.5, UC35. Admin live dashboard with 15 widgets.
+ * Admin live dashboard with 15 widgets.
  */
 class DashboardController extends Controller
 {

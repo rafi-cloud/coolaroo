@@ -8,19 +8,19 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 
 /**
- * NFR10, 10.2 step 8, T222. Daily mysqldump, kept 14 days.
+ * Daily mysqldump, kept 14 days.
  *
  * The dump runs through mysqldump rather than PHP because a PHP-side dump of a
  * live database is neither consistent nor fast. The binary is named by
- * MYSQLDUMP_PATH, which differs between XAMPP on Windows (10.1) and the VPS
- * (10.2), and the password reaches it through MYSQL_PWD rather than the
+ * MYSQLDUMP_PATH, which differs between XAMPP on Windows and the VPS,
+ * and the password reaches it through MYSQL_PWD rather than the
  * command line, where `ps` would show it.
  */
 class BackupDatabaseCommand extends Command
 {
     protected $signature = 'db:backup {--keep-days= : Override how many days of dumps to keep}';
 
-    protected $description = 'Write a mysqldump of the application database and prune old dumps (NFR10)';
+    protected $description = 'Write a mysqldump of the application database and prune old dumps';
 
     public function handle(): int
     {
@@ -67,7 +67,7 @@ class BackupDatabaseCommand extends Command
         return self::SUCCESS;
     }
 
-    /** NFR10: dumps older than the retention window go. */
+    /** dumps older than the retention window go. */
     private function prune(string $directory): int
     {
         $keepDays = (int) ($this->option('keep-days') ?? config('database.backup_keep_days', 14));

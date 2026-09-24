@@ -2,7 +2,7 @@
     title="Coolaroo Restaurant & Bistro — Taste something new"
     description="Coolaroo Restaurant & Bistro. Wood-fired pizza, burgers and fresh seafood. Scan the QR code at your table for the menu, or book ahead online."
 >
-  {{-- S01: Hero Section --}}
+  {{-- Hero Section --}}
   <section class="hero" data-testid="home-hero">
     <img class="hero-img" src="{{ asset('images/hero-1.jpg') }}" alt="A table of wood-fired dishes at Coolaroo">
     <div class="hero-shade"></div>
@@ -23,7 +23,7 @@
     <div class="dots" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
   </section>
 
-  {{-- S01: Action Tiles --}}
+  {{-- Action Tiles --}}
   <section class="tiles" data-testid="home-tiles">
     <a class="tile" href="{{ url('/#menu') }}" data-testid="home-tile-menu">
       <img src="{{ asset('images/tile-menu.jpg') }}" alt="A plate of pasta from the Coolaroo menu">
@@ -41,7 +41,7 @@
     </a>
   </section>
 
-  {{-- S01: About Section --}}
+  {{-- About Section --}}
   <section class="section wrap" id="about" data-testid="home-about">
     <div class="about">
       <div class="about-figure">
@@ -62,7 +62,7 @@
     </div>
   </section>
 
-  {{-- S01: Menu Section (T031, FR32, BR59) --}}
+  {{-- Menu Section --}}
   <section class="section menu-section" id="menu" data-testid="home-menu-section">
     <div class="wrap">
       <div class="center">
@@ -83,7 +83,7 @@
         @endforeach
       </nav>
 
-      {{-- Specials offer block (hidden when none per BR59) --}}
+      {{-- Specials offer block, hidden when there are none --}}
       @if($topSpecial)
         @php
           $specialSize = $topSpecial['size'];
@@ -162,7 +162,7 @@
     </div>
   </section>
 
-  {{-- S01: Reviews Section (T032, FR80, BR45) --}}
+  {{-- Reviews Section --}}
   <section class="section wrap" id="reviews" data-testid="home-reviews-section">
     <div class="center">
       <div class="rule center"></div>
@@ -170,7 +170,7 @@
     </div>
 
     <div class="reviews @if(! $showRatingCard) no-rating-card @endif" data-testid="home-reviews-container">
-      {{-- Rating summary card: shown when count >= public_rating_min_count (BR45) --}}
+      {{-- Rating summary card: shown when count >= public_rating_min_count --}}
       @if($showRatingCard && $ratingStats)
         <div class="rating-card" data-testid="home-rating-card">
           <p class="rating-big">{{ $ratingStats['overall_avg'] }}<span>/5</span></p>
@@ -197,11 +197,8 @@
         <div class="review-grid" data-testid="home-featured-reviews-grid">
           @forelse($featuredReviews as $feedback)
             @php
-              $parts = explode(' ', trim($feedback->customer?->full_name ?? 'Diner'));
-              $firstName = $parts[0] ?? 'Diner';
-              $lastInitial = isset($parts[1]) && strlen($parts[1]) > 0 ? strtoupper($parts[1][0]) . '.' : '';
-              $author = trim("{$firstName} {$lastInitial}");
-              $avgRating = round(($feedback->food_rating + $feedback->service_rating) / 2);
+              $author = $feedback->publicAuthor();
+              $avgRating = $feedback->averageRating();
               $starPct = round(($avgRating / 5) * 100);
             @endphp
             <article class="review" data-testid="home-review-{{ $feedback->order_id }}">
@@ -219,11 +216,17 @@
             <p data-testid="home-reviews-empty">Reviews will appear here as diners share their experiences.</p>
           @endforelse
         </div>
+
+        <p class="reviews-all-link">
+          <a href="{{ route('reviews.index') }}" class="btn btn-outline" data-testid="home-reviews-view-all">
+            Read all reviews
+          </a>
+        </p>
       </div>
     </div>
   </section>
 
-  {{-- S18: Reservation Wizard (T035, FR61, FR62) --}}
+  {{-- Reservation Wizard --}}
   <x-reserve />
 
   {{-- Section Anchor Hooks for subsequent Phase 6 tasks --}}

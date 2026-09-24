@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR35, FR36, BR21, BR57. Cart lines live in the session, not the database —
+ * Cart lines live in the session, not the database —
  * nothing about an unpaid cart is worth persisting past checkout.
  */
 class CartService

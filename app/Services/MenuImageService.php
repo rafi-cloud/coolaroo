@@ -10,7 +10,7 @@ use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\ImageManager;
 
 /**
- * FR23, NFR08. Stores and resizes menu item photos.
+ * Stores and resizes menu item photos.
  */
 class MenuImageService
 {

@@ -7,8 +7,8 @@ use App\Models\AddOnOption;
 use App\Models\MenuItem;
 
 /**
- * FR28. Groups/options are tightly coupled and each method is a thin
- * passthrough — one service, not one per entity (see T043's guide).
+ * Groups/options are tightly coupled and each method is a thin
+ * passthrough — one service, not one per entity ('s guide).
  */
 class AddOnService
 {

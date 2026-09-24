@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Staff\AdjustEtaRequest;
 use App\Models\MenuItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Services\EtaService;
 use App\Services\KitchenService;
 use Illuminate\Database\Eloquent\Collection;
@@ -20,9 +21,9 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 /**
- * FR56, FR57 (queue and filters, T080), FR58 (Start/Ready, T081) and FR59
- * (ETA adjustment, T082). S30, UC28. The order status behind Start/Ready is
- * derived by KitchenService, never set here (BR28).
+ * The station queue and its filters, Start/Ready, and ETA adjustment.
+ * The order status behind Start/Ready is derived by KitchenService,
+ * never set here.
  */
 class StationController extends Controller
 {
@@ -54,7 +55,7 @@ class StationController extends Controller
         ]);
     }
 
-    /** NFR09: what kds.js re-fetches on every broadcast and on reconnect. */
+    /** what kds.js re-fetches on every broadcast and on reconnect. */
     public function state(Request $request, Destination $destination): JsonResponse
     {
         $orders = $this->queue($request, $destination);
@@ -83,7 +84,7 @@ class StationController extends Controller
         ]);
     }
 
-    /** FR58. No Form Request: the order and the station both come from the URL. */
+    /** No Form Request: the order and the station both come from the URL. */
     public function start(Request $request, Order $order, Destination $destination): RedirectResponse
     {
         Gate::authorize('updateStation', [Order::class, $destination]);
@@ -93,7 +94,10 @@ class StationController extends Controller
         return back()->with('status', 'lines-started');
     }
 
-    /** FR58. */
+    /**
+     * Mark every still-preparing line at this station ready in one press, for
+     * a ticket that plates together. Lines already ticked are left alone.
+     */
     public function ready(Request $request, Order $order, Destination $destination): RedirectResponse
     {
         Gate::authorize('updateStation', [Order::class, $destination]);
@@ -103,7 +107,20 @@ class StationController extends Controller
         return back()->with('status', 'lines-ready');
     }
 
-    /** FR59. Same station-scoped ability as start()/ready(). */
+    /**
+     * Tick one prepared line. The station is taken from the line, so a bar
+     * cook cannot tick a kitchen line by posting its id.
+     */
+    public function readyLine(Request $request, OrderItem $line): RedirectResponse
+    {
+        Gate::authorize('updateStation', [Order::class, $line->destination]);
+
+        $this->kitchen->markLineReady($line, $request->user('staff'));
+
+        return back()->with('status', 'line-ready');
+    }
+
+    /** Same station-scoped ability as start()/ready(). */
     public function adjustEta(AdjustEtaRequest $request, Order $order, Destination $destination): RedirectResponse
     {
         Gate::authorize('updateStation', [Order::class, $destination]);
@@ -113,7 +130,7 @@ class StationController extends Controller
         return back()->with('status', 'eta-adjusted');
     }
 
-    /** FR29, S31: this station's active items with their add-on options, for the drawer. */
+    /** this station's active items with their add-on options, for the drawer. */
     private function availabilityItems(Destination $destination): Collection
     {
         return MenuItem::where('destination', $destination)
@@ -123,7 +140,7 @@ class StationController extends Controller
             ->get();
     }
 
-    /** FR56: oldest first, this station's active lines only. */
+    /** oldest first, this station's active lines only. */
     private function queue(Request $request, Destination $destination): Collection
     {
         $lineStatuses = $this->requestedLineStatuses($request);
@@ -144,7 +161,7 @@ class StationController extends Controller
             ->get();
     }
 
-    /** FR57: the status filter applies to the line, not the order. */
+    /** the status filter applies to the line, not the order. */
     private function requestedLineStatuses(Request $request): array
     {
         $requested = OrderItemStatus::tryFrom((string) $request->query('status'));

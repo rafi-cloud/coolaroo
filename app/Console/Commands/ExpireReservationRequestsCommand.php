@@ -6,13 +6,13 @@ use App\Services\ReservationService;
 use Illuminate\Console\Command;
 
 /**
- * BR37, 07.10. Scheduled every five minutes. Each expiry emails the customer.
+ * Scheduled every five minutes. Each expiry emails the customer.
  */
 class ExpireReservationRequestsCommand extends Command
 {
     protected $signature = 'reservations:expire-requests';
 
-    protected $description = 'Expire reservation requests left unreviewed near their booking time (BR37)';
+    protected $description = 'Expire reservation requests left unreviewed near their booking time';
 
     public function handle(ReservationService $reservations): int
     {

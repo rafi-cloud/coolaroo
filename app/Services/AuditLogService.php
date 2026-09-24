@@ -6,17 +6,36 @@ use App\Models\AuditLog;
 use App\Models\HistoricalDataManagement;
 use App\Models\Staff;
 use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
- * FR90: Search audit log (filter by user, action, entity, date; view before/after JSON).
- * FR99: View archived records (historical_data_management snapshots, BR62).
+ * Search audit log (filter by user, action, entity, date; view before/after JSON).
+ * View archived records (historical_data_management snapshots).
  */
 class AuditLogService
 {
     /**
-     * FR90: Search and filter immutable audit records.
+     * Parse a user-supplied date filter, returning null when it is not a
+     * date this system can read. Filters are dropped rather than raised so
+     * a mistyped query string still renders the log.
+     */
+    private function parseDate(mixed $value): ?Carbon
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse((string) $value);
+        } catch (InvalidFormatException) {
+            return null;
+        }
+    }
+
+    /**
+     * Search and filter immutable audit records.
      *
      * @param  array{action_type?: string, entity_name?: string, staff_id?: int|string, from?: string, to?: string, search?: string}  $filters
      */
@@ -37,12 +56,12 @@ class AuditLogService
             $query->where('staff_id', (int) $filters['staff_id']);
         }
 
-        if (! empty($filters['from'])) {
-            $query->where('logged_at', '>=', Carbon::parse($filters['from'])->startOfDay());
+        if (! empty($filters['from']) && ($from = $this->parseDate($filters['from'])) !== null) {
+            $query->where('logged_at', '>=', $from->startOfDay());
         }
 
-        if (! empty($filters['to'])) {
-            $query->where('logged_at', '<=', Carbon::parse($filters['to'])->endOfDay());
+        if (! empty($filters['to']) && ($to = $this->parseDate($filters['to'])) !== null) {
+            $query->where('logged_at', '<=', $to->endOfDay());
         }
 
         if (! empty($filters['search'])) {
@@ -64,7 +83,7 @@ class AuditLogService
     }
 
     /**
-     * FR99, BR62: Search and view archived record snapshots.
+     * Search and view archived record snapshots.
      *
      * @param  array{entity_name?: string, search?: string}  $filters
      */

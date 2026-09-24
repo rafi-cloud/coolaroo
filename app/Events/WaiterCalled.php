@@ -10,7 +10,7 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** 07.8, FR40. Floor alert — live only, nothing is persisted (BR50). */
+/** Floor alert — live only, nothing is persisted. */
 class WaiterCalled implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;

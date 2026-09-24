@@ -10,7 +10,7 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** 07.8, FR48. Floor's cash-waiting list. */
+/** Floor's cash-waiting list. */
 class CashPaymentRequested implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;

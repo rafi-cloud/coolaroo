@@ -17,7 +17,7 @@ class NoShowController extends Controller
     ) {}
 
     /**
-     * FR10, UC38, S38: Admin clears a customer's no-show flag with required reason.
+     * Admin clears a customer's no-show flag with required reason.
      */
     public function clear(Request $request, Customer $customer, Reservation $reservation): RedirectResponse
     {

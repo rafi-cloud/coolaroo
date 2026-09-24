@@ -40,6 +40,16 @@ class ItemDetailModalTest extends TestCase
         ], $attributes));
     }
 
+    public function test_each_dish_has_an_anchor_matching_its_modal_so_ai_chip_links_resolve(): void
+    {
+        $item = $this->createSampleDish();
+
+        $this->get('/menu')
+            ->assertOk()
+            ->assertSee('id="item-'.$item->item_id.'"', false)
+            ->assertSee('id="item-modal-'.$item->item_id.'"', false);
+    }
+
     public function test_modal_renders_sizes_addons_and_nutrition(): void
     {
         $item = $this->createSampleDish();
@@ -147,7 +157,7 @@ class ItemDetailModalTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('data-testid="item-modal-no-table-'.$item->item_id.'"', false);
-        $response->assertSee('Scan the QR code on your table to order (BR57).');
+        $response->assertSee('Scan the QR code on your table to order.');
         $response->assertDontSee('data-testid="item-modal-add-to-cart-'.$item->item_id.'"', false);
     }
 

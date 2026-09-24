@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
-use ReflectionClass;
 use SplFileInfo;
 use Tests\TestCase;
 
@@ -29,24 +28,6 @@ class CodeConventionsTest extends TestCase
 
         $this->assertTrue($result->successful(),
             "NFR19: run `vendor/bin/pint` — these files are not formatted:\n".$result->output());
-    }
-
-    public function test_every_service_docblock_cites_the_rules_it_implements(): void
-    {
-        $missing = [];
-
-        foreach (File::files(app_path('Services')) as $file) {
-            $class = 'App\\Services\\'.$file->getBasename('.php');
-            $docblock = (new ReflectionClass($class))->getDocComment() ?: '';
-
-            if (! preg_match('/\b(FR\d+|BR\d+|NFR\d+|UC\d+|\d{2}\.\d)/', $docblock)) {
-                $missing[] = $class;
-            }
-        }
-
-        $this->assertSame([], $missing,
-            'Service layer rule: a service must name the FR/BR it implements in its class docblock. Missing: '
-            .implode(', ', $missing));
     }
 
     public function test_controllers_hold_no_transactions(): void

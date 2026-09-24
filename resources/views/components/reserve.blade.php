@@ -32,19 +32,21 @@
           We will review your request and send confirmation to your email.
         </p>
         <div style="margin-top:1.2rem; display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap;">
-          <a href="{{ url('/#reserve') }}" class="btn btn-amber btn-sm" data-testid="reserve-new-booking-btn">Book another table</a>
+          <a href="#reserve-wizard" class="btn btn-amber btn-sm" data-testid="reserve-new-booking-btn">Book another table</a>
           @auth('customer')
             <a href="{{ route('orders.show', 'dummy') ?? url('/orders') }}" class="btn btn-outline btn-sm" style="display:none">My Bookings</a>
           @endauth
         </div>
       </div>
-    @elseif (!$onlineEnabled)
+    @endif
+
+    @if (!$onlineEnabled)
       <div class="reserve-paused-card" data-testid="reserve-paused-banner">
         <h3>Online reservations currently unavailable</h3>
         <p>Online bookings are paused at the moment. Please call us directly at <a href="tel:{{ preg_replace('/[^0-9+]/', '', $venuePhone) }}" data-testid="reserve-phone-link"><strong>{{ $venuePhone }}</strong></a> to check table availability.</p>
       </div>
     @else
-      <div class="wizard-container" data-testid="reserve-wizard-container">
+      <div class="wizard-container" id="reserve-wizard" data-testid="reserve-wizard-container">
         <!-- Step Indicators -->
         <div class="wizard-steps-indicator" aria-label="Booking steps">
           <div class="wizard-step-node active" id="step-node-1" data-testid="wizard-step-node-1">
@@ -306,6 +308,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  var defaultNoSlotsMessage = noSlotsAlert ? noSlotsAlert.textContent.trim() : '';
+
+  function showSlotsMessage(message) {
+    noSlotsAlert.textContent = message;
+    noSlotsAlert.style.display = 'block';
+  }
+
   function loadAvailability(date, party) {
     slotsGrid.innerHTML = '';
     slotsLoading.style.display = 'block';
@@ -319,12 +328,24 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(function (res) { return res.json(); })
     .then(function (data) {
       slotsLoading.style.display = 'none';
-      if (!data.available_slots || data.available_slots.length === 0) {
-        noSlotsAlert.style.display = 'block';
+
+      var availability = data.availability || {};
+
+      if (availability.status !== 'available') {
+        showSlotsMessage(availability.message || defaultNoSlotsMessage);
         return;
       }
 
-      data.available_slots.forEach(function (slot) {
+      var openSlots = (availability.slots || []).filter(function (slot) {
+        return slot.is_available;
+      });
+
+      if (openSlots.length === 0) {
+        showSlotsMessage(defaultNoSlotsMessage);
+        return;
+      }
+
+      openSlots.forEach(function (slot) {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'slot-pill';
@@ -347,8 +368,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .catch(function (err) {
       slotsLoading.style.display = 'none';
-      noSlotsAlert.style.display = 'block';
-      noSlotsAlert.textContent = 'Could not load slots. Please check your connection or contact venue.';
+      showSlotsMessage('Could not load slots. Please check your connection or contact venue.');
     });
   }
 });

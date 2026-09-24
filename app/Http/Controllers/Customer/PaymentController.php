@@ -18,9 +18,9 @@ use Illuminate\View\View;
 use Stripe\Exception\ApiErrorException;
 
 /**
- * FR46, FR47, FR48, BR24, BR25. show()/stripe()/return()/check() are
- * T070's "pay by card" half; cash() is T072's "request cash" half — the
- * actual "record cash payment" (FR49) is Staff\Floor\CashPaymentController.
+ * show()/stripe()/return()/check() are
+ * the "pay by card" half; cash is the "request cash" half — the
+ * actual "record cash payment" is Staff\Floor\CashPaymentController.
  */
 class PaymentController extends Controller
 {
@@ -72,7 +72,7 @@ class PaymentController extends Controller
         return redirect()->away($session->url);
     }
 
-    /** FR48: order stays pending_payment; the floor's cash-waiting list is told (07.8). */
+    /** order stays pending_payment; the floor's cash-waiting list is told. */
     public function cash(Order $order): RedirectResponse
     {
         Gate::authorize('pay', $order);
@@ -115,7 +115,7 @@ class PaymentController extends Controller
         return $this->verify($payment, $order);
     }
 
-    /** BR25: delegates to PaymentService::verifyStripePayment() (T073) — the one shared implementation. */
+    /** delegates to PaymentService::verifyStripePayment() — the one shared implementation. */
     private function verify(Payment $payment, Order $order): RedirectResponse
     {
         try {

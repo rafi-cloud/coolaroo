@@ -11,8 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * FR93 (UC40, BR63) and FR94 (UC41, BR54). 07.6 names this class for both,
- * separately from Staff\Floor\StaffOrderController (T073, FR42).
+ * Staff cancel and stock-conflict resolution, kept separate from
+ * Staff\Floor\StaffOrderController.
  */
 class OrderController extends Controller
 {

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 /**
- * FR52, BR13. return_to_stock is unticked by default, so an absent checkbox
+ * return_to_stock is unticked by default, so an absent checkbox
  * is a real "no" rather than a missing field.
  */
 class ApproveRefundRequest extends FormRequest

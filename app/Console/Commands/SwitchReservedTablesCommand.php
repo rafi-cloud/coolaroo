@@ -6,13 +6,13 @@ use App\Services\ReservationService;
 use Illuminate\Console\Command;
 
 /**
- * BR04, FR71, 07.10. Scheduled every minute.
+ * Scheduled every minute.
  */
 class SwitchReservedTablesCommand extends Command
 {
     protected $signature = 'reservations:switch-reserved';
 
-    protected $description = 'Switch assigned tables to reserved at T-30 and raise floor alerts (BR04, FR71)';
+    protected $description = 'Switch assigned tables to reserved at T-30 and raise floor alerts';
 
     public function handle(ReservationService $reservations): int
     {

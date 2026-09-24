@@ -13,10 +13,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR37, FR42, BR08, BR09, BR15-BR19, BR21, BR53. Takes CartService::rawLines()'s
- * plain array, not the cart itself — checkout doesn't need to know a cart is
- * session-backed. $staffActor (T092) is null for the QR customer path and
- * switches BR53's staff-order differences: exact stock check (not the 5x QR
+ * Takes the plain array from CartService::rawLines(), not the cart itself — checkout doesn't need to know a cart is
+ * session-backed. $staffActor is null for the QR customer path and
+ * switches the staff-order differences: exact stock check (not the 5x QR
  * buffer), taken_by_staff_id recorded, event_source 'waitstaff'.
  */
 class CheckoutService
@@ -53,7 +52,7 @@ class CheckoutService
     }
 
     /**
-     * BR08: revalidate availability, options and current prices.
+     * revalidate availability, options and current prices.
      *
      * @return array{0: array<int, array>, 1: string[]}
      */
@@ -97,8 +96,8 @@ class CheckoutService
     }
 
     /**
-     * BR09 (buffered, QR) or BR53 (exact, staff), aggregated per item_id
-     * across every valid line that ordered it.
+     * Stock check, buffered for the QR path or exact for staff orders,
+     * aggregated per item_id across every valid line that ordered it.
      */
     private function checkStock(array $validLines, bool $exact): void
     {

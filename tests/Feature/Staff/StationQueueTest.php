@@ -59,6 +59,33 @@ class StationQueueTest extends TestCase
     }
 
     /** The scoping that matters: a bar line must never reach the kitchen screen. */
+    public function test_the_eta_steppers_are_offered_while_there_is_still_cooking_to_do(): void
+    {
+        $order = $this->orderWithLine(Destination::Kitchen, 'preparing', [
+            'kitchen_eta_at' => now()->addMinutes(20),
+        ]);
+
+        $this->actingAs($this->staffWithRole('kitchen'), 'staff')
+            ->get(route('staff.kds.index', 'kitchen'))
+            ->assertOk()
+            ->assertSee('data-testid="kds-eta-plus-'.$order->order_id.'"', false)
+            ->assertSee('data-testid="kds-eta-minus-'.$order->order_id.'"', false);
+    }
+
+    public function test_the_eta_steppers_disappear_once_the_station_is_ready(): void
+    {
+        $order = $this->orderWithLine(Destination::Kitchen, 'ready', [
+            'kitchen_eta_at' => now()->addMinutes(20),
+        ]);
+
+        $this->actingAs($this->staffWithRole('kitchen'), 'staff')
+            ->get(route('staff.kds.index', 'kitchen'))
+            ->assertOk()
+            ->assertSee($order->order_number)
+            ->assertDontSee('data-testid="kds-eta-plus-'.$order->order_id.'"', false)
+            ->assertDontSee('data-testid="kds-eta-minus-'.$order->order_id.'"', false);
+    }
+
     public function test_another_stations_order_is_not_shown(): void
     {
         $bar = $this->orderWithLine(Destination::Bar);

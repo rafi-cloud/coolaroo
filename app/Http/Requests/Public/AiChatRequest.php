@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * FR43, BR49. Open to everyone including visitors, so nothing here
+ * Open to everyone including visitors, so nothing here
  * authorises — the guard is `ai_enabled`, checked in the controller.
  */
 class AiChatRequest extends FormRequest

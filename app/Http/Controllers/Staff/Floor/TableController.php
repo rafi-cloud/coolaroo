@@ -9,7 +9,6 @@ use App\Models\RestaurantTable;
 use App\Services\TableStatusService;
 use Illuminate\Http\RedirectResponse;
 
-/** FR17, FR18, UC17, UC18, S23. */
 class TableController extends Controller
 {
     public function __construct(private TableStatusService $tableStatus) {}

@@ -11,8 +11,8 @@ use Stripe\Refund as StripeRefund;
 use Stripe\StripeClient;
 
 /**
- * FR46, FR47, BR24-BR27. Test mode, no webhooks — every "is this paid"
- * question this app ever asks goes through retrieveSession() (BR25).
+ * Test mode, no webhooks — every "is this paid"
+ * question this app ever asks goes through retrieveSession().
  */
 class StripeService
 {
@@ -23,7 +23,7 @@ class StripeService
         $this->client = new StripeClient(config('services.stripe.secret'));
     }
 
-    /** BR24: amount fixed here. 30-minute expiry (07.9, Stripe's own minimum). */
+    /** amount fixed here. 30-minute expiry (07.9, Stripe's own minimum). */
     public function createCheckoutSession(Order $order, Payment $payment): Session
     {
         $base = request()->hasSession() ? request()->getSchemeAndHttpHost() : '';
@@ -50,14 +50,14 @@ class StripeService
         ]);
     }
 
-    /** BR25: the only thing this app accepts as proof of payment. */
+    /** the only thing this app accepts as proof of payment. */
     public function retrieveSession(string $sessionId): Session
     {
         return $this->client->checkout->sessions->retrieve($sessionId);
     }
 
     /**
-     * BR27, 07.9. Stripe refunds attach to the PaymentIntent, not the Checkout
+     * Stripe refunds attach to the PaymentIntent, not the Checkout
      * Session, so the intent id is resolved from the session and cached in
      * payment.provider_payment_id (06.4.21) on first use.
      */
@@ -86,7 +86,7 @@ class StripeService
         return $this->client->refunds->retrieve($refundId);
     }
 
-    /** BR26: local half of order cancel (T063) and the daily cleanup job (T160). */
+    /** local half of order cancel and the daily cleanup job. */
     public function expireSession(string $sessionId): void
     {
         try {

@@ -5,7 +5,7 @@ namespace App\Http\Requests\Staff;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * FR93, BR63: a reason is required and lands in the audit log. The ability
+ * a reason is required and lands in the audit log. The ability
  * itself needs the Order instance, so it is authorized in the controller.
  */
 class CancelOrderRequest extends FormRequest

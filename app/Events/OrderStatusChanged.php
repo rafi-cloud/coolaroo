@@ -10,7 +10,7 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** FR38, 07.8. Customer order timeline; floor's ready-to-serve alerts. */
+/** Customer order timeline; floor's ready-to-serve alerts. */
 class OrderStatusChanged implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;

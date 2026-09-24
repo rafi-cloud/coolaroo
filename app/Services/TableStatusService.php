@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR19, FR21, BR01-BR07. The real guarded transition engine — T050's
- * overrideStatus() deliberately bypasses this, for FR20's unguarded case.
+ * The real guarded transition engine — the
+ * overrideStatus deliberately bypasses this, for the unguarded case.
  */
 class TableStatusService
 {
@@ -44,7 +44,7 @@ class TableStatusService
         event(new TableStatusChanged($table));
     }
 
-    /** FR17, UC17: "Reserved or inactive tables blocked" — a walk-in never displaces a reservation. */
+    /** "Reserved or inactive tables blocked" — a walk-in never displaces a reservation. */
     public function seatWalkIn(RestaurantTable $table, Staff $actor, ?int $guestCount = null): Visit
     {
         if ($table->status !== TableStatus::Available) {
@@ -62,7 +62,7 @@ class TableStatusService
         ]);
     }
 
-    /** FR17: "one or more tables" — each gets its own transition and visit row, one guest count. */
+    /** "one or more tables" — each gets its own transition and visit row, one guest count. */
     public function seatGroup(Collection $tables, Staff $actor, ?int $guestCount = null): Collection
     {
         return DB::transaction(fn () => $tables->map(
@@ -91,7 +91,7 @@ class TableStatusService
         $this->transition($table, TableStatus::Available, $actor);
     }
 
-    /** FR18, BR06: any table in the group needing confirmation blocks the whole group. */
+    /** any table in the group needing confirmation blocks the whole group. */
     public function clearGroup(Collection $tables, Staff $actor, bool $force = false): void
     {
         if (! $force && $tables->contains(fn (RestaurantTable $table) => $this->hasActiveOrders($table))) {

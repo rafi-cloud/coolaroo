@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Enums\ReservationStatus;
 use App\Models\Customer;
+use App\Models\Order;
 use App\Models\Reservation;
 use App\Models\Role;
 use App\Models\SlotCapacity;
@@ -116,6 +117,39 @@ class CustomerManagementTest extends TestCase
             ->assertSee('Barry Allen')
             ->assertSee('barry@centralcity.com')
             ->assertSee('Trust profile');
+    }
+
+    public function test_customer_detail_shows_order_history(): void
+    {
+        $customer = Customer::factory()->create();
+
+        $order = Order::factory()->paid()->create([
+            'customer_id' => $customer->customer_id,
+            'order_number' => 'ORD-TEST-9001',
+        ]);
+
+        $otherOrder = Order::factory()->create(['order_number' => 'ORD-OTHER-9002']);
+
+        $response = $this->actingAs($this->admin, 'staff')
+            ->withSession(['staff_last_activity' => now()])
+            ->get(route('admin.customers.show', $customer));
+
+        $response->assertOk()
+            ->assertSee('Order history')
+            ->assertSee('ORD-TEST-9001')
+            ->assertSee('data-testid="admin-customer-order-row-'.$order->order_id.'"', false)
+            ->assertDontSee('ORD-OTHER-9002');
+    }
+
+    public function test_customer_detail_reports_no_orders_when_there_are_none(): void
+    {
+        $customer = Customer::factory()->create();
+
+        $this->actingAs($this->admin, 'staff')
+            ->withSession(['staff_last_activity' => now()])
+            ->get(route('admin.customers.show', $customer))
+            ->assertOk()
+            ->assertSee('No orders on record for this customer.');
     }
 
     public function test_admin_can_clear_no_show_with_required_reason(): void

@@ -18,19 +18,19 @@ class RoleSeeder extends Seeder
         Role::create([
             'role_name' => 'waitstaff',
             'description' => 'Floor, orders, reservations, refund requests.',
-            'landing_screen' => 'floor.index',
+            'landing_screen' => 'staff.floor.index',
         ]);
 
         Role::create([
             'role_name' => 'kitchen',
             'description' => 'Kitchen station display.',
-            'landing_screen' => 'kds.kitchen',
+            'landing_screen' => 'staff.kds.kitchen',
         ]);
 
         Role::create([
             'role_name' => 'bar',
             'description' => 'Bar station display.',
-            'landing_screen' => 'kds.bar',
+            'landing_screen' => 'staff.kds.bar',
         ]);
     }
 }

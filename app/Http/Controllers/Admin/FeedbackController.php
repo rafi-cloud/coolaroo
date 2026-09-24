@@ -12,10 +12,10 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 /**
- * Screen S40: Admin Feedback Moderation.
- * FR77: View and reply to feedback (BR44).
- * FR78: Hide abusive feedback with mandatory reason (BR44).
- * FR79: Feature/unfeature review on public site (BR45, UC34).
+ * Admin feedback moderation.
+ * View and reply to feedback.
+ * Hide abusive feedback with mandatory reason.
+ * Feature/unfeature review on public site.
  */
 class FeedbackController extends Controller
 {
@@ -24,7 +24,7 @@ class FeedbackController extends Controller
     ) {}
 
     /**
-     * FR77, S40, UC34: Display paginated feedback list with filters and status breakdown.
+     * Display paginated feedback list with filters and status breakdown.
      */
     public function index(Request $request): View
     {
@@ -45,7 +45,7 @@ class FeedbackController extends Controller
     }
 
     /**
-     * FR77, BR44: Reply to a customer review. Admin cannot edit the review itself.
+     * Reply to a customer review. Admin cannot edit the review itself.
      */
     public function reply(Request $request, Feedback $feedback): RedirectResponse
     {
@@ -62,7 +62,7 @@ class FeedbackController extends Controller
     }
 
     /**
-     * FR78, BR44: Hide abusive review with mandatory justification reason.
+     * Hide abusive review with mandatory justification reason.
      */
     public function hide(Request $request, Feedback $feedback): RedirectResponse
     {
@@ -79,7 +79,7 @@ class FeedbackController extends Controller
     }
 
     /**
-     * FR78: Restore hidden review to public visibility.
+     * Restore hidden review to public visibility.
      */
     public function unhide(Request $request, Feedback $feedback): RedirectResponse
     {
@@ -92,7 +92,7 @@ class FeedbackController extends Controller
     }
 
     /**
-     * FR79, BR45, UC34: Toggle featured testimonial status.
+     * Toggle featured testimonial status.
      * Hidden reviews cannot be featured.
      */
     public function toggleFeatured(Request $request, Feedback $feedback): RedirectResponse

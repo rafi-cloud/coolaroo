@@ -10,9 +10,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * FR51, UC26, BR27. Waitstaff, Kitchen or Bar may request — Admin passes
- * via the project-wide Gate::before bypass. FR52 (approve/reject/complete)
- * is T075's Admin::RefundController, not this class.
+ * Waitstaff, Kitchen or Bar may request — Admin passes
+ * via the project-wide Gate::before bypass. (approve/reject/complete)
+ * is the Admin::RefundController, not this class.
  */
 class RefundRequestController extends Controller
 {

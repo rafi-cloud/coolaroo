@@ -43,12 +43,84 @@ class FloorViewTest extends TestCase
             ->assertDontSee('data-testid="nav-admin-settings"', false);
     }
 
+    public function test_waitstaff_are_not_offered_station_links_they_cannot_open(): void
+    {
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->get(route('staff.floor.index'))
+            ->assertOk()
+            ->assertSee('data-testid="nav-staff-floor"', false)
+            ->assertDontSee('data-testid="nav-staff-kds-kitchen"', false)
+            ->assertDontSee('data-testid="nav-staff-kds-bar"', false);
+    }
+
+    public function test_kitchen_staff_are_not_offered_floor_links_they_cannot_open(): void
+    {
+        $this->actingAs($this->staffWithRole('kitchen'), 'staff')
+            ->get(route('staff.kds.kitchen'))
+            ->assertOk()
+            ->assertSee('data-testid="nav-staff-kds-kitchen"', false)
+            ->assertDontSee('data-testid="nav-staff-floor"', false)
+            ->assertDontSee('data-testid="nav-staff-reservations"', false);
+    }
+
+    public function test_a_cash_request_raises_an_alert_and_marks_its_table(): void
+    {
+        $table = RestaurantTable::factory()->create();
+        $order = Order::factory()->create(['table_id' => $table->table_id]);
+        $order->forceFill(['status' => OrderStatus::PendingPayment])->save();
+        Payment::factory()->create(['order_id' => $order->order_id, 'method' => PaymentMethod::Cash]);
+
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->get(route('staff.floor.index'))
+            ->assertOk()
+            ->assertSee('data-testid="floor-alert-'.$table->table_id.'"', false)
+            ->assertSee('Cash requested')
+            ->assertSee('needs-cash', false);
+    }
+
+    public function test_a_ready_order_raises_an_alert_and_marks_its_table(): void
+    {
+        $table = RestaurantTable::factory()->create();
+        $order = Order::factory()->create(['table_id' => $table->table_id]);
+        $order->forceFill(['status' => OrderStatus::Ready])->save();
+
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->get(route('staff.floor.index'))
+            ->assertOk()
+            ->assertSee('data-testid="floor-alert-'.$table->table_id.'"', false)
+            ->assertSee('Ready to serve')
+            ->assertSee('needs-ready', false);
+    }
+
+    public function test_a_quiet_floor_says_so_rather_than_showing_an_empty_box(): void
+    {
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->get(route('staff.floor.index'))
+            ->assertOk()
+            ->assertSee('Nothing needs attention.');
+    }
+
+    public function test_the_live_payload_carries_the_same_attention_state(): void
+    {
+        $table = RestaurantTable::factory()->create();
+        $order = Order::factory()->create(['table_id' => $table->table_id]);
+        $order->forceFill(['status' => OrderStatus::Ready])->save();
+
+        $this->actingAs($this->staffWithRole('waitstaff'), 'staff')
+            ->getJson(route('staff.floor.state'))
+            ->assertOk()
+            ->assertJsonPath('attention.0.kind', 'ready')
+            ->assertJsonPath('attention.0.table_id', $table->table_id);
+    }
+
     public function test_the_floor_page_lists_ready_orders_and_cash_waiting(): void
     {
         $ready = Order::factory()->create();
         $ready->forceFill(['status' => OrderStatus::Ready])->save();
 
-        $cashOrder = Order::factory()->paid()->create();
+        // an order awaiting cash is still pending_payment, per FR48
+        $cashOrder = Order::factory()->create();
+        $cashOrder->forceFill(['status' => OrderStatus::PendingPayment])->save();
         Payment::factory()->create(['order_id' => $cashOrder->order_id, 'method' => PaymentMethod::Cash]);
 
         $this->actingAs($this->staffWithRole('waitstaff'), 'staff')

@@ -7,9 +7,10 @@ use App\Services\AvailabilityService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 /**
- * FR61, BR32-BR35, BR58: Reservation availability API.
+ * Reservation availability API.
  */
 class AvailabilityController extends Controller
 {
@@ -19,8 +20,16 @@ class AvailabilityController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $date = $request->query('date', Carbon::tomorrow('Australia/Melbourne')->toDateString());
-        $partySize = max(1, (int) $request->query('party_size', 2));
+        $validated = Validator::make($request->query(), [
+            'date' => ['nullable', 'date'],
+            'party_size' => ['nullable', 'integer'],
+        ])->valid();
+
+        $date = isset($validated['date'])
+            ? Carbon::parse($validated['date'])->toDateString()
+            : Carbon::tomorrow('Australia/Melbourne')->toDateString();
+
+        $partySize = max(1, (int) ($validated['party_size'] ?? 2));
 
         $result = $this->availabilityService->checkDateAvailability($date, $partySize, isOnline: true);
 

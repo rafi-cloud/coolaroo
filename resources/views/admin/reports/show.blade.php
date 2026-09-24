@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    {{-- REPORT 1: SALES REPORT (FR82) --}}
+    {{-- REPORT 1: SALES REPORT --}}
     @if ($type === 'sales')
       <div class="dashboard-grid" data-testid="admin-report-sales">
         <article class="card tile">
@@ -220,7 +220,7 @@
       </div>
     @endif
 
-    {{-- REPORT 2: ITEMS & CATEGORIES (FR83) --}}
+    {{-- REPORT 2: ITEMS & CATEGORIES --}}
     @if ($type === 'items')
       <div class="dashboard-grid" data-testid="admin-report-items">
         <article class="card tile">
@@ -384,7 +384,7 @@
       </div>
     @endif
 
-    {{-- REPORT 3: OPERATIONS (FR84) --}}
+    {{-- REPORT 3: OPERATIONS --}}
     @if ($type === 'operations')
       <div class="dashboard-grid" data-testid="admin-report-operations">
         <article class="card tile">
@@ -455,7 +455,7 @@
               <thead>
                 <tr>
                   <th scope="col">Party Size Range</th>
-                  <th scope="col">Standard Turn Time Policy (BR34)</th>
+                  <th scope="col">Standard Turn Time Policy</th>
                   <th scope="col" class="num">Observed Average Duration</th>
                 </tr>
               </thead>
@@ -482,7 +482,7 @@
       </div>
     @endif
 
-    {{-- REPORT 4: RESERVATIONS (FR85) --}}
+    {{-- REPORT 4: RESERVATIONS --}}
     @if ($type === 'reservations')
       <div class="dashboard-grid" data-testid="admin-report-reservations">
         <article class="card tile">
@@ -553,7 +553,7 @@
       </div>
     @endif
 
-    {{-- REPORT 5: FEEDBACK (FR86) --}}
+    {{-- REPORT 5: FEEDBACK --}}
     @if ($type === 'feedback')
       <div class="dashboard-grid" data-testid="admin-report-feedback">
         <article class="card tile">
@@ -577,7 +577,7 @@
         <article class="card tile">
           <p class="tile-value" style="color:var(--cancelled)">{{ $data['hidden_count'] }}</p>
           <p class="tile-name">Hidden feedback count</p>
-          <p class="tile-change"><span>Moderated abusive or spam (FR78)</span></p>
+          <p class="tile-change"><span>Moderated abusive or spam</span></p>
         </article>
       </div>
 
@@ -682,7 +682,7 @@
       </div>
     @endif
 
-    {{-- REPORT 6: STAFF ACTIVITY (FR87) --}}
+    {{-- REPORT 6: STAFF ACTIVITY --}}
     @if ($type === 'staff')
       <div class="dashboard-grid" data-testid="admin-report-staff-activity">
         <article class="card wide">
@@ -732,14 +732,14 @@
         </article>
       </div>
 
-    {{-- REPORT 7: AI USAGE REPORT (FR45, FR98) --}}
+    {{-- REPORT 7: AI USAGE REPORT --}}
     @elseif ($type === 'ai')
-      {{-- Master On/Off Switch Card (FR98) --}}
+      {{-- Master On/Off Switch Card --}}
       <article class="card wide" style="margin-bottom: 1.5rem;" data-testid="admin-ai-switch-card">
         <header class="card-head" style="align-items:center;">
           <div>
-            <h3>AI Assistant Operational Control (FR98)</h3>
-            <p class="card-sub">Toggling controls customer accessibility to the AI chat widget and meal builder assistant (BR49).</p>
+            <h3>AI Assistant Operational Control</h3>
+            <p class="card-sub">Toggling controls customer accessibility to the AI chat widget and meal builder assistant.</p>
           </div>
           <div style="display:flex; align-items:center; gap:1rem;">
             @if ($aiEnabled)
@@ -807,14 +807,14 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Chat Assistant (S17, FR43)</strong></td>
+                  <td><strong>Chat Assistant</strong></td>
                   <td class="num">{{ $data['by_feature']['chat']['requests'] }}</td>
                   <td class="num">{{ number_format($data['by_feature']['chat']['tokens_in']) }}</td>
                   <td class="num">{{ number_format($data['by_feature']['chat']['tokens_out']) }}</td>
                   <td class="num"><strong>{{ number_format($data['by_feature']['chat']['total_tokens']) }}</strong></td>
                 </tr>
                 <tr>
-                  <td><strong>Meal Builder (S16, FR44)</strong></td>
+                  <td><strong>Meal Builder</strong></td>
                   <td class="num">{{ $data['by_feature']['meal_builder']['requests'] }}</td>
                   <td class="num">{{ number_format($data['by_feature']['meal_builder']['tokens_in']) }}</td>
                   <td class="num">{{ number_format($data['by_feature']['meal_builder']['tokens_out']) }}</td>

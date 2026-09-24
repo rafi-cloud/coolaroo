@@ -11,10 +11,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 /**
- * FR45, FR82–FR88, FR98, UC35, S41. Admin report pages for sales, items, operations, reservations, feedback, staff, and AI usage.
+ * Admin report pages for sales, items, operations, reservations, feedback, staff, and AI usage.
  */
 class ReportController extends Controller
 {
@@ -33,23 +34,42 @@ class ReportController extends Controller
         return redirect()->route('admin.reports.show', ['type' => 'sales']);
     }
 
+    /**
+     * Resolve the reporting window from the query string. Unparseable or
+     * non-scalar from/to values are discarded rather than thrown, so a
+     * mistyped URL still renders the default 30-day range.
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private function resolveRange(Request $request): array
+    {
+        $valid = Validator::make($request->query(), [
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date'],
+        ])->valid();
+
+        $from = isset($valid['from'])
+            ? Carbon::parse($valid['from'])->startOfDay()
+            : today()->subDays(29)->startOfDay();
+
+        $to = isset($valid['to'])
+            ? Carbon::parse($valid['to'])->endOfDay()
+            : today()->endOfDay();
+
+        if ($from->isAfter($to)) {
+            $from = (clone $to)->subDays(29)->startOfDay();
+        }
+
+        return [$from, $to];
+    }
+
     public function show(string $type, Request $request, ReportService $reportService, SettingService $settings): View
     {
         if (! array_key_exists($type, self::VALID_TYPES)) {
             abort(404, 'Unknown report type');
         }
 
-        $from = $request->filled('from')
-            ? Carbon::parse($request->query('from'))->startOfDay()
-            : today()->subDays(29)->startOfDay();
-
-        $to = $request->filled('to')
-            ? Carbon::parse($request->query('to'))->endOfDay()
-            : today()->endOfDay();
-
-        if ($from->isAfter($to)) {
-            $from = (clone $to)->subDays(29)->startOfDay();
-        }
+        [$from, $to] = $this->resolveRange($request);
 
         $data = match ($type) {
             'sales' => $reportService->salesReport($from, $to),
@@ -73,7 +93,7 @@ class ReportController extends Controller
     }
 
     /**
-     * FR98, BR49. Toggle AI Assistant on/off switch.
+     * Toggle AI Assistant on/off switch.
      */
     public function toggleAi(Request $request, SettingService $settings, AuditLogger $audit): RedirectResponse
     {
@@ -94,7 +114,7 @@ class ReportController extends Controller
     }
 
     /**
-     * FR88, UC35. Export report as PDF or CSV.
+     * Export report as PDF or CSV.
      */
     public function export(string $type, Request $request, ReportService $reportService): Response
     {
@@ -102,19 +122,9 @@ class ReportController extends Controller
             abort(404, 'Unknown report type');
         }
 
-        $from = $request->filled('from')
-            ? Carbon::parse($request->query('from'))->startOfDay()
-            : today()->subDays(29)->startOfDay();
+        [$from, $to] = $this->resolveRange($request);
 
-        $to = $request->filled('to')
-            ? Carbon::parse($request->query('to'))->endOfDay()
-            : today()->endOfDay();
-
-        if ($from->isAfter($to)) {
-            $from = (clone $to)->subDays(29)->startOfDay();
-        }
-
-        $format = strtolower((string) $request->query('format', 'csv'));
+        $format = strtolower(is_string($raw = $request->query('format', 'csv')) ? $raw : 'csv');
         $filename = sprintf('report-%s-%s-to-%s', $type, $from->toDateString(), $to->toDateString());
 
         if ($format === 'pdf') {

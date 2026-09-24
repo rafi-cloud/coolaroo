@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-/** BR49: provider limit errors and any other AI integration failure. */
+/** provider limit errors and any other AI integration failure. */
 class AiUnavailableException extends HttpException
 {
     public function __construct()

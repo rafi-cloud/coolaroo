@@ -7,7 +7,7 @@ use App\Models\Customer;
 use App\Models\Reservation;
 
 /**
- * FR09, BR40: Customer Trust Profile & Badge calculation on read.
+ * Customer Trust Profile & Badge calculation on read.
  */
 class TrustService
 {
@@ -18,7 +18,7 @@ class TrustService
     public const BADGE_NEW = 'New';
 
     /**
-     * BR40: Badge calculated on read:
+     * Badge calculated on read:
      * - Flagged if >= 1 uncleared no-show in last 12 months.
      * - Regular if >= 3 completed visits and not Flagged.
      * - Else New.
@@ -51,7 +51,7 @@ class TrustService
     }
 
     /**
-     * FR09: Full trust profile with badge and historical counts.
+     * Full trust profile with badge and historical counts.
      *
      * @return array<string, mixed>
      */

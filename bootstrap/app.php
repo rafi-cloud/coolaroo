@@ -11,6 +11,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // NFR01, T218: behind Nginx (10.2) the scheme arrives in X-Forwarded-Proto.
+        // behind Nginx the scheme arrives in X-Forwarded-Proto.
         $middleware->trustProxies(at: '*');
 
         $middleware->web(append: [
@@ -37,6 +38,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn (Request $request) => $request->is('staff*', 'admin*')
             ? route('staff.login')
             : route('customer.login'));
+
+        // A signed-in member asking for the login page again belongs back on
+        // their own screen, not stranded on the public site, which carries no
+        // navigation into the staff area.
+        $middleware->redirectUsersTo(fn (Request $request) => $request->is('staff*', 'admin*')
+            ? (Auth::guard('staff')->user()?->role?->landingUrl() ?? route('home'))
+            : route('home'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

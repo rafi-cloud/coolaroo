@@ -12,9 +12,9 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * FR29, 07.8. Public 'menu' channel — a plain Channel, not PrivateChannel:
+ * Public 'menu' channel — a plain Channel, not PrivateChannel:
  * routes/channels.php has no 'menu' callback because visitors are not
- * authenticated (T110).
+ * authenticated.
  */
 class MenuAvailabilityChanged implements ShouldBroadcast, ShouldDispatchAfterCommit
 {

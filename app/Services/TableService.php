@@ -8,9 +8,9 @@ use App\Models\Staff;
 use Illuminate\Support\Str;
 
 /**
- * FR11, FR12, FR13, FR20, BR62. The real transition engine
- * (TableStatusService) is T053 — overrideStatus() here is deliberately the
- * one place that bypasses it, per FR20's "any status, mandatory reason."
+ * The real transition engine
+ * (TableStatusService) is — overrideStatus here is deliberately the
+ * one place that bypasses it,'s "any status, mandatory reason."
  */
 class TableService
 {

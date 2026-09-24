@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * FR04, 3.3: role:admin,waitstaff etc. Admin passes every check (3.2).
+ * role:admin,waitstaff etc. Admin passes every check.
  */
 class EnsureRole
 {

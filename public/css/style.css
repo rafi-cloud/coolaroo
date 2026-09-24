@@ -2644,3 +2644,33 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.4}
 .pay-summary-total-label{font-size:1.05rem;font-weight:700;color:var(--ink)}
 .pay-summary-total-amount{font-size:1.75rem;font-weight:800;color:var(--orange-dark)}
 
+
+/* ---------- all-reviews page ---------- */
+.reviews-summary{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:1.4rem;
+  margin:0 0 1.6rem;
+  padding:1.2rem 1.4rem;
+  background:var(--sand);
+  border-radius:10px;
+}
+.reviews-summary .rating-big{
+  margin:0;
+  flex:none;
+}
+.reviews-summary-rows{
+  flex:1 1 16rem;
+  min-width:0;
+}
+.review-no-comment{
+  margin:0.6rem 0;
+  color:var(--body);
+  font-family:var(--serif);
+  font-style:italic;
+}
+.reviews-all-link{
+  margin:1.4rem 0 0;
+  text-align:center;
+}

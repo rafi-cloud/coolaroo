@@ -87,6 +87,6 @@
     <button class="btn btn-solid" type="submit" data-testid="admin-menu-item-create-submit">Create item</button>
   </form>
 
-  <p class="field-error" style="color:var(--body)">Sizes and prices are added after saving (T042).</p>
+  <p class="field-error" style="color:var(--body)">Sizes and prices are added after saving.</p>
 </div>
 </x-layouts.admin>

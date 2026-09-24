@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * FR52, UC33, S34. Admin only — the whole route group is behind role:admin.
+ * Admin only — the whole route group is behind role:admin.
  */
 class RefundController extends Controller
 {

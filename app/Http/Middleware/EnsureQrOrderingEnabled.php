@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * BR58. qr_ordering_enabled = 0 blocks customer cart/checkout (staff orders
+ * qr_ordering_enabled = 0 blocks customer cart/checkout (staff orders
  * are unaffected — this middleware never runs on a staff route).
  */
 class EnsureQrOrderingEnabled

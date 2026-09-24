@@ -86,6 +86,22 @@ class ReservationWizardTest extends TestCase
         $this->assertSame('Window seat requested, celebrating birthday', $reservation->special_requests);
     }
 
+    public function test_the_wizard_is_still_rendered_after_a_successful_request_so_another_booking_can_be_made(): void
+    {
+        $response = $this->actingAs($this->customer, 'customer')
+            ->post(route('reservations.store'), [
+                'booking_date' => '2026-09-25',
+                'slot_id' => $this->slot->slot_id,
+                'party_size' => 2,
+            ]);
+
+        $this->followRedirects($response)
+            ->assertOk()
+            ->assertSee('data-testid="reserve-success-banner"', false)
+            ->assertSee('data-testid="reserve-wizard-container"', false)
+            ->assertSee('id="reserve-wizard"', false);
+    }
+
     public function test_unauthenticated_guest_cannot_submit_reservation_request(): void
     {
         $response = $this->post(route('reservations.store'), [

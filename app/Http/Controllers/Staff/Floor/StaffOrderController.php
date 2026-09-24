@@ -28,8 +28,8 @@ use Illuminate\View\View;
 use Stripe\Exception\ApiErrorException;
 
 /**
- * FR42's Stripe-QR half (T073), FR47's staff Check-payment button, and
- * FR42's table/cart/checkout half (T092, index()/store()).
+ * the Stripe-QR half, the staff Check-payment button, and
+ * the table/cart/checkout half (index/store).
  */
 class StaffOrderController extends Controller
 {
@@ -40,7 +40,7 @@ class StaffOrderController extends Controller
         private CashPaymentService $cashPayments,
     ) {}
 
-    /** FR42, UC19. One route, two states — 07.6 lists no separate "order created" URI. */
+    /** One route, two states — 07.6 lists no separate "order created" URI. */
     public function index(RestaurantTable $table): View
     {
         Gate::authorize('take', Order::class);
@@ -62,7 +62,7 @@ class StaffOrderController extends Controller
         ]);
     }
 
-    /** BR53: exact stock check, taken_by_staff_id, no customer account. */
+    /** exact stock check, taken_by_staff_id, no customer account. */
     public function store(StaffOrderRequest $request, RestaurantTable $table): RedirectResponse
     {
         Gate::authorize('take', Order::class);
@@ -167,7 +167,7 @@ class StaffOrderController extends Controller
             ->first();
     }
 
-    /** FR42: active, available items with at least one active size. */
+    /** active, available items with at least one active size. */
     private function orderableItems(): Collection
     {
         return MenuItem::where('is_active', true)

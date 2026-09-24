@@ -22,7 +22,7 @@
       <div style="margin-bottom:1.2rem;">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .25rem 0;">Real-Time Operational Switches</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0;">
-          Instantly pause or resume public customer features without restarting or rebuilding the system. Changes take effect immediately via live WebSocket broadcasts (FR96, FR97, FR98, BR58).
+          Instantly pause or resume public customer features without restarting or rebuilding the system. Changes take effect immediately via live WebSocket broadcasts.
         </p>
       </div>
 
@@ -40,7 +40,7 @@
               </span>
             </div>
             <p style="font-size:.82rem; color:var(--body); line-height:1.45; margin:0 0 1rem 0;">
-              When paused, seated diners can browse dishes and menu prices but cannot add lines to cart or checkout. Staff orders remain fully functional (FR96, BR58).
+              When paused, seated diners can browse dishes and menu prices but cannot add lines to cart or checkout. Staff orders remain fully functional.
             </p>
           </div>
           <form method="POST" action="{{ route('admin.settings.toggle', 'qr_ordering_enabled') }}">
@@ -65,7 +65,7 @@
               </span>
             </div>
             <p style="font-size:.82rem; color:var(--body); line-height:1.45; margin:0 0 1rem 0;">
-              When paused, the public homepage reservation wizard disables online bookings and instructs guests to call the restaurant directly. Phone bookings remain enabled (FR97, BR58).
+              When paused, the public homepage reservation wizard disables online bookings and instructs guests to call the restaurant directly. Phone bookings remain enabled.
             </p>
           </div>
           <form method="POST" action="{{ route('admin.settings.toggle', 'reservations_online_enabled') }}">
@@ -90,7 +90,7 @@
               </span>
             </div>
             <p style="font-size:.82rem; color:var(--body); line-height:1.45; margin:0 0 1rem 0;">
-              When paused, hides the AI chat widget and meal builder across the website. Existing dining cart lines are retained (FR98, BR49).
+              When paused, hides the AI chat widget and meal builder across the website. Existing dining cart lines are retained.
             </p>
           </div>
           <form method="POST" action="{{ route('admin.settings.toggle', 'ai_enabled') }}">
@@ -118,7 +118,7 @@
       <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .3rem 0;">1. Venue Identity &amp; Contact Details</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0 0 1.2rem 0;">
-          Displayed in website headers, footers, customer confirmation emails, and provided in AI context (FR91).
+          Displayed in website headers, footers, customer confirmation emails, and provided in AI context.
         </p>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1.2rem;">
@@ -172,7 +172,7 @@
       <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .3rem 0;">2. Operating Hours &amp; Closed Days</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0 0 1.2rem 0;">
-          Defines daily schedule, automated daily stock resets (BR11), unpaid order expiration at close (BR26), and closed weekdays for booking availability (BR35).
+          Defines daily schedule, automated daily stock resets, unpaid order expiration at close, and closed weekdays for booking availability.
         </p>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.2rem; margin-bottom:1.2rem;">
@@ -215,30 +215,30 @@
       <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .3rem 0;">3. Reservation Rules &amp; Dining Durations</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0 0 1.2rem 0;">
-          Governs booking wizard lead times, party size restrictions, turnover durations, customer edit locks, and arrival grace periods (BR34, BR35, BR36, BR37, BR38, BR39).
+          Governs booking wizard lead times, party size restrictions, turnover durations, customer edit locks, and arrival grace periods.
         </p>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1.2rem;">
           <div class="field">
-            <label for="reservation_max_days_ahead" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Max Days Ahead (BR35)</label>
+            <label for="reservation_max_days_ahead" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Max Days Ahead</label>
             <input type="number" id="reservation_max_days_ahead" name="reservation_max_days_ahead" required min="1" max="365" value="{{ old('reservation_max_days_ahead', $settings['reservation_max_days_ahead'] ?? 60) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-max-days-ahead">
             <span style="font-size:.72rem; color:var(--cancelled);">Days into the future guests can reserve</span>
           </div>
 
           <div class="field">
-            <label for="reservation_min_lead_hours" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Min Lead Hours (BR35)</label>
+            <label for="reservation_min_lead_hours" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Min Lead Hours</label>
             <input type="number" id="reservation_min_lead_hours" name="reservation_min_lead_hours" required min="0" max="72" value="{{ old('reservation_min_lead_hours', $settings['reservation_min_lead_hours'] ?? 2) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-min-lead-hours">
             <span style="font-size:.72rem; color:var(--cancelled);">Minimum notice required before booking time</span>
           </div>
 
           <div class="field">
-            <label for="reservation_max_party_online" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Max Online Party Size (BR35)</label>
+            <label for="reservation_max_party_online" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Max Online Party Size</label>
             <input type="number" id="reservation_max_party_online" name="reservation_max_party_online" required min="1" max="50" value="{{ old('reservation_max_party_online', $settings['reservation_max_party_online'] ?? 10) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-max-party-online">
             <span style="font-size:.72rem; color:var(--cancelled);">Covers above this limit must book via phone</span>
           </div>
         </div>
 
-        <h3 style="font-size:.95rem; color:var(--ink); margin:1.4rem 0 .6rem 0;">Turnover Durations by Party Size (BR34)</h3>
+        <h3 style="font-size:.95rem; color:var(--ink); margin:1.4rem 0 .6rem 0;">Turnover Durations by Party Size</h3>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.2rem;">
           <div class="field">
             <label for="reservation_duration_1_2" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">1–2 Covers (Minutes)</label>
@@ -257,43 +257,43 @@
         <h3 style="font-size:.95rem; color:var(--ink); margin:1.4rem 0 .6rem 0;">Booking Lifecycle Timers &amp; Grace Windows</h3>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1.2rem;">
           <div class="field">
-            <label for="reservation_request_expiry_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Request Expiry (BR37)</label>
+            <label for="reservation_request_expiry_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Request Expiry</label>
             <input type="number" id="reservation_request_expiry_minutes" name="reservation_request_expiry_minutes" required min="10" max="720" value="{{ old('reservation_request_expiry_minutes', $settings['reservation_request_expiry_minutes'] ?? 60) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-request-expiry">
             <span style="font-size:.72rem; color:var(--cancelled);">Minutes before slot unreviewed requests expire</span>
           </div>
 
           <div class="field">
-            <label for="reservation_reminder_hours" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Reminder Email (FR75)</label>
+            <label for="reservation_reminder_hours" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Reminder Email</label>
             <input type="number" id="reservation_reminder_hours" name="reservation_reminder_hours" required min="1" max="168" value="{{ old('reservation_reminder_hours', $settings['reservation_reminder_hours'] ?? 24) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-reminder-hours">
             <span style="font-size:.72rem; color:var(--cancelled);">Hours prior to dispatch automated reminder</span>
           </div>
 
           <div class="field">
-            <label for="late_cancellation_hours" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Cancellation / Edit Lock (BR36, BR38)</label>
+            <label for="late_cancellation_hours" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Cancellation / Edit Lock</label>
             <input type="number" id="late_cancellation_hours" name="late_cancellation_hours" required min="0" max="48" value="{{ old('late_cancellation_hours', $settings['late_cancellation_hours'] ?? 2) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-late-cancel-hours">
             <span style="font-size:.72rem; color:var(--cancelled);">Hours before booking edits are locked</span>
           </div>
 
           <div class="field">
-            <label for="holder_unlock_before_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Customer Scan Grace (BR03)</label>
+            <label for="holder_unlock_before_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Customer Scan Grace</label>
             <input type="number" id="holder_unlock_before_minutes" name="holder_unlock_before_minutes" required min="0" max="120" value="{{ old('holder_unlock_before_minutes', $settings['holder_unlock_before_minutes'] ?? 15) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-holder-unlock">
             <span style="font-size:.72rem; color:var(--cancelled);">Minutes early customer QR scan seats table</span>
           </div>
 
           <div class="field">
-            <label for="reservation_grace_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Arrival Grace Period (BR39)</label>
+            <label for="reservation_grace_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Arrival Grace Period</label>
             <input type="number" id="reservation_grace_minutes" name="reservation_grace_minutes" required min="1" max="120" value="{{ old('reservation_grace_minutes', $settings['reservation_grace_minutes'] ?? 15) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-grace-minutes">
             <span style="font-size:.72rem; color:var(--cancelled);">Minutes after slot before no-show suggested</span>
           </div>
 
           <div class="field">
-            <label for="reserved_switch_before_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Table Sign Switch (BR04)</label>
+            <label for="reserved_switch_before_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Table Sign Switch</label>
             <input type="number" id="reserved_switch_before_minutes" name="reserved_switch_before_minutes" required min="1" max="180" value="{{ old('reserved_switch_before_minutes', $settings['reserved_switch_before_minutes'] ?? 30) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-reserved-switch">
             <span style="font-size:.72rem; color:var(--cancelled);">Minutes before slot table marked Reserved</span>
           </div>
 
           <div class="field">
-            <label for="unassigned_admin_alert_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Unassigned Alert (FR71)</label>
+            <label for="unassigned_admin_alert_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Unassigned Alert</label>
             <input type="number" id="unassigned_admin_alert_minutes" name="unassigned_admin_alert_minutes" required min="1" max="180" value="{{ old('unassigned_admin_alert_minutes', $settings['unassigned_admin_alert_minutes'] ?? 15) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-unassigned-alert">
             <span style="font-size:.72rem; color:var(--cancelled);">Minutes before slot unassigned booking alerts floor</span>
           </div>
@@ -304,60 +304,60 @@
       <div style="margin-bottom:2.2rem; padding-bottom:1.8rem; border-bottom:1px solid var(--line);">
         <h2 style="font-size:1.15rem; color:var(--ink); margin:0 0 .3rem 0;">4. Service, Stock &amp; Operational Timers</h2>
         <p style="font-size:.84rem; color:var(--cancelled); margin:0 0 1.2rem 0;">
-          Buffers for live QR ordering, kitchen/bar ETA calculations, waiter calling cooldowns, and trust badges (BR05, BR09, BR30, BR40, BR45, BR50, BR51).
+          Buffers for live QR ordering, kitchen/bar ETA calculations, waiter calling cooldowns, and trust badges.
         </p>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1.2rem;">
           <div class="field">
-            <label for="qr_stock_buffer_multiplier" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Stock Buffer Multiplier (BR09)</label>
+            <label for="qr_stock_buffer_multiplier" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Stock Buffer Multiplier</label>
             <input type="number" id="qr_stock_buffer_multiplier" name="qr_stock_buffer_multiplier" required min="1" max="50" value="{{ old('qr_stock_buffer_multiplier', $settings['qr_stock_buffer_multiplier'] ?? 5) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-stock-buffer">
             <span style="font-size:.72rem; color:var(--cancelled);">Safety stock buffer multiplier for QR checkout</span>
           </div>
 
           <div class="field">
-            <label for="table_idle_autoclear_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Table Idle Auto-Clear (BR05)</label>
+            <label for="table_idle_autoclear_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Table Idle Auto-Clear</label>
             <input type="number" id="table_idle_autoclear_minutes" name="table_idle_autoclear_minutes" required min="5" max="180" value="{{ old('table_idle_autoclear_minutes', $settings['table_idle_autoclear_minutes'] ?? 45) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-idle-autoclear">
             <span style="font-size:.72rem; color:var(--cancelled);">Minutes of inactivity before table reverts Available</span>
           </div>
 
           <div class="field">
-            <label for="avg_ticket_minutes_kitchen" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Kitchen Prep Baseline (BR30)</label>
+            <label for="avg_ticket_minutes_kitchen" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Kitchen Prep Baseline</label>
             <input type="number" id="avg_ticket_minutes_kitchen" name="avg_ticket_minutes_kitchen" required min="1" max="60" value="{{ old('avg_ticket_minutes_kitchen', $settings['avg_ticket_minutes_kitchen'] ?? 8) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-kitchen-eta">
             <span style="font-size:.72rem; color:var(--cancelled);">Base minutes per kitchen line for ETA calculation</span>
           </div>
 
           <div class="field">
-            <label for="avg_ticket_minutes_bar" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Bar Prep Baseline (BR30)</label>
+            <label for="avg_ticket_minutes_bar" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Bar Prep Baseline</label>
             <input type="number" id="avg_ticket_minutes_bar" name="avg_ticket_minutes_bar" required min="1" max="60" value="{{ old('avg_ticket_minutes_bar', $settings['avg_ticket_minutes_bar'] ?? 3) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-bar-eta">
             <span style="font-size:.72rem; color:var(--cancelled);">Base minutes per beverage ticket for ETA calculation</span>
           </div>
 
           <div class="field">
-            <label for="call_waiter_cooldown_seconds" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Call Waiter Cooldown (BR50)</label>
+            <label for="call_waiter_cooldown_seconds" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Call Waiter Cooldown</label>
             <input type="number" id="call_waiter_cooldown_seconds" name="call_waiter_cooldown_seconds" required min="10" max="600" value="{{ old('call_waiter_cooldown_seconds', $settings['call_waiter_cooldown_seconds'] ?? 120) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-call-waiter-cooldown">
             <span style="font-size:.72rem; color:var(--cancelled);">Seconds between waiter call button presses per table</span>
           </div>
 
           <div class="field">
-            <label for="staff_session_timeout_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Staff Inactivity Logout (BR51)</label>
+            <label for="staff_session_timeout_minutes" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Staff Inactivity Logout</label>
             <input type="number" id="staff_session_timeout_minutes" name="staff_session_timeout_minutes" required min="5" max="480" value="{{ old('staff_session_timeout_minutes', $settings['staff_session_timeout_minutes'] ?? 30) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-session-timeout">
             <span style="font-size:.72rem; color:var(--cancelled);">Minutes of idle staff session before re-authentication</span>
           </div>
 
           <div class="field">
-            <label for="regular_badge_visits" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Regular Trust Visits (BR40)</label>
+            <label for="regular_badge_visits" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Regular Trust Visits</label>
             <input type="number" id="regular_badge_visits" name="regular_badge_visits" required min="1" max="50" value="{{ old('regular_badge_visits', $settings['regular_badge_visits'] ?? 3) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-regular-visits">
             <span style="font-size:.72rem; color:var(--cancelled);">Completed visits required for Regular trust badge</span>
           </div>
 
           <div class="field">
-            <label for="no_show_expiry_months" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">No-Show Trust Window (BR40)</label>
+            <label for="no_show_expiry_months" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">No-Show Trust Window</label>
             <input type="number" id="no_show_expiry_months" name="no_show_expiry_months" required min="1" max="60" value="{{ old('no_show_expiry_months', $settings['no_show_expiry_months'] ?? 12) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-no-show-window">
             <span style="font-size:.72rem; color:var(--cancelled);">Months a no-show affects customer trust standing</span>
           </div>
 
           <div class="field">
-            <label for="public_rating_min_count" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Rating Card Min Reviews (BR45)</label>
+            <label for="public_rating_min_count" style="font-size:.82rem; font-weight:600; display:block; margin-bottom:.35rem;">Rating Card Min Reviews</label>
             <input type="number" id="public_rating_min_count" name="public_rating_min_count" required min="1" max="100" value="{{ old('public_rating_min_count', $settings['public_rating_min_count'] ?? 10) }}" style="width:100%; padding:.5rem .75rem; font-size:.88rem; border:1px solid var(--line); border-radius:6px;" data-testid="admin-setting-rating-min-count">
             <span style="font-size:.72rem; color:var(--cancelled);">Minimum verified reviews to display public score</span>
           </div>

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * BR57. FR35's own wording: outside table context, show
+ * the own wording: outside table context, show
  * "Scan the QR code on your table to order," don't just 403.
  */
 class EnsureTableContext

@@ -16,7 +16,7 @@ class CustomerController extends Controller
     ) {}
 
     /**
-     * FR103, UC38, S38: Searchable customer list with trust badges.
+     * Searchable customer list with trust badges.
      */
     public function index(Request $request): View
     {
@@ -49,7 +49,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * FR09, UC38, S38: View customer profile, trust breakdown and reservation history.
+     * View customer profile, trust breakdown, reservation history and order history.
      */
     public function show(Customer $customer): View
     {
@@ -61,10 +61,22 @@ class CustomerController extends Controller
             ->orderByDesc('booking_time')
             ->get();
 
+        $orders = $customer->orders()
+            ->with('restaurantTable')
+            ->withCount('items')
+            ->orderByDesc('placed_at')
+            ->get();
+
         return view('admin.customers.show', [
             'customer' => $customer,
             'profile' => $profile,
             'reservations' => $reservations,
+            'orders' => $orders,
+            'orderTotals' => [
+                'count' => $orders->count(),
+                'spend' => $orders->whereNotNull('paid_at')->sum('total_amount'),
+                'last' => $orders->first()?->placed_at,
+            ],
         ]);
     }
 }

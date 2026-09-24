@@ -13,12 +13,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
-/** BR30. Calculation (T071's original formula, relocated here) and staff adjustment (FR59). */
+/** Calculation (the original formula, relocated here) and staff adjustment. */
 class EtaService
 {
     public function __construct(private AuditLogger $auditLogger) {}
 
-    /** BR30: longest prep time at the station + orders ahead x avg minutes per order. */
+    /** longest prep time at the station + orders ahead x avg minutes per order. */
     public function estimate(Order $order, Collection $items, Destination $destination): ?Carbon
     {
         $lines = $items->filter(fn ($line) => $line->destination === $destination);
@@ -42,7 +42,7 @@ class EtaService
         return now()->addMinutes($longestPrep + $queueAhead * $avgMinutes);
     }
 
-    /** FR59: staff nudge a live ETA. Refused if this station has no ETA to adjust. */
+    /** staff nudge a live ETA. Refused if this station has no ETA to adjust. */
     public function adjust(Order $order, Destination $destination, int $minutes, Staff $actor): Order
     {
         $column = $destination === Destination::Kitchen ? 'kitchen_eta_at' : 'bar_eta_at';

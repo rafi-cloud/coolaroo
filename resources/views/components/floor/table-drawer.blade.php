@@ -1,6 +1,15 @@
 @props(['table', 'tables'])
 <details class="kds-drawer floor-table-drawer" data-testid="floor-table-drawer-{{ $table->table_id }}">
-  <summary>Manage</summary>
+  {{-- the drawer holds one action, and which one depends on the table --}}
+  <summary>
+    @if ($table->status === \App\Enums\TableStatus::Available)
+      Seat guests
+    @elseif ($table->status === \App\Enums\TableStatus::Occupied)
+      Clear table
+    @else
+      Table details
+    @endif
+  </summary>
 
   @if ($table->status === \App\Enums\TableStatus::Available)
     @php($candidates = $tables->where('status', \App\Enums\TableStatus::Available)->where('table_id', '!=', $table->table_id))

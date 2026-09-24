@@ -22,8 +22,7 @@ use Illuminate\Validation\ValidationException;
 use Stripe\Exception\ApiErrorException;
 
 /**
- * FR51 (request, T074) and FR52 (approve/reject/complete/retry, T075).
- * BR13, BR27, 5.5, 07.7.
+ * (request) and (approve/reject/complete/retry).
  */
 class RefundService
 {
@@ -146,7 +145,7 @@ class RefundService
     }
 
     /**
-     * The "Check refund status" half of BR25's own logic, for a refund left at
+     * The "Check refund status" half of the own logic, for a refund left at
      * processing because this app never saw the API result.
      */
     public function checkProcessing(Refund $refund, Staff $admin): Refund
@@ -191,7 +190,7 @@ class RefundService
         return $refund;
     }
 
-    /** 07.11: integration failures go to the integrations channel, not the request log. */
+    /** integration failures go to the integrations channel, not the request log. */
     private function markFailed(Refund $refund, string $message): Refund
     {
         $refund->status->ensureCanTransitionTo(RefundStatus::Failed);
@@ -207,8 +206,8 @@ class RefundService
     }
 
     /**
-     * 07.7: lock order → check total ≤ paid → refunded_qty, payment_status,
-     * optional stock return (BR13).
+     * lock order → check total ≤ paid → refunded_qty, payment_status,
+     * optional stock return.
      */
     private function complete(Refund $refund, Staff $admin): Refund
     {
@@ -251,7 +250,7 @@ class RefundService
         });
     }
 
-    /** 5.3: a line whose whole quantity is refunded is cancelled. BR13 gates the stock return. */
+    /** a line whose whole quantity is refunded is cancelled. gates the stock return. */
     private function applyToLine(Refund $refund, OrderItem $item): void
     {
         $item->forceFill(['refunded_qty' => $item->refunded_qty + $refund->quantity])->save();

@@ -11,7 +11,7 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-/** BR54, 07.8. Alerts the affected station and admin to resolve later (FR94). */
+/** Alerts the affected station and admin to resolve later. */
 class StockConflictDetected implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, QueuedBroadcast, SerializesModels;

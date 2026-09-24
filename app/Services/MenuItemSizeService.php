@@ -6,9 +6,6 @@ use App\Models\MenuItem;
 use App\Models\MenuItemSize;
 use Illuminate\Validation\ValidationException;
 
-/**
- * FR26, FR27.
- */
 class MenuItemSizeService
 {
     public function __construct(private AuditLogger $auditLogger) {}

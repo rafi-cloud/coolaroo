@@ -158,7 +158,7 @@
             {{-- Hidden Reason Alert --}}
             @if ($f->is_hidden)
               <div style="margin-top:.75rem; padding:.6rem .9rem; background:#FFFBEB; border-left:3px solid #F59E0B; border-radius:4px; font-size:.82rem; color:#92400E;" data-testid="admin-feedback-hidden-reason-{{ $f->order_id }}">
-                <strong>Moderation Reason (BR44):</strong> {{ $f->hidden_reason }}
+                <strong>Moderation Reason:</strong> {{ $f->hidden_reason }}
               </div>
             @endif
 
@@ -182,12 +182,12 @@
                 <form method="POST" action="{{ route('admin.feedback.feature', $f) }}" style="display:inline;">
                   @csrf
                   @method('PATCH')
-                  <button type="submit" class="btn btn-xs {{ $f->is_featured ? 'btn-outline' : 'btn-ghost' }}" data-testid="admin-feedback-feature-btn-{{ $f->order_id }}" title="{{ $f->is_featured ? 'Remove from homepage featured list' : 'Display this review in public homepage reviews section (BR45)' }}">
+                  <button type="submit" class="btn btn-xs {{ $f->is_featured ? 'btn-outline' : 'btn-ghost' }}" data-testid="admin-feedback-feature-btn-{{ $f->order_id }}" title="{{ $f->is_featured ? 'Remove from homepage featured list' : 'Display this review in public homepage reviews section' }}">
                     {{ $f->is_featured ? '★ Unfeature' : '☆ Feature on Home' }}
                   </button>
                 </form>
               @else
-                <button type="button" class="btn btn-xs btn-outline" disabled style="opacity:.45; cursor:not-allowed;" title="Hidden reviews cannot be featured on the homepage (BR45)" data-testid="admin-feedback-feature-disabled-{{ $f->order_id }}">
+                <button type="button" class="btn btn-xs btn-outline" disabled style="opacity:.45; cursor:not-allowed;" title="Hidden reviews cannot be featured on the homepage" data-testid="admin-feedback-feature-disabled-{{ $f->order_id }}">
                   ☆ Feature (Hidden)
                 </button>
               @endif
@@ -212,7 +212,7 @@
                       @method('PATCH')
                       <div class="field" style="margin-bottom:.75rem;">
                         <label for="hide-reason-{{ $f->order_id }}" style="font-size:.8rem; font-weight:600; display:block; margin-bottom:.3rem;">
-                          Mandatory Reason (BR44) <span style="color:var(--danger)">*</span>
+                          Mandatory Reason <span style="color:var(--danger)">*</span>
                         </label>
                         <input type="text" id="hide-reason-{{ $f->order_id }}" name="reason" required maxlength="255" placeholder="e.g. Offensive language, spam, or privacy violation" style="width:100%; padding:.45rem .6rem; font-size:.82rem; border:1px solid var(--line); border-radius:4px;" data-testid="admin-feedback-hide-reason-input-{{ $f->order_id }}">
                       </div>
@@ -236,7 +236,7 @@
                     @csrf
                     <div class="field" style="margin-bottom:.75rem;">
                       <label for="reply-text-{{ $f->order_id }}" style="font-size:.8rem; font-weight:600; display:block; margin-bottom:.3rem;">
-                        Management Response (FR77)
+                        Management Response
                       </label>
                       <textarea id="reply-text-{{ $f->order_id }}" name="reply" rows="4" required maxlength="1000" placeholder="Thank the guest or address their concerns..." style="width:100%; padding:.5rem; font-size:.85rem; border:1px solid var(--line); border-radius:4px;" data-testid="admin-feedback-reply-textarea-{{ $f->order_id }}">{{ old('reply', $f->admin_reply) }}</textarea>
                       <div style="font-size:.72rem; color:var(--cancelled); margin-top:.2rem;">Maximum 1,000 characters. Visible to the public.</div>

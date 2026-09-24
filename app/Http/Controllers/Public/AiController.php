@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * FR43, FR44, UC09, BR47–BR49. Public on purpose — BR49: "available to
+ * Public on purpose — "available to
  * everyone including visitors, with no app rate limit", so there is no
  * auth middleware and deliberately no throttle on these routes.
  */

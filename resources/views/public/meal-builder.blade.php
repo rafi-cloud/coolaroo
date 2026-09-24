@@ -32,8 +32,8 @@
             <legend>Dietary needs</legend>
             <div class="mb-tags">
               @foreach ($dietaryTags as $tag)
-                <label class="mb-tag" for="mb-diet-{{ $tag->tag_id }}">
-                  <input type="checkbox" id="mb-diet-{{ $tag->tag_id }}" name="dietary[]" value="{{ $tag->tag_name }}" data-testid="meal-builder-diet-{{ $tag->tag_id }}">
+                <label class="mb-tag" for="mb-diet-{{ $tag->dietary_tag_id }}">
+                  <input type="checkbox" id="mb-diet-{{ $tag->dietary_tag_id }}" name="dietary[]" value="{{ $tag->tag_name }}" data-testid="meal-builder-diet-{{ $tag->dietary_tag_id }}">
                   {{ $tag->tag_name }}
                 </label>
               @endforeach
@@ -56,8 +56,6 @@
       <p class="mb-note" data-testid="meal-builder-disclaimer">{{ \App\Services\AiMenuService::ALLERGEN_DISCLAIMER }}</p>
     </div>
   </section>
-
-  <x-chat />
 
   @push('scripts')
   <script>
@@ -191,7 +189,7 @@
         submit.disabled = false;
 
         if (!data.suggestions || data.suggestions.length === 0) {
-          say(data.summary || 'We could not find a meal that fits. Try a larger budget or fewer restrictions.');
+          say("We could not put a meal together from today’s menu. Try a larger budget, or fewer dietary filters.");
           return;
         }
 

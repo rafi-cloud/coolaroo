@@ -8,7 +8,7 @@ use App\Models\Staff;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * FR91, FR96, FR97, FR98, BR49, BR58: Settings management, cache, typed getters,
+ * Settings management, cache, typed getters,
  * venue details, and operational switches.
  */
 class SettingService
@@ -83,7 +83,7 @@ class SettingService
     }
 
     /**
-     * FR91: Bulk update settings with change detection, audit logging, and switch broadcasting.
+     * Bulk update settings with change detection, audit logging, and switch broadcasting.
      *
      * @param  array<string, mixed>  $values
      * @return list<string> list of updated setting keys
@@ -131,7 +131,7 @@ class SettingService
     }
 
     /**
-     * FR96, FR97, FR98, BR58, BR49: Toggle an operational switch.
+     * Toggle an operational switch.
      */
     public function toggleSwitch(string $key, Staff $admin): bool
     {
@@ -167,7 +167,7 @@ class SettingService
     }
 
     /**
-     * Venue information bundle for header, footer, AI, emails (FR91).
+     * Venue information bundle for header, footer, AI, emails.
      *
      * @return array<string, mixed>
      */

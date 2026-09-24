@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 /**
- * FR63, FR68, S27, S28: Staff Floor Reservations Board & Review.
+ * Staff Floor Reservations Board & Review.
  */
 class ReservationController extends Controller
 {
@@ -78,7 +78,7 @@ class ReservationController extends Controller
             $reservation->assigned_tables = $activeVisits->map(fn ($v) => $v->restaurantTable)->filter();
             $reservation->is_unassigned = $activeVisits->isEmpty();
 
-            // FR68: unassigned bookings inside T-30 highlighted
+            // unassigned bookings inside T-30 highlighted
             $bookedAt = $this->reservationService->bookedAt($reservation);
             $insideT30 = now()->betweenIncluded(
                 $bookedAt->copy()->subMinutes(30),
@@ -90,7 +90,7 @@ class ReservationController extends Controller
                 && $insideT30
                 && in_array($reservation->status, [ReservationStatus::Confirmed, ReservationStatus::Requested], true);
 
-            // BR39: grace elapsed check
+            // grace elapsed check
             $graceMinutes = (int) (Setting::find('reservation_grace_minutes')?->setting_value ?? 15);
             $graceCutoff = $bookedAt->copy()->addMinutes($graceMinutes);
             $reservation->is_grace_elapsed = $reservation->status === ReservationStatus::Confirmed && now()->gte($graceCutoff);

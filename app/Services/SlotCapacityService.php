@@ -6,9 +6,6 @@ use App\Models\SlotCapacity;
 use App\Models\Staff;
 use Illuminate\Validation\ValidationException;
 
-/**
- * FR100.
- */
 class SlotCapacityService
 {
     public function __construct(private AuditLogger $auditLogger) {}

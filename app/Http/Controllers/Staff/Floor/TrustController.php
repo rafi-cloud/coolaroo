@@ -8,7 +8,7 @@ use App\Services\TrustService;
 use Illuminate\Http\JsonResponse;
 
 /**
- * FR09: View Customer Trust Profile.
+ * View Customer Trust Profile.
  */
 class TrustController extends Controller
 {

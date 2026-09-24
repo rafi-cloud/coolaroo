@@ -78,7 +78,7 @@
         </div>
       @endif
 
-      {{-- FR34: Nutrition Information --}}
+      {{-- Nutrition Information --}}
       @if($hasNutrition)
         <div class="item-modal-nutrition" data-testid="item-modal-nutrition-{{ $item->item_id }}">
           <h4>Nutrition (per serve)</h4>
@@ -161,7 +161,7 @@
         >
       @endif
 
-      {{-- Add-on Groups (BR16) --}}
+      {{-- Add-on Groups --}}
       @if($item->addOnGroups->isNotEmpty())
         <div class="item-modal-add-ons" data-testid="item-modal-add-ons-{{ $item->item_id }}">
           @foreach($item->addOnGroups as $group)
@@ -267,13 +267,13 @@
           <div class="modal-state-notice no-table" data-testid="item-modal-no-table-{{ $item->item_id }}">
             <div class="notice-body">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-              <p>Scan the QR code on your table to order (BR57).</p>
+              <p>Scan the QR code on your table to order.</p>
             </div>
             <button type="button" class="btn btn-ghost" data-close-modal="item-modal-{{ $item->item_id }}">Close</button>
           </div>
         @elseif(! $qrOrderingEnabled)
           <div class="modal-state-notice paused" data-testid="item-modal-paused-{{ $item->item_id }}">
-            <p><strong>Ordering paused</strong> &mdash; Online ordering is temporarily paused by staff (BR58).</p>
+            <p><strong>Ordering paused</strong> &mdash; Online ordering is temporarily paused by staff.</p>
             <button type="button" class="btn btn-ghost" data-close-modal="item-modal-{{ $item->item_id }}">Close</button>
           </div>
         @else

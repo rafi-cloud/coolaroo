@@ -29,8 +29,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR62, FR63, FR66, FR67, BR31-BR38, BR41, BR42, BR58, BR64.
- * Core reservation service for requesting, approving, declining, cancelling,
+ * * Core reservation service for requesting, approving, declining, cancelling,
  * and updating reservations with concurrency locks and state machine enforcement.
  */
 class ReservationService
@@ -42,7 +41,7 @@ class ReservationService
     ) {}
 
     /**
-     * FR62, BR31, BR35, BR42, BR58: Customer submits a reservation request.
+     * Customer submits a reservation request.
      * Status starts at requested; slot capacity is checked; unique reference code generated.
      */
     public function request(Customer $customer, array $data): Reservation
@@ -170,7 +169,7 @@ class ReservationService
     }
 
     /**
-     * FR64, BR31, BR33, BR58: Staff creates a phone booking.
+     * Staff creates a phone booking.
      * Confirmed immediately; allowed even when online reservations paused.
      */
     public function createPhoneBooking(Staff $staff, array $data): Reservation
@@ -266,7 +265,7 @@ class ReservationService
     }
 
     /**
-     * FR63, BR31, BR33: Staff approves a reservation request.
+     * Staff approves a reservation request.
      * Checks slot capacity, transitions requested -> confirmed, records reviewer and timestamp.
      */
     public function approve(Reservation $reservation, Staff $staff): Reservation
@@ -303,7 +302,7 @@ class ReservationService
     }
 
     /**
-     * FR63: Staff declines a reservation request with optional reason.
+     * Staff declines a reservation request with optional reason.
      * Transitions requested -> declined, unlinks any tables, records reviewer.
      */
     public function decline(Reservation $reservation, Staff $staff, ?string $reason = null): Reservation
@@ -333,7 +332,7 @@ class ReservationService
     }
 
     /**
-     * FR67, BR38, BR64: Customer cancels their reservation.
+     * Customer cancels their reservation.
      * Flags late cancellation if within 2 hours of booking time; unlinks tables.
      */
     public function cancelByCustomer(Reservation $reservation, Customer $customer): Reservation
@@ -371,7 +370,7 @@ class ReservationService
     }
 
     /**
-     * FR67, BR38, BR64: Staff cancels a reservation.
+     * Staff cancels a reservation.
      * Records late cancellation if within 2 hours; unlinks tables.
      */
     public function cancelByStaff(Reservation $reservation, Staff $staff, ?string $reason = null): Reservation
@@ -404,7 +403,7 @@ class ReservationService
     }
 
     /**
-     * FR66, BR36, BR38, BR64: Customer or Staff updates a reservation.
+     * Customer or Staff updates a reservation.
      * For customer: changes to date, time or party return booking to requested and unlink tables,
      * and are locked within 2 hours of booking. Notes stay editable anytime.
      * For staff: can always edit date/time/party/notes.
@@ -551,13 +550,13 @@ class ReservationService
                     }
                 }
 
-                // If customer made core change to confirmed booking, return to requested (BR36)
+                // If customer made core change to confirmed booking, return to requested
                 if ($actor instanceof Customer && $locked->status === ReservationStatus::Confirmed) {
                     $locked->status->ensureCanTransitionTo(ReservationStatus::Requested);
                     $locked->forceFill(['status' => ReservationStatus::Requested]);
                 }
 
-                // Unlink tables on core change (BR36, BR64)
+                // Unlink tables on core change
                 $this->unlinkTables($locked, VisitCloseReason::Unassigned);
 
                 $locked->booking_date = $newDate->toDateString();
@@ -579,7 +578,7 @@ class ReservationService
     }
 
     /**
-     * BR37, 5.8: Expire an unreviewed reservation request.
+     * Expire an unreviewed reservation request.
      */
     public function expire(Reservation $reservation): Reservation
     {
@@ -605,7 +604,7 @@ class ReservationService
     }
 
     /**
-     * FR65, FR95, BR04, BR07, BR33, BR64: Assign or reassign tables to a reservation.
+     * Assign or reassign tables to a reservation.
      * Checks active tables, total seats >= party_size, no overlapping reservation windows.
      * If assigned inside T-30, transitions Available tables to Reserved with place-sign alert.
      *
@@ -631,7 +630,7 @@ class ReservationService
                 ]);
             }
 
-            // BR07: Inactive tables cannot be assigned
+            // Inactive tables cannot be assigned
             foreach ($tables as $table) {
                 if (! $table->is_active) {
                     throw ValidationException::withMessages([
@@ -640,7 +639,7 @@ class ReservationService
                 }
             }
 
-            // BR33: Seats >= party size
+            // Seats >= party size
             $totalSeats = $tables->sum('seat_capacity');
             if ($totalSeats < $lockedRes->party_size) {
                 throw ValidationException::withMessages([
@@ -648,7 +647,7 @@ class ReservationService
                 ]);
             }
 
-            // BR33: Overlap check per table
+            // Overlap check per table
             $start1 = $this->bookedAt($lockedRes);
             $duration1 = $this->availability->getDurationMinutes($lockedRes->party_size);
             $end1 = $start1->copy()->addMinutes($duration1);
@@ -681,10 +680,10 @@ class ReservationService
                 }
             }
 
-            // Unassign any previously assigned tables first (reassignment per FR95, BR64)
+            // Unassign any previously assigned tables first (reassignment)
             $this->unlinkTables($lockedRes, VisitCloseReason::Unassigned);
 
-            // Check if inside T-30 window (BR04)
+            // Check if inside T-30 window
             $isToday = $lockedRes->booking_date->isToday();
             $insideT30 = $isToday && now()->betweenIncluded(
                 $start1->copy()->subMinutes(30),
@@ -697,7 +696,7 @@ class ReservationService
                 $visit = $table->visits()->create([
                     'reservation_id' => $lockedRes->reservation_id,
                     'guest_count' => $lockedRes->party_size,
-                    'opened_at' => null, // BR04: opened_at NULL until occupied
+                    'opened_at' => null, // opened_at stays NULL until the table is occupied
                 ]);
                 $visits->push($visit);
 
@@ -718,7 +717,7 @@ class ReservationService
     }
 
     /**
-     * FR95, BR64: Unassign all tables linked to a reservation.
+     * Unassign all tables linked to a reservation.
      * Closes visit rows with close_reason = unassigned; returns Reserved tables to Available.
      */
     public function unassignTables(Reservation $reservation, ?Staff $staff = null): void
@@ -733,7 +732,7 @@ class ReservationService
     }
 
     /**
-     * BR64: Unassigning tables closes their open visit rows with given reason;
+     * Unassigning tables closes their open visit rows with given reason;
      * a table Reserved for that booking returns to Available.
      */
     public function unlinkTables(Reservation $reservation, VisitCloseReason $reason): void
@@ -756,7 +755,7 @@ class ReservationService
         }
     }
 
-    /** BR36: Customer date/time/party edits locked within 2 hours of booking time. */
+    /** Customer date/time/party edits locked within 2 hours of booking time. */
     public function isLockedForCustomer(Reservation $reservation): bool
     {
         return now()->greaterThanOrEqualTo(
@@ -764,7 +763,7 @@ class ReservationService
         );
     }
 
-    /** BR38: Cancellation < 2 hours before booking is recorded as late. */
+    /** Cancellation < 2 hours before booking is recorded as late. */
     public function isLateCancellation(Reservation $reservation): bool
     {
         return now()->greaterThanOrEqualTo(
@@ -796,7 +795,7 @@ class ReservationService
         return Carbon::parse($dateStr.' '.$timeStr);
     }
 
-    /** 06.4.16: the visit row is the only link between a table and a reservation. */
+    /** 16: the visit row is the only link between a table and a reservation. */
     public function assignedReservation(RestaurantTable $table): ?Reservation
     {
         return $table->visits()
@@ -806,7 +805,7 @@ class ReservationService
             ->first()?->reservation;
     }
 
-    /** BR02, BR03: the holder, inside [booking - unlock, booking + grace]. */
+    /** the holder, inside [booking - unlock, booking + grace]. */
     public function isHolderWithinWindow(Reservation $reservation, ?Customer $customer): bool
     {
         if ($customer === null || $reservation->customer_id !== $customer->customer_id) {
@@ -828,7 +827,7 @@ class ReservationService
     }
 
     /**
-     * FR69, BR03, BR04: Staff seats a reservation.
+     * Staff seats a reservation.
      * Opens all assigned visit rows and transitions linked tables to Occupied.
      */
     public function seatReservation(Reservation $reservation, ?Staff $staff = null): Reservation
@@ -876,7 +875,7 @@ class ReservationService
     }
 
     /**
-     * FR70, BR39: Staff marks a reservation as no-show after grace period expires.
+     * Staff marks a reservation as no-show after grace period expires.
      * Transitions reservation to NoShow, records staff and timestamp, closes visits with reason no_show,
      * and returns Reserved tables to Available.
      */
@@ -911,7 +910,7 @@ class ReservationService
     }
 
     /**
-     * FR10: Clear no-show flag on a reservation.
+     * Clear no-show flag on a reservation.
      * Records admin, reason and timestamp; audits action; recalculates trust badge on read.
      */
     public function clearNoShow(Reservation $reservation, Staff $admin, string $reason): Reservation
@@ -943,7 +942,7 @@ class ReservationService
         });
     }
 
-    /** BR04, FR69: reuse the assigned-but-unopened visits; open them and occupy all linked tables. */
+    /** reuse the assigned-but-unopened visits; open them and occupy all linked tables. */
     public function seatOnHolderScan(RestaurantTable $table, Reservation $reservation): Visit
     {
         return DB::transaction(function () use ($table, $reservation) {
@@ -994,7 +993,7 @@ class ReservationService
         });
     }
 
-    /** BR41: 'Jane D' — never the full surname. */
+    /** 'Jane D' — never the full surname. */
     public function holderDisplayName(Reservation $reservation): string
     {
         $name = trim($reservation->customer?->full_name ?? $reservation->guest_name ?? '');
@@ -1010,7 +1009,7 @@ class ReservationService
     }
 
     /**
-     * FR75: Send reservation reminder email (default 24 hours before booking).
+     * Send reservation reminder email (default 24 hours before booking).
      */
     public function sendReminder(Reservation $reservation): bool
     {
@@ -1030,7 +1029,7 @@ class ReservationService
     }
 
     /**
-     * BR37, FR71, 07.10: Expire every request still unreviewed inside the
+     * Expire every request still unreviewed inside the
      * expiry window before its booking time. Past-dated requests go too —
      * nobody is reviewing yesterday's.
      */
@@ -1056,7 +1055,7 @@ class ReservationService
     }
 
     /**
-     * FR75, 07.10: Queue the reminder for every confirmed booking now inside
+     * Queue the reminder for every confirmed booking now inside
      * the reminder window. `sendReminder()` owns the once-only rule.
      */
     public function sendDueReminders(): int
@@ -1084,7 +1083,7 @@ class ReservationService
     }
 
     /**
-     * BR04, FR71, 07.10: At T-30 an assigned table goes Reserved with a
+     * At T-30 an assigned table goes Reserved with a
      * place-sign alert; a table still occupied raises the warning instead, and
      * a booking with no table at all raises the unassigned alert — once for the
      * floor at T-30, again for admin at T-15.
@@ -1149,7 +1148,7 @@ class ReservationService
     }
 
     /**
-     * FR70, BR39, 07.10: Past grace and not seated — the system suggests, and
+     * Past grace and not seated — the system suggests, and
      * stops there. The status stays confirmed until a staff member confirms
      * the no-show through markNoShow().
      */
@@ -1195,7 +1194,7 @@ class ReservationService
     }
 
     /**
-     * FR74, FR75, NFR15: Queue transactional email to reservation holder.
+     * Queue transactional email to reservation holder.
      */
     private function queueMail(Reservation $reservation, QueuedMailable $mailable): void
     {

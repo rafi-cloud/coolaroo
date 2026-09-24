@@ -5,9 +5,6 @@ namespace App\Services;
 use App\Models\Staff;
 use Illuminate\Validation\ValidationException;
 
-/**
- * FR02, FR08, BR60, BR62.
- */
 class StaffAccountService
 {
     public function __construct(private AuditLogger $auditLogger) {}

@@ -5,7 +5,7 @@ namespace App\Http\Requests\Public;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * FR44, BR49. Open to everyone including visitors; `ai_enabled` is the gate
+ * Open to everyone including visitors; `ai_enabled` is the gate
  * and the controller checks it.
  */
 class AiMealBuilderRequest extends FormRequest

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Staff\Floor;
 
+use App\Enums\OrderStatus;
 use App\Enums\PaymentAttemptStatus;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
@@ -15,9 +16,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR49, BR22, BR23, BR54. UC20 step 5's "Confirm" action — everything
+ * The "Confirm" action of the cash payment flow — everything
  * before it (open the item, see the amount, enter received) is
- * <x-floor.cash-modal>'s job once T090/T091 give it a page to live on.
+ * the cash modal's job.
  */
 class CashPaymentController extends Controller
 {
@@ -27,13 +28,21 @@ class CashPaymentController extends Controller
     {
         Gate::authorize('recordPayment', Order::class);
 
+        abort_unless($order->status === OrderStatus::PendingPayment, 404, 'This order is not awaiting payment.');
+
         $payment = $order->payments()
             ->where('method', PaymentMethod::Cash)
             ->where('status', PaymentAttemptStatus::Pending)
             ->latest('payment_id')
             ->first();
 
-        abort_if($payment === null, 404, 'No pending cash payment for this order.');
+        // FR49 is a create for staff. The customer may have pressed "Cash" and
+        // left a pending row, but a staff-taken order never has one, so the
+        // waiter opens the attempt here rather than being turned away.
+        $payment ??= $order->payments()->create([
+            'method' => PaymentMethod::Cash,
+            'amount' => $order->total_amount,
+        ]);
 
         $adjustmentAmount = (float) ($request->validated('adjustment_amount') ?? 0);
         $amountDue = $this->cash->amountDue($order, $adjustmentAmount);

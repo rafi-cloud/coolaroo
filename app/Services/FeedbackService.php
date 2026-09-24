@@ -10,10 +10,10 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
 /**
- * FR76: Customer feedback submit (BR43).
- * FR77: View and reply to feedback (BR44).
- * FR78: Hide abusive feedback with mandatory reason (BR44).
- * FR79: Feature review on public site (BR45, UC34).
+ * Customer feedback submit.
+ * View and reply to feedback.
+ * Hide abusive feedback with mandatory reason.
+ * Feature review on public site.
  */
 class FeedbackService
 {
@@ -22,7 +22,7 @@ class FeedbackService
     ) {}
 
     /**
-     * BR43: one feedback per served, paid QR order. Ownership, served status and
+     * one feedback per served, paid QR order. Ownership, served status and
      * staff-taken exclusion are FeedbackPolicy::create()'s job, checked before
      * this runs; "not already submitted" is checked here instead, since it needs
      * a query the policy deliberately avoids.
@@ -45,7 +45,7 @@ class FeedbackService
     }
 
     /**
-     * FR77: Paginated feedback list for admin moderation.
+     * Paginated feedback list for admin moderation.
      *
      * @param  array{status?: string, rating?: int|string, search?: string}  $filters
      */
@@ -107,8 +107,8 @@ class FeedbackService
     }
 
     /**
-     * FR77: Reply to feedback.
-     * Admin cannot edit customer rating or comment (BR44).
+     * Reply to feedback.
+     * Admin cannot edit customer rating or comment.
      */
     public function reply(Feedback $feedback, Staff $admin, string $reply): Feedback
     {
@@ -126,8 +126,8 @@ class FeedbackService
     }
 
     /**
-     * FR78, BR44: Hide abusive feedback with mandatory reason.
-     * Hidden feedback is excluded from public averages and cannot be featured (BR45, UC34).
+     * Hide abusive feedback with mandatory reason.
+     * Hidden feedback is excluded from public averages and cannot be featured.
      */
     public function hide(Feedback $feedback, Staff $admin, string $reason): Feedback
     {
@@ -150,7 +150,7 @@ class FeedbackService
     }
 
     /**
-     * FR78: Unhide feedback.
+     * Unhide feedback.
      */
     public function unhide(Feedback $feedback, Staff $admin): Feedback
     {
@@ -165,8 +165,8 @@ class FeedbackService
     }
 
     /**
-     * FR79, BR45: Feature review on public site.
-     * Hidden feedback cannot be featured (UC34).
+     * Feature review on public site.
+     * Hidden feedback cannot be featured.
      */
     public function feature(Feedback $feedback, Staff $admin): Feedback
     {
@@ -186,7 +186,7 @@ class FeedbackService
     }
 
     /**
-     * FR79: Unfeature review.
+     * Unfeature review.
      */
     public function unfeature(Feedback $feedback, Staff $admin): Feedback
     {

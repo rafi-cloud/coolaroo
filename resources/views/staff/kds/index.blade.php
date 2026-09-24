@@ -65,7 +65,7 @@
             </span>
             @php($eta = $destination === \App\Enums\Destination::Kitchen ? $order->kitchen_eta_at : $order->bar_eta_at)
             @if ($eta)
-              <span class="muted">ETA @auDateTime($eta)</span>
+              <span class="muted">ETA @auTime($eta)</span>
             @endif
           </div>
         </header>
@@ -79,6 +79,22 @@
         <ul class="kds-lines">
           @foreach ($order->items as $line)
             <li>
+              @if ($line->status === \App\Enums\OrderItemStatus::Preparing)
+                <form method="POST" action="{{ route('staff.kds.line.ready', $line) }}" class="kds-line-tick">
+                  @csrf
+                  <input type="checkbox" id="line-ready-{{ $line->order_item_id }}" data-line-ready
+                         data-testid="kds-line-tick-{{ $line->order_item_id }}">
+                  <label class="sr-only" for="line-ready-{{ $line->order_item_id }}">
+                    Mark {{ $line->item_name }} ready
+                  </label>
+                  <button type="submit" class="sr-only">Mark ready</button>
+                </form>
+              @elseif (in_array($line->status, [\App\Enums\OrderItemStatus::Ready, \App\Enums\OrderItemStatus::Served], true))
+                <span class="kds-line-tick is-done" aria-hidden="true">&check;</span>
+              @else
+                <span class="kds-line-tick is-empty" aria-hidden="true"></span>
+              @endif
+
               <span class="kds-qty">{{ $line->quantity }}&times;</span>
               <span class="kds-item">
                 {{ $line->item_name }}
@@ -109,11 +125,16 @@
           @if ($lineStatuses->contains('preparing'))
             <form method="POST" action="{{ route('staff.kds.ready', [$order, $destination->value]) }}">
               @csrf
-              <button type="submit" class="btn btn-solid" data-testid="kds-ready-{{ $order->order_id }}">Ready</button>
+              <button type="submit" class="btn btn-solid" data-testid="kds-ready-{{ $order->order_id }}">
+                All ready
+              </button>
             </form>
           @endif
 
-          @if ($eta)
+          @php($stillCooking = $lineStatuses->contains('pending') || $lineStatuses->contains('preparing'))
+
+          {{-- Nothing left to cook at this station means nothing left to estimate. --}}
+          @if ($eta && $stillCooking)
             <form method="POST" action="{{ route('staff.kds.eta', [$order, $destination->value]) }}" class="kds-eta-form">
               @csrf
               @method('PATCH')

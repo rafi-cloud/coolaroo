@@ -16,17 +16,14 @@ use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-        //
-    }
+    public function register(): void {}
 
     public function boot(): void
     {
         Paginator::defaultView('components.pagination');
         Paginator::defaultSimpleView('components.pagination-simple');
 
-        // NFR01, T218: https for every generated URL, including Vite assets and
+        // https for every generated URL, including Vite assets and
         // the Reverb endpoint, once the app is served over TLS (10.2 step 7).
         if (config('app.force_https')) {
             URL::forceScheme('https');
@@ -58,6 +55,10 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::directive('auDateTime', function ($expression) {
             return "<?php echo \App\Support\AustralianDate::dateTime({$expression}); ?>";
+        });
+
+        Blade::directive('auTime', function ($expression) {
+            return "<?php echo \App\Support\AustralianDate::time({$expression}); ?>";
         });
     }
 }

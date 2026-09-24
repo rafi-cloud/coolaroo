@@ -25,8 +25,8 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * FR55, 07.7, BR01, BR10, BR25, BR30, BR54. Shared by Stripe (T070) and cash
- * (T072) — both create a Payment row and hand it here; this class builds
+ * Shared by Stripe and cash
+ * — both create a Payment row and hand it here; this class builds
  * the transaction itself.
  */
 class PaymentService
@@ -39,7 +39,7 @@ class PaymentService
         private EtaService $eta,
     ) {}
 
-    /** BR25: the one place any caller (customer or staff, T073) turns a retrieved session into "paid" or not. */
+    /** the one place any caller (customer or staff) turns a retrieved session into "paid" or not. */
     public function verifyStripePayment(Payment $payment, Staff|Customer|null $actor = null): bool
     {
         $session = $this->stripe->retrieveSession($payment->stripe_session_id);
@@ -54,11 +54,11 @@ class PaymentService
     }
 
     /**
-     * BR25, FR47, 07.10. The reconcile job's half of "no webhooks": every
+     * The reconcile job's half of "no webhooks": every
      * pending Stripe attempt is re-read from Stripe, so a customer who paid
      * and then closed the tab still reaches the kitchen. An attempt Stripe
      * has expired is closed off locally — the order itself stays
-     * pending_payment until the closing-time cleanup (BR26).
+     * pending_payment until the closing-time cleanup.
      *
      * @return array{checked:int, paid:int, expired:int, failed:int}
      */
@@ -158,7 +158,7 @@ class PaymentService
         });
     }
 
-    /** BR09/BR10/BR54: exact deduction, flagged (never blocked) on conflict. */
+    /** exact deduction, flagged (never blocked) on conflict. */
     private function deductStock(Order $order, Collection $items): void
     {
         $quantityByItem = [];
@@ -190,7 +190,7 @@ class PaymentService
         }
     }
 
-    /** BR01, 06.4.16: opened_by_staff_id stays NULL — no staff is present for a QR payment. */
+    /** 16: opened_by_staff_id stays NULL — no staff is present for a QR payment. */
     private function openVisit(RestaurantTable $table): Visit
     {
         $visit = Visit::where('table_id', $table->table_id)->whereNull('closed_at')->first();

@@ -8,7 +8,6 @@ use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 class AuthenticatedStaffController extends Controller
@@ -32,9 +31,7 @@ class AuthenticatedStaffController extends Controller
 
         $this->auditLogger->log($staff, 'login', $staff);
 
-        $landingScreen = $staff->role->landing_screen;
-
-        return redirect()->to(Route::has($landingScreen) ? route($landingScreen) : '/');
+        return redirect()->to($staff->role->landingUrl());
     }
 
     public function destroy(Request $request): RedirectResponse

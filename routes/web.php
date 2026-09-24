@@ -41,6 +41,7 @@ use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\LegalController;
 use App\Http\Controllers\Public\MealBuilderController;
 use App\Http\Controllers\Public\MenuController;
+use App\Http\Controllers\Public\ReviewController;
 use App\Http\Controllers\Public\TableScanController;
 use App\Http\Controllers\Public\WaiterCallController;
 use App\Http\Controllers\Staff\Auth\AuthenticatedStaffController;
@@ -61,6 +62,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
 Route::get('/reservations/availability', [PublicAvailabilityController::class, 'index'])->name('reservations.availability');
+Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 Route::get('/privacy', [LegalController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [LegalController::class, 'terms'])->name('terms');
 
@@ -150,7 +152,7 @@ Route::middleware(['auth:staff', 'staff.session'])->group(function () {
     Route::get('/staff/profile', [StaffProfileController::class, 'edit'])->name('staff.profile.edit');
     Route::patch('/staff/profile', [StaffProfileController::class, 'update'])->name('staff.profile.update');
 
-    // No role: restriction — FR51's actor list (Waitstaff, Kitchen, Bar, Admin)
+    // No role: restriction — the actor list (Waitstaff, Kitchen, Bar, Admin)
     // is enforced by OrderPolicy::requestRefund() itself, not route middleware.
     Route::post('/staff/orders/{order}/refund-requests', [RefundRequestController::class, 'store'])->name('staff.orders.refund-requests.store');
 });
@@ -182,9 +184,12 @@ Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:waitsta
 Route::prefix('staff')->middleware(['auth:staff', 'staff.session', 'role:kitchen,bar'])->group(function () {
     Route::post('/orders/{order}/stock-conflict/resolve', [StaffOrderActionsController::class, 'resolveConflict'])->name('staff.orders.stock-conflict.resolve');
 
+    Route::get('/kds/kitchen', [StationController::class, 'index'])->defaults('destination', 'kitchen')->name('staff.kds.kitchen');
+    Route::get('/kds/bar', [StationController::class, 'index'])->defaults('destination', 'bar')->name('staff.kds.bar');
     Route::get('/kds/{destination}', [StationController::class, 'index'])->name('staff.kds.index');
     Route::get('/kds/{destination}/state', [StationController::class, 'state'])->name('staff.kds.state');
     Route::post('/kds/orders/{order}/{destination}/start', [StationController::class, 'start'])->name('staff.kds.start');
+    Route::post('/kds/lines/{line}/ready', [StationController::class, 'readyLine'])->name('staff.kds.line.ready');
     Route::post('/kds/orders/{order}/{destination}/ready', [StationController::class, 'ready'])->name('staff.kds.ready');
     Route::patch('/kds/orders/{order}/{destination}/eta', [StationController::class, 'adjustEta'])->name('staff.kds.eta');
     Route::patch('/menu-items/{menuItem}/availability', [AvailabilityController::class, 'toggleMenuItem'])->name('staff.menu-items.availability');

@@ -6,12 +6,9 @@ use App\Models\MenuItem;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 
-/**
- * FR30, BR09-BR14, BR54.
- */
 class StockService
 {
-    /** BR09's buffer. Public since T140: the dashboard's low-stock widget measures against it (08.5). */
+    /** the buffer. Public since the dashboard's low-stock widget measures against it. */
     public function bufferMultiplier(): int
     {
         return (int) (Setting::find('qr_stock_buffer_multiplier')?->setting_value ?? 5);
@@ -65,7 +62,7 @@ class StockService
 
     /**
      * Atomically increments sold_today only if it stays within daily_limit.
-     * Returns false (not an exception — BR54) if it would be exceeded.
+     * Returns false (not an exception —) if it would be exceeded.
      */
     public function deduct(MenuItem $item, int $quantity): bool
     {

@@ -33,7 +33,7 @@ class OrderPolicy
         return in_array($staff->role->role_name, ['waitstaff', 'kitchen', 'bar'], true);
     }
 
-    /** FR58: a station may only move its own lines. Admin passes via Gate::before. */
+    /** a station may only move its own lines. Admin passes via Gate::before. */
     public function updateStation(Staff $staff, Destination $destination): bool
     {
         return $staff->role->role_name === $destination->value;

@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
- * 07.4, 07.9. GitHub Models' OpenAI-compatible chat completions endpoint.
- * chat() is the client (T120); buildContext() is the live menu/venue
- * context (T121, BR46); the system prompts, structured output schemas and
- * guardrails are T122 (BR47, BR48). The /ai/chat and meal-builder endpoints
- * that call chat() with them (T127, T128) are separate tasks.
+ * GitHub Models' OpenAI-compatible chat completions endpoint.
+ * chat() is the client; buildContext() is the live menu/venue
+ * context; the system prompts, structured output schemas and
+ * guardrails are The /ai/chat and meal-builder endpoints
+ * that call chat() with them are separate tasks.
  */
 class AiMenuService
 {
@@ -27,14 +27,14 @@ class AiMenuService
     ) {}
 
     /**
-     * BR49: a missing key, a timeout, a 429, a 5xx, or any other failure all
+     * a missing key, a timeout, a 429, a 5xx, or any other failure all
      * surface to the caller as the same AiUnavailableException — the real
-     * cause is logged to the `integrations` channel (07.11) here, once, so
+     * cause is logged to the `integrations` channel here, once, so
      * nothing downstream needs to know GitHub Models' error shape.
      *
      * @param  array<int, array{role:string, content:string}>  $messages
      * @param  array<string, mixed>|null  $responseFormat  Passed through as
-     *                                                     `response_format` (OpenAI-compatible structured output) — T122
+     *                                                     `response_format` (OpenAI-compatible structured output) —
      *                                                     fills this in; optional here.
      * @return array<string, mixed> Decoded chat completion response body.
      */
@@ -78,10 +78,10 @@ class AiMenuService
     }
 
     /**
-     * BR46: currently available items, sizes, options, prices, allergens,
+     * currently available items, sizes, options, prices, allergens,
      * nutrition, plus venue name, address and hours. No customer personal
      * data. `is_active && is_available` is the same "show this" signal the
-     * public menu (T033) already uses — not StockService's stricter,
+     * public menu already uses — not StockService's stricter,
      * buffered QR-checkout check, a different question.
      *
      * @return array<string, mixed>
@@ -120,9 +120,9 @@ class AiMenuService
     private const HISTORY_TURNS = 6;
 
     /**
-     * FR43: one question, one answer. The ids the model names are resolved
+     * one question, one answer. The ids the model names are resolved
      * against the same context it was given, so an invented id simply
-     * disappears (BR47).
+     * disappears.
      *
      * @param  array<int, array{role:string, content:string}>  $history
      * @return array{answer:string, items:array<int,array<string,mixed>>, usage:array{tokens_in:int, tokens_out:int}}
@@ -150,7 +150,7 @@ class AiMenuService
     }
 
     /**
-     * FR44, BR47. The model picks ids; every price, line total and meal
+     * The model picks ids; every price, line total and meal
      * total below is calculated here from the live menu. A suggestion is
      * returned only if the whole basket is orderable as it stands and
      * still fits the budget once we have priced it ourselves.
@@ -248,7 +248,7 @@ class AiMenuService
 
     /**
      * The keys `item_id`, `size_id`, `add_on_option_ids` and `quantity` are
-     * exactly what `AddCartLineRequest` expects, so T124's Add to cart can
+     * exactly what `AddCartLineRequest` expects, so the Add to cart can
      * post a line back unchanged.
      *
      * @param  array<string, mixed>  $line
@@ -303,7 +303,7 @@ class AiMenuService
     }
 
     /**
-     * BR47 drops an id that does not belong to the item; a group left
+     * drops an id that does not belong to the item; a group left
      * outside its min/max by that drop makes the whole line unorderable,
      * because `AddCartLineRequest` would reject it too. Null says so.
      *
@@ -337,7 +337,7 @@ class AiMenuService
     /**
      * The provider returns the structured output as a JSON string inside
      * the message content. Anything that is not decodable JSON is a failed
-     * request like any other (BR49) — same log channel, same exception.
+     * request like any other — same log channel, same exception.
      *
      * @param  array<string, mixed>  $response
      * @return array<string, mixed>
@@ -357,7 +357,7 @@ class AiMenuService
     }
 
     /**
-     * 06.4.24's `tokens_in`/`tokens_out` — the provider's own measured
+     * 24's `tokens_in`/`tokens_out` — the provider's own measured
      * counts, not an estimate.
      *
      * @param  array<string, mixed>  $response
@@ -372,7 +372,7 @@ class AiMenuService
     }
 
     /**
-     * BR47: drop any id that is not in the live context.
+     * drop any id that is not in the live context.
      *
      * @param  array<int, mixed>  $itemIds
      * @param  array<string, mixed>  $context
@@ -403,17 +403,17 @@ class AiMenuService
     }
 
     /**
-     * BR48: the fixed allergy disclaimer. The app owns this wording (it
-     * matches the menu page's, FR33) and the model is told not to write its
+     * the fixed allergy disclaimer. The app owns this wording (it
+     * matches the menu page's) and the model is told not to write its
      * own — generated safety text would not be fixed text.
      */
     public const ALLERGEN_DISCLAIMER = 'Allergen labels reflect the tags stored for each dish and its add-on options. Our kitchen handles nuts, seafood, gluten and dairy, and cross-contact may occur, so please tell our staff about any serious allergy before ordering.';
 
-    /** BR48: the fixed decline used whenever the model flags a question off-topic. */
+    /** the fixed decline used whenever the model flags a question off-topic. */
     public const OFF_TOPIC_REPLY = 'I can only help with the Coolaroo menu — dishes, prices, dietary and allergen tags, and our address and hours.';
 
     /**
-     * System prompt for the chat widget (S17, FR43).
+     * System prompt for the chat widget.
      *
      * @param  array<string, mixed>|null  $context  Pass an already-built
      *                                              context to avoid a second set of queries.
@@ -428,7 +428,7 @@ class AiMenuService
     }
 
     /**
-     * System prompt for the meal builder (S16, FR44). BR47: the model picks
+     * System prompt for the meal builder. the model picks
      * IDs, the server prices them — the prompt never asks for a number.
      *
      * @param  array<string, mixed>|null  $context
@@ -437,6 +437,8 @@ class AiMenuService
     {
         return $this->basePrompt(<<<'TASK'
             The guest gives a budget, a party size, dietary needs and preferences.
+            A dietary need is met only when the dish's diet list contains that exact
+            tag; never infer it from the dish name or ingredients.
             Offer one to three complete suggestions that fit, each with a short
             title, one sentence saying why it fits, and the exact lines to order:
             item_id, size_id, the option_ids of any add-ons you choose, and qty.
@@ -448,7 +450,7 @@ class AiMenuService
     }
 
     /**
-     * BR47/07.9: OpenAI-compatible structured output for a chat answer.
+     * OpenAI-compatible structured output for a chat answer.
      * Strict mode needs every property required and additionalProperties
      * false, so an empty array carries the "none" case rather than an
      * absent key.
@@ -480,8 +482,8 @@ class AiMenuService
     }
 
     /**
-     * BR47: suggestions carry IDs and quantities only — no price, subtotal
-     * or total field exists for the model to fill, because T128 calculates
+     * suggestions carry IDs and quantities only — no price, subtotal
+     * or total field exists for the model to fill, because calculates
      * every total from the live menu.
      *
      * @return array<string, mixed>
@@ -535,7 +537,7 @@ class AiMenuService
     }
 
     /**
-     * BR48: a flagged off-topic question is declined in this app's fixed
+     * a flagged off-topic question is declined in this app's fixed
      * words, not the model's, and anything it referenced is dropped. Shared
      * by both response shapes.
      *
@@ -564,7 +566,7 @@ class AiMenuService
     }
 
     /**
-     * BR47, BR48. The shared guardrails plus the live context; the task
+     * The shared guardrails plus the live context; the task
      * paragraph is all that differs between the two assistants.
      *
      * @param  array<string, mixed>|null  $context
